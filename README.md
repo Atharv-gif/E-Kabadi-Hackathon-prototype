@@ -931,48 +931,6 @@ into a single user experience.
 
 ---
 
-# 📸 Screenshots
-
-> Add your final application screenshots here before the hackathon submission.
-
-Recommended structure:
-
-```markdown
-## 📱 Application Preview
-
-| Citizen Dashboard | Scrap Detection |
-|:---:|:---:|
-| ![Citizen Dashboard](assets/images/citizen_dashboard.png) | ![Scrap Detection](assets/images/scrap_detection.png) |
-
-| Collector Dashboard | Pickup Tracking |
-|:---:|:---:|
-| ![Collector Dashboard](assets/images/collector_dashboard.png) | ![Pickup Tracking](assets/images/pickup_tracking.png) |
-```
-
-Replace the filenames with the **actual filenames inside `assets/images/`**.
-
----
-
-# 🎥 Demo
-
-If you have a demo video, add it here:
-
-```markdown
-## 🎥 Demo
-
-[▶️ Watch E-Kabadi Demo](YOUR_VIDEO_LINK)
-```
-
-You can use:
-
-* YouTube
-* Google Drive
-* Loom
-* GitHub-hosted video
-* Any public demo URL
-
----
-
 # 📊 Project Highlights
 
 | Area                    | Implementation          |
@@ -1027,9 +985,7 @@ Then open a Pull Request.
 
 # 📜 License
 
-This project is currently a **hackathon prototype**.
-
-If you intend to open-source the project for public reuse, add an appropriate license such as MIT after confirming the team's preferred licensing terms.
+This project is currently a **hackathon prototype of WeDev**.
 
 ---
 
@@ -1039,6 +995,7 @@ If you intend to open-source the project for public reuse, add an appropriate li
 
 ## 🚀 Team WeDev
 
+<b>Bhavya Bothera, Atharv Giri, Rehan Memom</b>
 <b>Building technology for a cleaner and smarter future.</b>
 
 <br><br>
@@ -1050,8 +1007,6 @@ If you intend to open-source the project for public reuse, add an appropriate li
 ---
 
 # 🏁 Hackathon Submission
-
-### Project Name
 
 # ♻️ E-Kabadi
 
