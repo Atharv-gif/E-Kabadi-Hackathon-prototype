@@ -1,29 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
 import '../../../providers/pickup_provider.dart';
 
-class ScrapVerificationScreen extends ConsumerWidget {
+class ScrapVerificationScreen extends ConsumerStatefulWidget {
   const ScrapVerificationScreen({super.key});
 
-  void _onConfirmPayment(BuildContext context, WidgetRef ref) async {
+  @override
+  ConsumerState<ScrapVerificationScreen> createState() => _ScrapVerificationScreenState();
+}
+
+class _ScrapVerificationScreenState extends ConsumerState<ScrapVerificationScreen> {
+  bool _confirming = false;
+
+  Future<void> _onConfirmPayment() async {
+    setState(() => _confirming = true);
     await ref.read(pickupProvider.notifier).completePickupAndPay(4.6, 118.0);
-    if (context.mounted) {
+    if (mounted) {
       context.push('/citizen/payment-receipt');
     }
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(title: 'Doorstep Scrap Verification'),
       body: SafeArea(
+        bottom: false,
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -33,116 +44,147 @@ class ScrapVerificationScreen extends ConsumerWidget {
                 'Collector Verified Breakdown',
                 style: AppTypography.titleLarge,
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: AppSpacing.xs),
               Text(
-                'Collector Ramesh verified material quality and weighed scrap using digital scales.',
-                style: AppTypography.bodyMedium,
+                'Collector Ramesh verified material quality and weighed your scrap on a digital scale.',
+                style: AppTypography.bodyMedium.copyWith(height: 1.5),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.xxl),
 
-              // Side-by-side Comparison Card
+              // ── AI vs Verified comparison ──
               CustomCard(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(AppSpacing.xl),
                 child: Row(
                   children: [
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('AI Estimate', style: AppTypography.bodySmall),
+                          Row(
+                            children: [
+                              const Icon(LucideIcons.sparkles, size: 14, color: AppColors.textMuted),
+                              const SizedBox(width: 4),
+                              Text('AI Estimate', style: AppTypography.bodySmall),
+                            ],
+                          ),
                           const SizedBox(height: 4),
-                          Text('₹118.00', style: AppTypography.titleMedium.copyWith(color: AppColors.textMuted)),
+                          Text('\u20B9118.00', style: AppTypography.titleMedium.copyWith(color: AppColors.textMuted)),
                           const SizedBox(height: 2),
                           Text('Est. 4.6 kg', style: AppTypography.bodySmall),
                         ],
                       ),
                     ),
-                    Container(height: 50, width: 1, color: AppColors.border),
+                    Container(height: 56, width: 1, color: AppColors.border),
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 16),
+                        padding: const EdgeInsets.only(left: AppSpacing.lg),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Verified Final', style: AppTypography.labelSmall.copyWith(color: AppColors.primary)),
+                            Row(
+                              children: [
+                                const Icon(LucideIcons.badgeCheck, size: 14, color: AppColors.primary),
+                                const SizedBox(width: 4),
+                                Text('Verified Final', style: AppTypography.labelSmall.copyWith(color: AppColors.primary, fontSize: 10)),
+                              ],
+                            ),
                             const SizedBox(height: 4),
                             Text(
-                              '₹118.00',
-                              style: AppTypography.displayMedium.copyWith(fontSize: 24, color: AppColors.primary),
+                              '\u20B9118.00',
+                              style: AppTypography.displayMedium.copyWith(fontSize: 26, color: AppColors.primary),
                             ),
                             const SizedBox(height: 2),
-                            Text('Actual 4.6 kg', style: AppTypography.titleSmall),
+                            Text('Actual 4.6 kg', style: AppTypography.titleSmall.copyWith(fontSize: 13)),
                           ],
                         ),
                       ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 24),
+              ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.05, end: 0),
+              const SizedBox(height: AppSpacing.xxl),
 
               Text('Verified Itemized List', style: AppTypography.titleMedium),
-              const SizedBox(height: 12),
-
+              const SizedBox(height: AppSpacing.md),
               CustomCard(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 child: Column(
                   children: [
+                    _itemRow('PET Plastic Bottles', '1.4 kg @ \u20B950/kg', '\u20B970.00'),
+                    const Divider(height: AppSpacing.xl),
+                    _itemRow('Cardboard Boxes', '3.2 kg @ \u20B915/kg', '\u20B948.00'),
+                    const Divider(height: AppSpacing.xl),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('PET Plastic Bottles (1.4 kg @ ₹50/kg)', style: AppTypography.bodyMedium),
-                        Text('₹70.00', style: AppTypography.titleSmall),
-                      ],
-                    ),
-                    const Divider(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Cardboard Boxes (3.2 kg @ ₹15/kg)', style: AppTypography.bodyMedium),
-                        Text('₹48.00', style: AppTypography.titleSmall),
+                        Text('Total', style: AppTypography.titleSmall),
+                        Text(
+                          '\u20B9118.00',
+                          style: AppTypography.titleMedium.copyWith(color: AppColors.primaryDark),
+                        ),
                       ],
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.xl),
 
-              // Eco Points Notification Box
+              // ── Eco points banner ──
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 decoration: BoxDecoration(
                   color: AppColors.rewardOrangeLight,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.rewardOrange.withValues(alpha: 0.5)),
+                  borderRadius: AppRadius.rLg,
+                  border: Border.all(color: AppColors.rewardOrange.withValues(alpha: 0.4)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(LucideIcons.award, color: AppColors.rewardOrange, size: 28),
-                    const SizedBox(width: 14),
+                    const Icon(LucideIcons.award, color: AppColors.rewardOrange, size: 26),
+                    const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('+20 Eco Points Reward', style: AppTypography.titleSmall.copyWith(color: AppColors.rewardOrange)),
-                          Text('You will earn 20 Eco Points upon payment completion.', style: AppTypography.bodySmall),
+                          Text(
+                            'You will earn 20 Eco Points once payment completes.',
+                            style: AppTypography.bodySmall,
+                          ),
                         ],
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppSpacing.xxxl),
 
               CustomButton(
                 text: 'Accept Amount & Receive Payment',
-                onPressed: () => _onConfirmPayment(context, ref),
+                onPressed: _confirming ? null : _onConfirmPayment,
+                isLoading: _confirming,
                 icon: LucideIcons.wallet,
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _itemRow(String label, String detail, String amount) {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: AppTypography.bodyMedium.copyWith(color: AppColors.textPrimary)),
+              Text(detail, style: AppTypography.bodySmall),
+            ],
+          ),
+        ),
+        Text(amount, style: AppTypography.titleSmall),
+      ],
     );
   }
 }

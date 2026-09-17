@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../../core/theme/app_spacing.dart';
 import '../../shared/widgets/custom_button.dart';
 
 class OnboardingSlide {
@@ -11,12 +12,14 @@ class OnboardingSlide {
   final String description;
   final IconData icon;
   final Color accentColor;
+  final Color accentLight;
 
   OnboardingSlide({
     required this.title,
     required this.description,
     required this.icon,
     required this.accentColor,
+    required this.accentLight,
   });
 }
 
@@ -37,25 +40,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       description: 'No more waiting for unorganized collectors. Connect instantly with verified scrap collectors in your locality.',
       icon: LucideIcons.smartphone,
       accentColor: AppColors.primary,
+      accentLight: AppColors.primaryLight,
     ),
     OnboardingSlide(
       title: 'AI identifies & estimates your scrap',
       description: 'Snap a picture and let our smart AI categorize materials, estimate weight, and provide transparent price ranges.',
       icon: LucideIcons.scanLine,
       accentColor: AppColors.techBlue,
+      accentLight: AppColors.techBlueLight,
     ),
     OnboardingSlide(
       title: 'Track pickup. Get paid. Earn rewards.',
       description: 'Real-time collector tracking, instant digital UPI payment at your doorstep, plus Eco Points for saving the planet.',
       icon: LucideIcons.award,
       accentColor: AppColors.rewardOrange,
+      accentLight: AppColors.rewardOrangeLight,
     ),
   ];
 
   void _next() {
     if (_currentIndex < _slides.length - 1) {
       _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
+        duration: AppDurations.normal,
         curve: Curves.easeInOut,
       );
     } else {
@@ -65,131 +71,103 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final slide = _slides[_currentIndex];
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             children: [
-              // Top Bar Skip
+              // Top bar: brand chip + skip
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryLight,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(LucideIcons.recycle, size: 20, color: AppColors.primary),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'E-Kabaadi',
-                        style: AppTypography.titleMedium.copyWith(color: AppColors.primaryDark),
-                      ),
-                    ],
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryLight,
+                      borderRadius: AppRadius.rSm,
+                    ),
+                    child: const Icon(LucideIcons.recycle, size: 20, color: AppColors.primary),
                   ),
                   TextButton(
                     onPressed: () => context.go('/login'),
                     child: Text(
                       'Skip',
-                      style: AppTypography.labelLarge.copyWith(color: AppColors.textMuted),
+                      style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-
-              // PageView Content
               Expanded(
                 child: PageView.builder(
                   controller: _pageController,
-                  onPageChanged: (idx) {
-                    setState(() {
-                      _currentIndex = idx;
-                    });
-                  },
                   itemCount: _slides.length,
+                  onPageChanged: (i) => setState(() => _currentIndex = i),
                   itemBuilder: (context, index) {
-                    final slide = _slides[index];
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 180,
-                          height: 180,
-                          decoration: BoxDecoration(
-                            color: slide.accentColor.withValues(alpha: 0.12),
-                            shape: BoxShape.circle,
+                    final s = _slides[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 190,
+                            height: 190,
+                            decoration: BoxDecoration(
+                              color: s.accentLight,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(s.icon, size: 84, color: s.accentColor),
+                          )
+                              .animate(delay: 100.ms)
+                              .scale(duration: 500.ms, curve: Curves.easeOutBack),
+                          const SizedBox(height: AppSpacing.huge),
+                          Text(
+                            s.title,
+                            style: AppTypography.displayMedium.copyWith(fontSize: 26, height: 1.25),
+                            textAlign: TextAlign.center,
                           ),
-                          child: Icon(
-                            slide.icon,
-                            size: 90,
-                            color: slide.accentColor,
-                          ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
-                        ),
-                        const SizedBox(height: 40),
-                        Text(
-                          slide.title,
-                          style: AppTypography.displayMedium.copyWith(fontSize: 24),
-                          textAlign: TextAlign.center,
-                        ).animate().fadeIn().slideY(begin: 0.2, end: 0),
-                        const SizedBox(height: 14),
-                        Text(
-                          slide.description,
-                          style: AppTypography.bodyLarge,
-                          textAlign: TextAlign.center,
-                        ).animate().fadeIn(delay: 200.ms),
-                      ],
+                          const SizedBox(height: AppSpacing.lg),
+                          Text(
+                            s.description,
+                            style: AppTypography.bodyLarge.copyWith(height: 1.55),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
                     );
                   },
                 ),
               ),
 
-              // Dots indicator
+              // Progress dots
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  _slides.length,
-                  (index) => AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
+                children: List.generate(_slides.length, (i) {
+                  final active = i == _currentIndex;
+                  return AnimatedContainer(
+                    duration: AppDurations.normal,
+                    curve: Curves.easeInOut,
                     margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: _currentIndex == index ? 24 : 8,
+                    width: active ? 26 : 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: _currentIndex == index
-                          ? AppColors.primary
-                          : AppColors.border,
-                      borderRadius: BorderRadius.circular(4),
+                      color: active ? slide.accentColor : AppColors.borderStrong,
+                      borderRadius: AppRadius.rPill,
                     ),
-                  ),
-                ),
+                  );
+                }),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppSpacing.xxl),
 
-              // Bottom Buttons
               CustomButton(
-                text: _currentIndex == _slides.length - 1 ? 'Get Started' : 'Continue',
+                text: _currentIndex == _slides.length - 1 ? 'Get Started' : 'Next',
                 onPressed: _next,
-                icon: LucideIcons.arrowRight,
+                icon: _currentIndex == _slides.length - 1 ? LucideIcons.arrowRight : null,
               ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Already have an account? ', style: AppTypography.bodyMedium),
-                  GestureDetector(
-                    onTap: () => context.go('/login'),
-                    child: Text(
-                      'Log in',
-                      style: AppTypography.titleSmall.copyWith(color: AppColors.primary),
-                    ),
-                  ),
-                ],
-              ),
+              const SizedBox(height: AppSpacing.md),
             ],
           ),
         ),

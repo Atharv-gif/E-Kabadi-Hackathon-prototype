@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/app_shadows.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
@@ -17,109 +20,137 @@ class CollectorArrivalScreen extends ConsumerWidget {
     final pickupState = ref.watch(pickupProvider);
     final active = pickupState.activePickup;
     final otpCode = active?.otpCode ?? '4829';
+    final collectorName = active?.collectorName ?? 'Ramesh Kumar';
 
     return Scaffold(
       appBar: const CustomAppBar(title: 'Collector Arrived'),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
+        bottom: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
           child: Column(
             children: [
+              const SizedBox(height: AppSpacing.lg),
               Container(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(22),
                 decoration: const BoxDecoration(
                   color: AppColors.primaryLight,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(LucideIcons.truck, size: 64, color: AppColors.primary),
+                child: const Icon(LucideIcons.truck, size: 56, color: AppColors.primary),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.xl),
               Text(
                 'Your collector has arrived!',
                 style: AppTypography.displayMedium.copyWith(fontSize: 24),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
               Text(
-                'Verify the collector identity & share the OTP before handing over scrap.',
-                style: AppTypography.bodyLarge,
+                'Verify the collector\u2019s identity and share the OTP before handing over your scrap.',
+                style: AppTypography.bodyLarge.copyWith(height: 1.5),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppSpacing.xxl),
 
-              // Collector Verification Card
+              // ── Collector identity card ──
               CustomCard(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 child: Row(
                   children: [
                     CircleAvatar(
-                      radius: 30,
+                      radius: 28,
                       backgroundColor: AppColors.primaryDark,
                       child: Text('RK', style: AppTypography.titleLarge.copyWith(color: AppColors.surface)),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: AppSpacing.lg),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
-                              Text('Ramesh Kumar', style: AppTypography.titleMedium),
+                              Flexible(
+                                child: Text(collectorName, style: AppTypography.titleMedium, overflow: TextOverflow.ellipsis),
+                              ),
                               const SizedBox(width: 6),
-                              const Icon(LucideIcons.badgeCheck, size: 18, color: AppColors.techBlue),
+                              const Icon(LucideIcons.badgeCheck, size: 17, color: AppColors.techBlue),
                             ],
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 2),
                           Text('ID: COL-EK-892', style: AppTypography.bodySmall),
-                          Text('Verified E-Kabaadi Partner', style: AppTypography.labelSmall.copyWith(color: AppColors.primary)),
+                          Text(
+                            'Verified E-Kabaadi Partner',
+                            style: AppTypography.labelSmall.copyWith(color: AppColors.primary, fontSize: 10),
+                          ),
                         ],
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: AppSpacing.xxl),
 
-              // Share OTP Code Box
+              // ── OTP share box ──
               Container(
-                padding: const EdgeInsets.all(20),
+                width: double.infinity,
+                padding: const EdgeInsets.all(AppSpacing.xxl),
                 decoration: BoxDecoration(
                   color: AppColors.surfaceVariant,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.primary, width: 2),
+                  borderRadius: AppRadius.rXl,
+                  border: Border.all(color: AppColors.primary, width: 1.5),
                 ),
                 child: Column(
                   children: [
-                    Text('Share Verification OTP', style: AppTypography.titleSmall),
-                    const SizedBox(height: 8),
+                    Text(
+                      'SHARE THIS CODE WITH COLLECTOR',
+                      style: AppTypography.labelSmall.copyWith(color: AppColors.textSecondary, fontSize: 10, letterSpacing: 1),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: otpCode.split('').map((digit) {
-                        return Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 6),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.border),
-                          ),
-                          child: Text(
-                            digit,
-                            style: AppTypography.displayMedium.copyWith(color: AppColors.primary),
-                          ),
+                      children: otpCode
+                          .split('')
+                          .map((digit) => Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 6),
+                                width: 52,
+                                height: 62,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: AppColors.surface,
+                                  borderRadius: AppRadius.rMd,
+                                  border: Border.all(color: AppColors.borderStrong),
+                                  boxShadow: AppShadows.card,
+                                ),
+                                child: Text(
+                                  digit,
+                                  style: AppTypography.displayMedium.copyWith(fontSize: 26, color: AppColors.primaryDark),
+                                ),
+                              ))
+                          .toList(),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    TextButton.icon(
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: otpCode));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('OTP copied to clipboard')),
                         );
-                      }).toList(),
+                      },
+                      icon: const Icon(LucideIcons.copy, size: 16, color: AppColors.primary),
+                      label: Text('Copy Code', style: AppTypography.labelLarge.copyWith(color: AppColors.primary, fontSize: 13)),
                     ),
                   ],
                 ),
               ),
-              const Spacer(),
+              const SizedBox(height: AppSpacing.xxl),
 
               CustomButton(
-                text: 'Verify Scrap & Calculate Price',
+                text: 'Continue to Scrap Verification',
                 onPressed: () => context.push('/citizen/scrap-verification'),
                 icon: LucideIcons.scale,
               ),
+              const SizedBox(height: AppSpacing.lg),
             ],
           ),
         ),

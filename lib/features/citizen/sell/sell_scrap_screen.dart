@@ -4,16 +4,17 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
+import '../../../shared/widgets/common.dart';
 import '../../../providers/scrap_provider.dart';
 
 class SellScrapScreen extends ConsumerWidget {
   const SellScrapScreen({super.key});
 
   void _startAiScan(BuildContext context, WidgetRef ref) async {
-    // Start scan and navigate to AI analysis screen
     await ref.read(scrapScanProvider.notifier).analyzeImage('assets/images/img 1.png');
     if (context.mounted) {
       context.push('/citizen/ai-analysis');
@@ -27,8 +28,9 @@ class SellScrapScreen extends ConsumerWidget {
     return Scaffold(
       appBar: const CustomAppBar(title: 'Sell Your Scrap', showBack: false),
       body: SafeArea(
+        bottom: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 110),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -36,40 +38,45 @@ class SellScrapScreen extends ConsumerWidget {
                 'Upload a Photo & Let AI Identify',
                 style: AppTypography.titleLarge,
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: AppSpacing.xs),
               Text(
-                'Our computer vision AI will scan materials, estimate weight, and calculate approximate market value.',
-                style: AppTypography.bodyMedium,
+                'Our AI detects the material type; you confirm the approximate weight. Final amount is calculated after collector verification.',
+                style: AppTypography.bodyMedium.copyWith(height: 1.5),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.xl),
 
-              // Camera Upload Hero Box
-              CustomCard(
-                padding: const EdgeInsets.all(24),
-                color: AppColors.primaryLight.withValues(alpha: 0.5),
-                border: Border.all(color: AppColors.primary, width: 2),
+              // ── Premium upload zone ──
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(AppSpacing.xxl),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryLight.withValues(alpha: 0.4),
+                  borderRadius: AppRadius.rXl,
+                  border: Border.all(color: AppColors.primaryMedium, width: 1.5),
+                ),
                 child: Column(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(18),
                       decoration: const BoxDecoration(
                         color: AppColors.primary,
                         shape: BoxShape.circle,
+                        boxShadow: [BoxShadow(color: Color(0x3315803D), blurRadius: 20, offset: Offset(0, 8))],
                       ),
-                      child: const Icon(LucideIcons.camera, size: 40, color: AppColors.surface),
+                      child: const Icon(LucideIcons.scanLine, size: 36, color: AppColors.surface),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.lg),
                     Text(
                       'Scan Scrap with AI Camera',
                       style: AppTypography.titleMedium,
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: AppSpacing.xs),
                     Text(
-                      'Supports Plastic, Paper, Metals, E-Waste & Appliances',
+                      'Plastic • Paper • Metal • E-Waste • Appliances',
                       style: AppTypography.bodySmall,
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: AppSpacing.xl),
                     Row(
                       children: [
                         Expanded(
@@ -79,7 +86,7 @@ class SellScrapScreen extends ConsumerWidget {
                             icon: LucideIcons.camera,
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppSpacing.md),
                         Expanded(
                           child: CustomButton(
                             text: 'From Gallery',
@@ -93,12 +100,11 @@ class SellScrapScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: AppSpacing.xxxl),
 
-              // Category Rates Grid
-              Text('Live Scrap Rates', style: AppTypography.titleMedium),
-              const SizedBox(height: 12),
-
+              // ── Live rates ──
+              const SectionHeader(title: 'Live Scrap Rates'),
+              const SizedBox(height: AppSpacing.md),
               categoriesAsync.when(
                 data: (categories) => GridView.builder(
                   shrinkWrap: true,
@@ -107,7 +113,7 @@ class SellScrapScreen extends ConsumerWidget {
                     crossAxisCount: 2,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
-                    childAspectRatio: 1.35,
+                    childAspectRatio: 1.45,
                   ),
                   itemCount: categories.length,
                   itemBuilder: (context, index) {
@@ -129,15 +135,20 @@ class SellScrapScreen extends ConsumerWidget {
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
                                   color: AppColors.primaryLight,
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: AppRadius.rSm,
                                 ),
-                                child: const Icon(LucideIcons.package, size: 20, color: AppColors.primary),
+                                child: const Icon(LucideIcons.package, size: 18, color: AppColors.primary),
                               ),
-                              const Icon(LucideIcons.chevronRight, size: 18, color: AppColors.textMuted),
+                              const Icon(LucideIcons.chevronRight, size: 16, color: AppColors.textMuted),
                             ],
                           ),
                           const Spacer(),
-                          Text(cat.category, style: AppTypography.titleSmall),
+                          Text(
+                            cat.category,
+                            style: AppTypography.titleSmall,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                           const SizedBox(height: 2),
                           Text(
                             cat.priceRange,
@@ -148,12 +159,45 @@ class SellScrapScreen extends ConsumerWidget {
                     );
                   },
                 ),
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (err, stack) => Text('Error loading categories: $err'),
+                loading: () => GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 1.45,
+                  children: List.generate(6, (_) => const _RateCardSkeleton()),
+                ),
+                error: (err, stack) => ErrorView(
+                  message: 'Could not load today\u2019s scrap rates.',
+                  onRetry: () => ref.invalidate(categoryPricesProvider),
+                ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _RateCardSkeleton extends StatelessWidget {
+  const _RateCardSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomCard(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          SkeletonBox(width: 36, height: 36, radius: 10),
+          Spacer(),
+          SkeletonBox(width: 90, height: 14, radius: 6),
+          SizedBox(height: 8),
+          SkeletonBox(width: 64, height: 11, radius: 6),
+        ],
       ),
     );
   }

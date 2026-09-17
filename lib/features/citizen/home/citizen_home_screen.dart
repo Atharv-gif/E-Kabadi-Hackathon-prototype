@@ -6,305 +6,349 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/app_shadows.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
+import '../../../shared/widgets/common.dart';
+import '../../../shared/widgets/metric_card.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/pickup_provider.dart';
+import '../../../models/pickup_request_model.dart';
 
 class CitizenHomeScreen extends ConsumerWidget {
   const CitizenHomeScreen({super.key});
+
+  String _statusLine(PickupStatus? status) {
+    switch (status) {
+      case PickupStatus.pending:
+      case PickupStatus.accepted:
+        return 'Finding a collector for you';
+      case PickupStatus.onTheWay:
+        return 'Collector is on the way';
+      case PickupStatus.arrived:
+        return 'Collector has arrived';
+      case PickupStatus.verified:
+        return 'Scrap verified';
+      case PickupStatus.completed:
+        return 'Pickup completed';
+      default:
+        return 'Pickup in progress';
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
     final pickupState = ref.watch(pickupProvider);
     final userName = authState.user?.name ?? 'Aarav Sharma';
+    final active = pickupState.activePickup;
+    final hasActive = active != null &&
+        active.status != PickupStatus.completed &&
+        active.status != PickupStatus.cancelled;
 
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
+        bottom: false,
+        child: RefreshIndicator(
+          color: AppColors.primary,
+          backgroundColor: AppColors.surface,
+          onRefresh: () async {
+            await ref.read(pickupProvider.notifier).loadPickups();
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 110),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Header ──
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Good morning,',
+                            style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            userName.split(' ').first,
+                            style: AppTypography.displayMedium.copyWith(fontSize: 26),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Stack(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.surface,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: AppColors.border),
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Notifications view open')),
+                              );
+                            },
+                            icon: const Icon(LucideIcons.bell, size: 22, color: AppColors.textPrimary),
+                          ),
+                        ),
+                        Positioned(
+                          right: 10,
+                          top: 10,
+                          child: Container(
+                            width: 9,
+                            height: 9,
+                            decoration: BoxDecoration(
+                              color: AppColors.error,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: AppColors.surface, width: 1.5),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.xl),
+
+                // ── Active pickup banner ──
+                if (hasActive) ...[
+                  CustomCard(
+                    color: AppColors.techBlueLight,
+                    border: Border.all(color: AppColors.techBlue, width: 1.5),
+                    borderRadius: 18,
+                    onTap: () => context.push('/citizen/live-tracking'),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(11),
+                          decoration: const BoxDecoration(
+                            color: AppColors.techBlue,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(LucideIcons.truck, color: AppColors.surface, size: 20),
+                        ),
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _statusLine(active.status),
+                                style: AppTypography.titleSmall.copyWith(color: AppColors.textPrimary),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '${active.collectorName} • ETA ~6 min',
+                                style: AppTypography.bodySmall.copyWith(color: AppColors.techBlue),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(LucideIcons.chevronRight, size: 20, color: AppColors.techBlue),
+                      ],
+                    ),
+                  ).animate().fadeIn(duration: 300.ms).slideY(begin: -0.08, end: 0),
+                  const SizedBox(height: AppSpacing.xl),
+                ],
+
+                // ── Hero CTA card ──
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(AppSpacing.xxl),
+                  decoration: BoxDecoration(
+                    gradient: AppColors.heroGradient,
+                    borderRadius: AppRadius.rXl,
+                    boxShadow: AppShadows.glowingGreen,
+                  ),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Good morning, $userName 👋',
-                        style: AppTypography.titleLarge,
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface.withValues(alpha: 0.16),
+                          borderRadius: AppRadius.rPill,
+                        ),
+                        child: Text(
+                          'INSTANT DOORSTEP PICKUP',
+                          style: AppTypography.labelSmall.copyWith(
+                            color: AppColors.primaryLight,
+                            fontSize: 10,
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: AppSpacing.md),
+                      Text(
+                        'Find a Scrap Collector',
+                        style: AppTypography.displayMedium.copyWith(
+                          color: AppColors.surface,
+                          fontSize: 26,
+                          height: 1.2,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        'Turn unused household scrap into cash — AI estimates, verified pickup, instant UPI payment.',
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: AppColors.primaryLight.withValues(alpha: 0.95),
+                          height: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xl),
                       Row(
                         children: [
-                          const Icon(LucideIcons.mapPin, size: 14, color: AppColors.primary),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Sector 62, Noida, UP',
-                            style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+                          Expanded(
+                            child: CustomButton(
+                              text: 'Sell Scrap Now',
+                              onPressed: () => context.go('/citizen/sell'),
+                              icon: LucideIcons.camera,
+                              type: ButtonType.secondary,
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.md),
+                          Expanded(
+                            child: CustomButton(
+                              text: 'Schedule Pickup',
+                              onPressed: () => context.push('/citizen/schedule-pickup'),
+                              icon: LucideIcons.calendar,
+                              type: ButtonType.outline,
+                            ),
                           ),
                         ],
                       ),
                     ],
                   ),
-                  Stack(
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Notifications view open')),
-                          );
-                        },
-                        icon: const Icon(LucideIcons.bell, color: AppColors.textPrimary),
+                ).animate().fadeIn(duration: 350.ms).slideY(begin: 0.06, end: 0, curve: Curves.easeOutCubic),
+                const SizedBox(height: AppSpacing.xxxl),
+
+                // ── Impact metrics ──
+                const SectionHeader(title: 'Your Environmental Impact'),
+                const SizedBox(height: AppSpacing.md),
+                Row(
+                  children: [
+                    Expanded(
+                      child: MetricCard(
+                        icon: LucideIcons.scale,
+                        iconColor: AppColors.primary,
+                        iconBg: AppColors.primaryLight,
+                        value: '12.5 kg',
+                        label: 'Scrap Recycled',
                       ),
-                      Positioned(
-                        right: 8,
-                        top: 8,
-                        child: Container(
-                          width: 10,
-                          height: 10,
-                          decoration: const BoxDecoration(
-                            color: AppColors.error,
-                            shape: BoxShape.circle,
-                          ),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: MetricCard(
+                        icon: LucideIcons.leaf,
+                        iconColor: AppColors.success,
+                        iconBg: AppColors.successLight,
+                        value: '23.4 kg',
+                        label: 'CO\u2082 Saved',
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: MetricCard(
+                        icon: LucideIcons.award,
+                        iconColor: AppColors.rewardOrange,
+                        iconBg: AppColors.rewardOrangeLight,
+                        value: '840',
+                        label: 'Eco Points',
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.xl),
+
+                // ── Money received card ──
+                CustomCard(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryLight,
+                          borderRadius: AppRadius.rMd,
                         ),
+                        child: const Icon(LucideIcons.banknote, size: 24, color: AppColors.primary),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Total Money Received', style: AppTypography.bodySmall),
+                            const SizedBox(height: 2),
+                            Text(
+                              '\u20B91,248',
+                              style: AppTypography.titleLarge.copyWith(fontSize: 22),
+                            ),
+                          ],
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => context.go('/citizen/orders'),
+                        child: Text('History', style: AppTypography.labelLarge.copyWith(color: AppColors.primary, fontSize: 13)),
                       ),
                     ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 24),
+                ),
+                const SizedBox(height: AppSpacing.xxxl),
 
-              // Active Pickup Live Tracker Banner (if any active)
-              if (pickupState.activePickup != null) ...[
+                // ── Recent pickups ──
+                SectionHeader(
+                  title: 'Recent Pickups',
+                  actionLabel: 'View All',
+                  onAction: () => context.go('/citizen/orders'),
+                ),
+                const SizedBox(height: AppSpacing.md),
                 CustomCard(
-                  color: AppColors.techBlueLight,
-                  border: Border.all(color: AppColors.techBlue, width: 1.5),
-                  onTap: () => context.push('/citizen/live-tracking'),
+                  onTap: () => context.push('/citizen/scrap-journey'),
                   child: Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: const BoxDecoration(
-                          color: AppColors.techBlue,
+                          color: AppColors.primaryLight,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(LucideIcons.truck, color: AppColors.surface, size: 24),
+                        child: const Icon(LucideIcons.packageCheck, color: AppColors.primary, size: 22),
                       ),
-                      const SizedBox(width: 14),
+                      const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Collector Ramesh is on the way!',
-                              style: AppTypography.titleSmall.copyWith(color: AppColors.textPrimary),
-                            ),
+                            Text('Plastic & Cardboard Scrap', style: AppTypography.titleSmall),
                             const SizedBox(height: 2),
                             Text(
-                              'ETA: 6 mins • 1.2 km away',
-                              style: AppTypography.bodySmall.copyWith(color: AppColors.techBlue),
+                              '18 Sep 2026 • Collector Ramesh Kumar',
+                              style: AppTypography.bodySmall,
                             ),
                           ],
                         ),
                       ),
-                      const Icon(LucideIcons.chevronRight, color: AppColors.techBlue),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text('+ \u20B9118', style: AppTypography.titleSmall.copyWith(color: AppColors.success)),
+                          Text('+20 Points', style: AppTypography.bodySmall.copyWith(color: AppColors.rewardOrange)),
+                        ],
+                      ),
                     ],
                   ),
-                ).animate().shimmer(duration: 1500.ms),
-                const SizedBox(height: 20),
+                ),
               ],
-
-              // Hero Action Card
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: AppShadows.glowingGreen,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: AppColors.surface.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            '⚡ Instant Doorstep Pickup',
-                            style: AppTypography.labelSmall.copyWith(color: AppColors.surface),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
-                    Text(
-                      'Turn Unused Household Scrap Into Cash',
-                      style: AppTypography.titleLarge.copyWith(
-                        color: AppColors.surface,
-                        fontSize: 22,
-                        height: 1.2,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Upload scrap photos, get instant AI price estimates & doorstep collection.',
-                      style: AppTypography.bodyMedium.copyWith(color: AppColors.primaryLight),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: CustomButton(
-                            text: '+ Sell Scrap',
-                            onPressed: () => context.go('/citizen/sell'),
-                            type: ButtonType.primary,
-                            icon: LucideIcons.camera,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: CustomButton(
-                            text: 'Schedule',
-                            onPressed: () => context.push('/citizen/schedule-pickup'),
-                            type: ButtonType.secondary,
-                            icon: LucideIcons.calendar,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 28),
-
-              // Your Eco Impact Metrics
-              Text('Your Environmental Impact 🌿', style: AppTypography.titleMedium),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomCard(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(LucideIcons.scale, color: AppColors.primary, size: 28),
-                          const SizedBox(height: 10),
-                          Text(
-                            '12.5 kg',
-                            style: AppTypography.titleLarge.copyWith(fontSize: 20),
-                          ),
-                          Text(
-                            'Scrap Recycled',
-                            style: AppTypography.bodySmall,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: CustomCard(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(LucideIcons.leaf, color: AppColors.success, size: 28),
-                          const SizedBox(height: 10),
-                          Text(
-                            '23.4 kg',
-                            style: AppTypography.titleLarge.copyWith(fontSize: 20),
-                          ),
-                          Text(
-                            'CO₂ Saved',
-                            style: AppTypography.bodySmall,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: CustomCard(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(LucideIcons.award, color: AppColors.rewardOrange, size: 28),
-                          const SizedBox(height: 10),
-                          Text(
-                            '840',
-                            style: AppTypography.titleLarge.copyWith(fontSize: 20, color: AppColors.rewardOrange),
-                          ),
-                          Text(
-                            'Eco Points',
-                            style: AppTypography.bodySmall,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 28),
-
-              // Recent Activity Section
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Recent Pickups', style: AppTypography.titleMedium),
-                  TextButton(
-                    onPressed: () => context.go('/citizen/orders'),
-                    child: Text('View All', style: AppTypography.labelLarge.copyWith(color: AppColors.primary)),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-
-              CustomCard(
-                onTap: () => context.push('/citizen/scrap-journey'),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: const BoxDecoration(
-                        color: AppColors.primaryLight,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(LucideIcons.packageCheck, color: AppColors.primary, size: 24),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Plastic & Cardboard Scrap', style: AppTypography.titleSmall),
-                          const SizedBox(height: 2),
-                          Text('18 Sep 2026 • Collector Ramesh Kumar', style: AppTypography.bodySmall),
-                        ],
-                      ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text('+ ₹118', style: AppTypography.titleSmall.copyWith(color: AppColors.success)),
-                        Text('+20 Points', style: AppTypography.bodySmall.copyWith(color: AppColors.rewardOrange)),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

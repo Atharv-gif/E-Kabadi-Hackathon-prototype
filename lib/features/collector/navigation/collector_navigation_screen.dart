@@ -4,10 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/app_shadows.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
-
 
 class CollectorNavigationScreen extends ConsumerWidget {
   const CollectorNavigationScreen({super.key});
@@ -15,41 +16,47 @@ class CollectorNavigationScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Navigation & Turn-by-Turn', showBack: false),
+      appBar: const CustomAppBar(title: 'Navigation', showBack: false),
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
-            // Target Customer Card Header
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              color: AppColors.surface,
+            // ── Target customer card ──
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
               child: CustomCard(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 color: AppColors.primaryLight,
                 border: Border.all(color: AppColors.primary, width: 1.5),
+                borderRadius: 18,
                 child: Row(
                   children: [
                     CircleAvatar(
                       radius: 22,
                       backgroundColor: AppColors.primary,
-                      child: const Icon(LucideIcons.user, color: AppColors.surface, size: 22),
+                      child: const Icon(LucideIcons.user, color: AppColors.surface, size: 20),
                     ),
-                    const SizedBox(width: 14),
+                    const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('Navigating to Aarav Sharma', style: AppTypography.titleSmall),
                           const SizedBox(height: 2),
-                          Text('Flat 402, Green Valley, Sector 62', style: AppTypography.bodySmall),
+                          Text(
+                            'Flat 402, Green Valley, Sector 62',
+                            style: AppTypography.bodySmall,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ],
                       ),
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text('1.2 km', style: AppTypography.titleSmall.copyWith(color: AppColors.primary)),
-                        Text('ETA 6 min', style: AppTypography.bodySmall),
+                        Text('1.2 km', style: AppTypography.titleSmall.copyWith(color: AppColors.primaryDark)),
+                        Text('ETA ~6 min', style: AppTypography.bodySmall),
                       ],
                     ),
                   ],
@@ -57,54 +64,66 @@ class CollectorNavigationScreen extends ConsumerWidget {
               ),
             ),
 
-            // Map Area Canvas
+            // ── Map area ──
             Expanded(
               child: Stack(
                 children: [
-                  CustomPaint(
-                    size: Size.infinite,
-                    painter: CollectorRouteMapPainter(),
-                  ),
+                  const CustomPaint(size: Size.infinite, painter: CollectorRouteMapPainter()),
 
-                  // Floating Navigation Card at Bottom
+                  // Turn instruction banner
                   Positioned(
-                    bottom: 20,
+                    top: 16,
                     left: 20,
                     right: 20,
                     child: Container(
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(AppSpacing.md),
                       decoration: BoxDecoration(
                         color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 16)],
+                        borderRadius: AppRadius.rLg,
+                        border: Border.all(color: AppColors.border),
+                        boxShadow: AppShadows.elevated,
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: const BoxDecoration(color: AppColors.techBlueLight, shape: BoxShape.circle),
+                            child: const Icon(LucideIcons.cornerUpRight, color: AppColors.techBlue, size: 20),
+                          ),
+                          const SizedBox(width: AppSpacing.md),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('In 200 m, turn right onto Sector 62 Main Rd', style: AppTypography.titleSmall, maxLines: 2, overflow: TextOverflow.ellipsis),
+                                Text('Speed limit 40 km/h • Clear traffic', style: AppTypography.bodySmall),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Floating arrive card
+                  Positioned(
+                    bottom: 16,
+                    left: 20,
+                    right: 20,
+                    child: Container(
+                      padding: const EdgeInsets.all(AppSpacing.xl),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: AppRadius.rXl,
+                        border: Border.all(color: AppColors.border),
+                        boxShadow: AppShadows.elevated,
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: const BoxDecoration(color: AppColors.techBlueLight, shape: BoxShape.circle),
-                                child: const Icon(LucideIcons.navigation, color: AppColors.techBlue, size: 24),
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('In 200m, Turn Right onto Sector 62 Main Rd', style: AppTypography.titleSmall),
-                                    Text('Speed limit 40 km/h • Clear traffic', style: AppTypography.bodySmall),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 18),
                           CustomButton(
                             text: 'I Have Arrived at Household',
                             onPressed: () => context.push('/collector/verify'),
-                            type: ButtonType.primary,
                             icon: LucideIcons.mapPin,
                           ),
                         ],
@@ -122,37 +141,50 @@ class CollectorNavigationScreen extends ConsumerWidget {
 }
 
 class CollectorRouteMapPainter extends CustomPainter {
+  const CollectorRouteMapPainter();
+
   @override
   void paint(Canvas canvas, Size size) {
-    final bgPaint = Paint()..color = const Color(0xFFE2E8F0);
+    final bgPaint = Paint()..color = const Color(0xFFE8EDF3);
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), bgPaint);
 
     final roadPaint = Paint()
       ..color = Colors.white
-      ..strokeWidth = 28
-      ..style = PaintingStyle.stroke;
-
-    final roadPath = Path()
-      ..moveTo(size.width * 0.1, size.height * 0.8)
-      ..lineTo(size.width * 0.5, size.height * 0.5)
-      ..lineTo(size.width * 0.8, size.height * 0.2);
-
-    canvas.drawPath(roadPath, roadPaint);
-
-    // Route line
-    final routePaint = Paint()
-      ..color = AppColors.primary
-      ..strokeWidth = 8
+      ..strokeWidth = 26
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
+    final roadPath = Path()
+      ..moveTo(size.width * 0.1, size.height * 0.8)
+      ..quadraticBezierTo(size.width * 0.5, size.height * 0.55, size.width * 0.8, size.height * 0.2);
+
+    canvas.drawPath(roadPath, roadPaint);
+
+    // Route outline + line
+    final routeOutline = Paint()
+      ..color = AppColors.primary.withValues(alpha: 0.25)
+      ..strokeWidth = 14
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+    canvas.drawPath(roadPath, routeOutline);
+
+    final routePaint = Paint()
+      ..color = AppColors.primary
+      ..strokeWidth = 6
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
     canvas.drawPath(roadPath, routePaint);
 
-    // Collector Vehicle Pin
-    canvas.drawCircle(Offset(size.width * 0.1, size.height * 0.8), 20, Paint()..color = AppColors.techBlue);
+    // Collector vehicle pin
+    final vehicle = Offset(size.width * 0.1, size.height * 0.8);
+    canvas.drawCircle(vehicle, 16, Paint()..color = AppColors.techBlue);
+    canvas.drawCircle(vehicle, 5, Paint()..color = AppColors.surface);
 
-    // Customer Destination Pin
-    canvas.drawCircle(Offset(size.width * 0.8, size.height * 0.2), 20, Paint()..color = AppColors.primaryDark);
+    // Customer destination pin
+    final dest = Offset(size.width * 0.8, size.height * 0.2);
+    canvas.drawCircle(dest, 18, Paint()..color = AppColors.primaryDark.withValues(alpha: 0.2));
+    canvas.drawCircle(dest, 10, Paint()..color = AppColors.primaryDark);
+    canvas.drawCircle(dest, 4, Paint()..color = AppColors.surface);
   }
 
   @override

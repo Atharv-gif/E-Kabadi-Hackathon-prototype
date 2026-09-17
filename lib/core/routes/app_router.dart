@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/splash/splash_screen.dart';
@@ -31,39 +32,62 @@ import '../../features/collector/eco_coins/eco_coins_screen.dart';
 import '../../features/collector/voice/collector_voice_screen.dart';
 import '../../features/collector/profile/collector_profile_screen.dart';
 
+/// Smooth fade-through transition used across all routes.
+CustomTransitionPage<void> _fadePage(Widget child, GoRouterState state) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 260),
+    reverseTransitionDuration: const Duration(milliseconds: 200),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+      return FadeTransition(
+        opacity: curved,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 0.015),
+            end: Offset.zero,
+          ).animate(curved),
+          child: child,
+        ),
+      );
+    },
+  );
+}
+
 final appRouter = GoRouter(
   initialLocation: '/splash',
   routes: [
     GoRoute(
       path: '/splash',
-      builder: (context, state) => const SplashScreen(),
+      pageBuilder: (context, state) => _fadePage(const SplashScreen(), state),
     ),
     GoRoute(
       path: '/onboarding',
-      builder: (context, state) => const OnboardingScreen(),
+      pageBuilder: (context, state) => _fadePage(const OnboardingScreen(), state),
     ),
     GoRoute(
       path: '/login',
-      builder: (context, state) => const LoginScreen(),
+      pageBuilder: (context, state) => _fadePage(const LoginScreen(), state),
     ),
     GoRoute(
       path: '/signup',
-      builder: (context, state) => const SignupScreen(),
+      pageBuilder: (context, state) => _fadePage(const SignupScreen(), state),
     ),
     GoRoute(
       path: '/otp',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final phone = state.extra as String? ?? '9876512345';
-        return OtpVerificationScreen(phoneNumber: phone);
+        return _fadePage(OtpVerificationScreen(phoneNumber: phone), state);
       },
     ),
     GoRoute(
       path: '/location-permission',
-      builder: (context, state) => const LocationPermissionScreen(),
+      pageBuilder: (context, state) => _fadePage(const LocationPermissionScreen(), state),
     ),
     GoRoute(
       path: '/role-selection',
-      builder: (context, state) => const RoleSelectionScreen(),
+      pageBuilder: (context, state) => _fadePage(const RoleSelectionScreen(), state),
     ),
 
     // Citizen Routes Shell
@@ -72,55 +96,55 @@ final appRouter = GoRouter(
       routes: [
         GoRoute(
           path: '/citizen/home',
-          builder: (context, state) => const CitizenHomeScreen(),
+          pageBuilder: (context, state) => _fadePage(const CitizenHomeScreen(), state),
         ),
         GoRoute(
           path: '/citizen/sell',
-          builder: (context, state) => const SellScrapScreen(),
+          pageBuilder: (context, state) => _fadePage(const SellScrapScreen(), state),
         ),
         GoRoute(
           path: '/citizen/ai-analysis',
-          builder: (context, state) => const AiAnalysisScreen(),
+          pageBuilder: (context, state) => _fadePage(const AiAnalysisScreen(), state),
         ),
         GoRoute(
           path: '/citizen/schedule-pickup',
-          builder: (context, state) => const SchedulePickupScreen(),
+          pageBuilder: (context, state) => _fadePage(const SchedulePickupScreen(), state),
         ),
         GoRoute(
           path: '/citizen/collector-matching',
-          builder: (context, state) => const CollectorMatchingScreen(),
+          pageBuilder: (context, state) => _fadePage(const CollectorMatchingScreen(), state),
         ),
         GoRoute(
           path: '/citizen/live-tracking',
-          builder: (context, state) => const LiveTrackingScreen(),
+          pageBuilder: (context, state) => _fadePage(const LiveTrackingScreen(), state),
         ),
         GoRoute(
           path: '/citizen/collector-arrival',
-          builder: (context, state) => const CollectorArrivalScreen(),
+          pageBuilder: (context, state) => _fadePage(const CollectorArrivalScreen(), state),
         ),
         GoRoute(
           path: '/citizen/scrap-verification',
-          builder: (context, state) => const ScrapVerificationScreen(),
+          pageBuilder: (context, state) => _fadePage(const ScrapVerificationScreen(), state),
         ),
         GoRoute(
           path: '/citizen/payment-receipt',
-          builder: (context, state) => const PaymentReceiptScreen(),
+          pageBuilder: (context, state) => _fadePage(const PaymentReceiptScreen(), state),
         ),
         GoRoute(
           path: '/citizen/orders',
-          builder: (context, state) => const PickupHistoryScreen(),
+          pageBuilder: (context, state) => _fadePage(const PickupHistoryScreen(), state),
         ),
         GoRoute(
           path: '/citizen/scrap-journey',
-          builder: (context, state) => const ScrapJourneyScreen(),
+          pageBuilder: (context, state) => _fadePage(const ScrapJourneyScreen(), state),
         ),
         GoRoute(
           path: '/citizen/rewards',
-          builder: (context, state) => const EcoRewardsScreen(),
+          pageBuilder: (context, state) => _fadePage(const EcoRewardsScreen(), state),
         ),
         GoRoute(
           path: '/citizen/profile',
-          builder: (context, state) => const CitizenProfileScreen(),
+          pageBuilder: (context, state) => _fadePage(const CitizenProfileScreen(), state),
         ),
       ],
     ),
@@ -131,27 +155,27 @@ final appRouter = GoRouter(
       routes: [
         GoRoute(
           path: '/collector/dashboard',
-          builder: (context, state) => const CollectorDashboardScreen(),
+          pageBuilder: (context, state) => _fadePage(const CollectorDashboardScreen(), state),
         ),
         GoRoute(
           path: '/collector/navigation',
-          builder: (context, state) => const CollectorNavigationScreen(),
+          pageBuilder: (context, state) => _fadePage(const CollectorNavigationScreen(), state),
         ),
         GoRoute(
           path: '/collector/verify',
-          builder: (context, state) => const CollectorVerificationScreen(),
+          pageBuilder: (context, state) => _fadePage(const CollectorVerificationScreen(), state),
         ),
         GoRoute(
           path: '/collector/eco-coins',
-          builder: (context, state) => const EcoCoinsScreen(),
+          pageBuilder: (context, state) => _fadePage(const EcoCoinsScreen(), state),
         ),
         GoRoute(
           path: '/collector/voice',
-          builder: (context, state) => const CollectorVoiceScreen(),
+          pageBuilder: (context, state) => _fadePage(const CollectorVoiceScreen(), state),
         ),
         GoRoute(
           path: '/collector/profile',
-          builder: (context, state) => const CollectorProfileScreen(),
+          pageBuilder: (context, state) => _fadePage(const CollectorProfileScreen(), state),
         ),
       ],
     ),

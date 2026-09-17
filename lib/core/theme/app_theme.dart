@@ -19,6 +19,7 @@ class AppTheme {
         error: AppColors.error,
         onError: AppColors.surface,
       ),
+      splashFactory: InkSparkle.splashFactory,
       fontFamily: AppTypography.bodyMedium.fontFamily,
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.surface,
@@ -63,6 +64,25 @@ class AppTheme {
           ),
           textStyle: AppTypography.labelLarge,
         ),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(22),
+        ),
+        titleTextStyle: AppTypography.titleMedium,
+        contentTextStyle: AppTypography.bodyMedium,
+      ),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: AppColors.textPrimary,
+        contentTextStyle: AppTypography.bodyMedium.copyWith(color: AppColors.surface),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        behavior: SnackBarBehavior.floating,
+      ),
+      dividerTheme: const DividerThemeData(
+        color: AppColors.border,
+        thickness: 1,
+        space: 1,
       ),
     );
   }

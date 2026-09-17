@@ -26,16 +26,27 @@ class AppColors {
   static const Color surface = Color(0xFFFFFFFF);
   static const Color surfaceVariant = Color(0xFFF1F5F9);
   static const Color border = Color(0xFFE2E8F0);
+  static const Color borderStrong = Color(0xFFCBD5E1);
 
   // Status & Feedback Colors
   static const Color success = Color(0xFF16A34A);
+  static const Color successLight = Color(0xFFDCFCE7);
   static const Color warning = Color(0xFFD97706);
+  static const Color warningLight = Color(0xFFFEF3C7);
   static const Color error = Color(0xFFDC2626);
+  static const Color errorLight = Color(0xFFFEE2E2);
   static const Color info = Color(0xFF2563EB);
+  static const Color infoLight = Color(0xFFDBEAFE);
 
   // Shimmer / Gradient
   static const LinearGradient primaryGradient = LinearGradient(
     colors: [Color(0xFF15803D), Color(0xFF166534)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient heroGradient = LinearGradient(
+    colors: [Color(0xFF166534), Color(0xFF14532D)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -50,5 +61,13 @@ class AppColors {
     colors: [Color(0xFFF97316), Color(0xFFEA580C)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient shimmerGradient = LinearGradient(
+    colors: [
+      Color(0xFFE2E8F0),
+      Color(0xFFF8FAFC),
+      Color(0xFFE2E8F0),
+    ],
   );
 }

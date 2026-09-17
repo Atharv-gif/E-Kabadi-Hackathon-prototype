@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
@@ -18,76 +19,57 @@ class AiAnalysisScreen extends ConsumerWidget {
     final scanState = ref.watch(scrapScanProvider);
 
     return Scaffold(
-      appBar: const CustomAppBar(title: 'AI Scrap Classification'),
+      appBar: const CustomAppBar(title: 'AI Scrap Analysis'),
       body: SafeArea(
+        bottom: false,
         child: scanState.isAnalyzing
-            ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(32),
-                      decoration: const BoxDecoration(
-                        color: AppColors.primaryLight,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(LucideIcons.scanLine, size: 64, color: AppColors.primary),
-                    ).animate(onPlay: (controller) => controller.repeat(reverse: true)).scale(begin: const Offset(0.9, 0.9), end: const Offset(1.1, 1.1)),
-                    const SizedBox(height: 24),
-                    Text(
-                      'AI Computer Vision Scanning...',
-                      style: AppTypography.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Detecting polymers, density, and market rates',
-                      style: AppTypography.bodySmall,
-                    ),
-                  ],
-                ),
-              )
+            ? _AnalyzingView()
             : SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Image Preview with AI overlay tag
+                    // ── Image preview with AI tag ──
                     Stack(
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: AppRadius.rXl,
                           child: Container(
-                            height: 220,
+                            height: 210,
                             width: double.infinity,
                             color: AppColors.surfaceVariant,
                             child: Image.asset(
                               'assets/images/img 1.png',
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) => Container(
-                                color: AppColors.primaryDark,
+                                decoration: const BoxDecoration(gradient: AppColors.heroGradient),
                                 child: const Center(
-                                  child: Icon(LucideIcons.recycle, size: 80, color: AppColors.surface),
+                                  child: Icon(LucideIcons.recycle, size: 72, color: AppColors.surface),
                                 ),
                               ),
                             ),
                           ),
                         ),
                         Positioned(
-                          top: 14,
-                          left: 14,
+                          top: 12,
+                          left: 12,
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
-                              color: AppColors.primaryDark.withValues(alpha: 0.9),
-                              borderRadius: BorderRadius.circular(100),
+                              color: AppColors.primaryDark.withValues(alpha: 0.92),
+                              borderRadius: AppRadius.rPill,
                             ),
                             child: Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(LucideIcons.sparkles, size: 14, color: AppColors.primaryMedium),
+                                const Icon(LucideIcons.sparkles, size: 13, color: AppColors.primaryMedium),
                                 const SizedBox(width: 6),
                                 Text(
-                                  'AI Identified • 94% Confidence',
-                                  style: AppTypography.labelSmall.copyWith(color: AppColors.surface),
+                                  'AI ANALYSIS COMPLETE',
+                                  style: AppTypography.labelSmall.copyWith(
+                                    color: AppColors.surface,
+                                    fontSize: 10,
+                                  ),
                                 ),
                               ],
                             ),
@@ -95,56 +77,55 @@ class AiAnalysisScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.xxl),
 
-                    Text('Detected Scrap Materials', style: AppTypography.titleMedium),
-                    const SizedBox(height: 12),
+                    // ── Detected materials ──
+                    Text('AI Detected Material', style: AppTypography.titleMedium),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      'Automatic identification from your photo',
+                      style: AppTypography.bodySmall,
+                    ),
+                    const SizedBox(height: AppSpacing.md),
 
-                    // Detected Items List
                     ...scanState.analyzedItems.map(
                       (item) => Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.only(bottom: AppSpacing.md),
                         child: CustomCard(
-                          padding: const EdgeInsets.all(16),
-                          border: Border.all(color: AppColors.primary, width: 1.5),
+                          padding: const EdgeInsets.all(AppSpacing.lg),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(10),
-                                        decoration: const BoxDecoration(
-                                          color: AppColors.primaryLight,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(LucideIcons.package, color: AppColors.primary, size: 22),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(item.category, style: AppTypography.titleSmall),
-                                          Text(item.subType, style: AppTypography.bodySmall),
-                                        ],
-                                      ),
-                                    ],
+                                  Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: const BoxDecoration(
+                                      color: AppColors.primaryLight,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(LucideIcons.package, color: AppColors.primary, size: 20),
                                   ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        '₹${item.estimatedTotal.toStringAsFixed(0)}',
-                                        style: AppTypography.titleMedium.copyWith(color: AppColors.primary),
-                                      ),
-                                      Text(
-                                        '~${item.weightKg} kg',
-                                        style: AppTypography.bodySmall,
-                                      ),
-                                    ],
+                                  const SizedBox(width: AppSpacing.md),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(item.category, style: AppTypography.titleSmall),
+                                        Text(item.subType, style: AppTypography.bodySmall),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.techBlueLight,
+                                      borderRadius: AppRadius.rPill,
+                                    ),
+                                    child: Text(
+                                      '${(item.confidenceScore * 100).toStringAsFixed(0)}% match',
+                                      style: AppTypography.labelSmall.copyWith(color: AppColors.techBlue, fontSize: 10),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -153,38 +134,80 @@ class AiAnalysisScreen extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.lg),
 
-                    // Mandatory AI Disclaimer Banner
+                    // ── Citizen-entered weight (clearly separated) ──
+                    Text('Approximate Weight (you enter)', style: AppTypography.titleMedium),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      'AI cannot measure physical weight from a photo — please estimate.',
+                      style: AppTypography.bodySmall,
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    CustomCard(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: Column(
+                        children: [
+                          for (var i = 0; i < scanState.analyzedItems.length; i++) ...[
+                            if (i > 0) const Divider(height: AppSpacing.xxl),
+                            _WeightRow(
+                              label: scanState.analyzedItems[i].subType,
+                              initialKg: scanState.analyzedItems[i].weightKg,
+                            ),
+                          ],
+                          if (scanState.analyzedItems.isEmpty) ...[
+                            const _WeightRow(label: 'Mixed scrap', initialKg: 5.0),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+
+                    // ── Estimated value summary ──
                     Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(AppSpacing.lg),
                       decoration: BoxDecoration(
-                        color: AppColors.warning.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.warning.withValues(alpha: 0.5)),
+                        gradient: AppColors.heroGradient,
+                        borderRadius: AppRadius.rLg,
                       ),
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(LucideIcons.alertCircle, color: AppColors.warning, size: 20),
-                          const SizedBox(width: 12),
                           Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Estimated Value',
+                                  style: AppTypography.bodySmall.copyWith(color: AppColors.primaryLight),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  '\u20B9${_totalEstimate(scanState)}',
+                                  style: AppTypography.displayMedium.copyWith(color: AppColors.surface, fontSize: 28),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(LucideIcons.info, size: 18, color: AppColors.primaryLight),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            flex: 2,
                             child: Text(
-                              'The AI provides an approximate classification and price estimate. Final classification, weight and price are verified during pickup.',
-                              style: AppTypography.bodySmall.copyWith(color: AppColors.textPrimary, height: 1.3),
+                              'Final amount is calculated after collector verification.',
+                              style: AppTypography.bodySmall.copyWith(color: AppColors.primaryLight),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: AppSpacing.xxxl),
 
                     CustomButton(
                       text: 'Confirm & Schedule Pickup',
                       onPressed: () => context.push('/citizen/schedule-pickup'),
                       icon: LucideIcons.calendarCheck,
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.md),
                     Row(
                       children: [
                         Expanded(
@@ -195,7 +218,7 @@ class AiAnalysisScreen extends ConsumerWidget {
                             icon: LucideIcons.refreshCw,
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppSpacing.md),
                         Expanded(
                           child: CustomButton(
                             text: 'Edit Manually',
@@ -209,6 +232,115 @@ class AiAnalysisScreen extends ConsumerWidget {
                   ],
                 ),
               ),
+      ),
+    );
+  }
+
+  String _totalEstimate(ScrapScanState state) {
+    final total = state.analyzedItems.fold<double>(0, (sum, i) => sum + i.estimatedTotal);
+    return total.toStringAsFixed(0);
+  }
+}
+
+class _WeightRow extends StatefulWidget {
+  final String label;
+  final double initialKg;
+
+  const _WeightRow({required this.label, required this.initialKg});
+
+  @override
+  State<_WeightRow> createState() => _WeightRowState();
+}
+
+class _WeightRowState extends State<_WeightRow> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialKg.toStringAsFixed(1));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(widget.label, style: AppTypography.bodyMedium.copyWith(color: AppColors.textPrimary)),
+              Text('approximate weight', style: AppTypography.bodySmall),
+            ],
+          ),
+        ),
+        SizedBox(
+          width: 110,
+          child: TextField(
+            controller: _controller,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            textAlign: TextAlign.right,
+            style: AppTypography.titleSmall.copyWith(color: AppColors.primaryDark),
+            decoration: InputDecoration(
+              suffixText: 'kg',
+              suffixStyle: AppTypography.bodySmall,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              fillColor: AppColors.surface,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _AnalyzingView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(28),
+            decoration: const BoxDecoration(
+              color: AppColors.primaryLight,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(LucideIcons.scanLine, size: 56, color: AppColors.primary),
+          )
+              .animate(onPlay: (controller) => controller.repeat(reverse: true))
+              .scale(begin: const Offset(0.92, 0.92), end: const Offset(1.08, 1.08), duration: 900.ms, curve: Curves.easeInOut),
+          const SizedBox(height: AppSpacing.xxl),
+          Text(
+            'Analyzing your scrap…',
+            style: AppTypography.titleMedium,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            'Identifying material type from your photo',
+            style: AppTypography.bodyMedium,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          SizedBox(
+            width: 160,
+            child: ClipRRect(
+              borderRadius: AppRadius.rPill,
+              child: const LinearProgressIndicator(
+                minHeight: 5,
+                backgroundColor: AppColors.border,
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

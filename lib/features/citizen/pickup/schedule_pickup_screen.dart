@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
@@ -25,41 +26,56 @@ class _SchedulePickupScreenState extends ConsumerState<SchedulePickupScreen> {
   String _selectedTimeSlot = AppConstants.timeSlots[1]; // 11 AM - 1 PM
   final TextEditingController _instructionsController = TextEditingController(text: 'Call me when you arrive');
   final String _address = 'Flat 402, Green Valley Apts, Sector 62, Noida, UP - 201301';
+  bool _submitting = false;
 
-  void _onConfirmPickup() async {
+  Future<void> _onConfirmPickup() async {
+    setState(() => _submitting = true);
     final items = ref.read(scrapScanProvider).analyzedItems;
     await ref.read(pickupProvider.notifier).createRequest(
-      items: items.isEmpty
-          ? [
-              const ScrapItemModel(
-                id: 'DEMO-1',
-                category: 'Plastic',
-                subType: 'PET Bottles',
-                weightKg: 1.4,
-                pricePerKg: 50,
-                estimatedTotal: 70,
-                confidenceScore: 0.94,
-              ),
-              const ScrapItemModel(
-                id: 'DEMO-2',
-                category: 'Paper',
-                subType: 'Cardboard Boxes',
-                weightKg: 3.2,
-                pricePerKg: 15,
-                estimatedTotal: 48,
-                confidenceScore: 0.91,
-              ),
-            ]
-          : items,
-      date: _selectedDate,
-      timeSlot: _selectedTimeSlot,
-      address: _address,
-      instructions: _instructionsController.text,
-    );
+          items: items.isEmpty
+              ? const [
+                  ScrapItemModel(
+                    id: 'DEMO-1',
+                    category: 'Plastic',
+                    subType: 'PET Bottles',
+                    weightKg: 1.4,
+                    pricePerKg: 50,
+                    estimatedTotal: 70,
+                    confidenceScore: 0.94,
+                  ),
+                  ScrapItemModel(
+                    id: 'DEMO-2',
+                    category: 'Paper',
+                    subType: 'Cardboard Boxes',
+                    weightKg: 3.2,
+                    pricePerKg: 15,
+                    estimatedTotal: 48,
+                    confidenceScore: 0.91,
+                  ),
+                ]
+              : items,
+          date: _selectedDate,
+          timeSlot: _selectedTimeSlot,
+          address: _address,
+          instructions: _instructionsController.text,
+        );
 
     if (mounted) {
+      setState(() => _submitting = false);
       context.push('/citizen/collector-matching');
     }
+  }
+
+  double get _estimatedTotal {
+    final items = ref.read(scrapScanProvider).analyzedItems;
+    if (items.isEmpty) return 118;
+    return items.fold<double>(0, (s, i) => s + i.estimatedTotal);
+  }
+
+  @override
+  void dispose() {
+    _instructionsController.dispose();
+    super.dispose();
   }
 
   @override
@@ -67,16 +83,17 @@ class _SchedulePickupScreenState extends ConsumerState<SchedulePickupScreen> {
     return Scaffold(
       appBar: const CustomAppBar(title: 'Schedule Doorstep Pickup'),
       body: SafeArea(
+        bottom: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Pickup Address Card
+              // ── Pickup address ──
               Text('Pickup Address', style: AppTypography.titleMedium),
-              const SizedBox(height: 10),
+              const SizedBox(height: AppSpacing.md),
               CustomCard(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 child: Row(
                   children: [
                     Container(
@@ -85,53 +102,53 @@ class _SchedulePickupScreenState extends ConsumerState<SchedulePickupScreen> {
                         color: AppColors.primaryLight,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(LucideIcons.mapPin, color: AppColors.primary, size: 24),
+                      child: const Icon(LucideIcons.mapPin, color: AppColors.primary, size: 22),
                     ),
-                    const SizedBox(width: 14),
+                    const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('Home Address', style: AppTypography.titleSmall),
                           const SizedBox(height: 2),
-                          Text(_address, style: AppTypography.bodySmall),
+                          Text(_address, style: AppTypography.bodySmall, maxLines: 2, overflow: TextOverflow.ellipsis),
                         ],
                       ),
                     ),
                     TextButton(
                       onPressed: () {},
-                      child: Text('Change', style: AppTypography.labelLarge.copyWith(color: AppColors.primary)),
+                      child: Text('Change', style: AppTypography.labelLarge.copyWith(color: AppColors.primary, fontSize: 13)),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.xxl),
 
-              // Date Selection
+              // ── Date selection ──
               Text('Select Pickup Date', style: AppTypography.titleMedium),
-              const SizedBox(height: 10),
+              const SizedBox(height: AppSpacing.md),
               Row(
                 children: [
                   _buildDateTile('Today, 18 Sep'),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: AppSpacing.md),
                   _buildDateTile('Tomorrow, 19 Sep'),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: AppSpacing.md),
                   _buildDateTile('20 Sep'),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.xxl),
 
-              // Time Slot Selection
+              // ── Time slot selection ──
               Text('Select Preferred Time Slot', style: AppTypography.titleMedium),
-              const SizedBox(height: 10),
+              const SizedBox(height: AppSpacing.md),
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 2.5,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 2.6,
                 ),
                 itemCount: AppConstants.timeSlots.length,
                 itemBuilder: (context, index) {
@@ -145,35 +162,70 @@ class _SchedulePickupScreenState extends ConsumerState<SchedulePickupScreen> {
                       width: isSelected ? 2 : 1,
                     ),
                     onTap: () {
-                      setState(() {
-                        _selectedTimeSlot = slot;
-                      });
+                      setState(() => _selectedTimeSlot = slot);
                     },
-                    child: Center(
-                      child: Text(
-                        slot,
-                        style: AppTypography.titleSmall.copyWith(
-                          color: isSelected ? AppColors.primaryDark : AppColors.textPrimary,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (isSelected) ...[
+                          const Icon(LucideIcons.check, size: 15, color: AppColors.primaryDark),
+                          const SizedBox(width: 6),
+                        ],
+                        Flexible(
+                          child: Text(
+                            slot,
+                            style: AppTypography.titleSmall.copyWith(
+                              fontSize: 14,
+                              color: isSelected ? AppColors.primaryDark : AppColors.textPrimary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   );
                 },
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.xxl),
 
-              // Additional Instructions
+              // ── Instructions ──
               CustomTextField(
                 label: 'Pickup Instructions (Optional)',
                 hint: 'e.g., Ring bell twice, items kept at gate',
                 controller: _instructionsController,
                 prefixIcon: const Icon(LucideIcons.messageSquare, color: AppColors.textMuted),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppSpacing.xxl),
+
+              // ── Summary strip ──
+              CustomCard(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                color: AppColors.surfaceVariant,
+                shadows: const [],
+                child: Row(
+                  children: [
+                    const Icon(LucideIcons.receipt, size: 20, color: AppColors.textSecondary),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Text(
+                        'Estimated value (before verification)',
+                        style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+                      ),
+                    ),
+                    Text(
+                      '\u20B9${_estimatedTotal.toStringAsFixed(0)}',
+                      style: AppTypography.titleSmall.copyWith(color: AppColors.primaryDark),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xxl),
 
               CustomButton(
                 text: 'Confirm Pickup Request',
-                onPressed: _onConfirmPickup,
+                onPressed: _submitting ? null : _onConfirmPickup,
+                isLoading: _submitting,
                 icon: LucideIcons.checkCircle,
               ),
             ],
@@ -194,17 +246,17 @@ class _SchedulePickupScreenState extends ConsumerState<SchedulePickupScreen> {
           width: isSelected ? 2 : 1,
         ),
         onTap: () {
-          setState(() {
-            _selectedDate = label;
-          });
+          setState(() => _selectedDate = label);
         },
         child: Center(
           child: Text(
             label,
-            style: AppTypography.titleSmall.copyWith(
-              color: isSelected ? AppColors.primaryDark : AppColors.textPrimary,
-              fontSize: 13,
+            style: AppTypography.labelLarge.copyWith(
+              fontSize: 12.5,
+              color: isSelected ? AppColors.primaryDark : AppColors.textSecondary,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ),

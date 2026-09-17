@@ -2,6 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_typography.dart';
+import '../../core/theme/app_shadows.dart';
+import '../../core/theme/app_spacing.dart';
+
+class _NavItem {
+  final String route;
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+
+  const _NavItem(this.route, this.icon, this.activeIcon, this.label);
+}
+
+const _items = <_NavItem>[
+  _NavItem('/citizen/home', LucideIcons.home, LucideIcons.home, 'Home'),
+  _NavItem('/citizen/sell', LucideIcons.camera, LucideIcons.camera, 'Sell'),
+  _NavItem('/citizen/orders', LucideIcons.clipboardList, LucideIcons.clipboardList, 'History'),
+  _NavItem('/citizen/rewards', LucideIcons.award, LucideIcons.award, 'Rewards'),
+  _NavItem('/citizen/profile', LucideIcons.user, LucideIcons.user, 'Profile'),
+];
 
 class CitizenShell extends StatelessWidget {
   final Widget child;
@@ -10,31 +30,10 @@ class CitizenShell extends StatelessWidget {
 
   int _calculateSelectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
-    if (location.startsWith('/citizen/sell')) return 1;
-    if (location.startsWith('/citizen/orders')) return 2;
-    if (location.startsWith('/citizen/rewards')) return 3;
-    if (location.startsWith('/citizen/profile')) return 4;
-    return 0; // /citizen/home
-  }
-
-  void _onItemTapped(int index, BuildContext context) {
-    switch (index) {
-      case 0:
-        context.go('/citizen/home');
-        break;
-      case 1:
-        context.go('/citizen/sell');
-        break;
-      case 2:
-        context.go('/citizen/orders');
-        break;
-      case 3:
-        context.go('/citizen/rewards');
-        break;
-      case 4:
-        context.go('/citizen/profile');
-        break;
+    for (var i = 0; i < _items.length; i++) {
+      if (location.startsWith(_items[i].route)) return i;
     }
+    return 0;
   }
 
   @override
@@ -43,48 +42,56 @@ class CitizenShell extends StatelessWidget {
 
     return Scaffold(
       body: child,
+      extendBody: true,
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+        decoration: BoxDecoration(
           color: AppColors.surface,
-          border: Border(top: BorderSide(color: AppColors.border, width: 1)),
+          borderRadius: AppRadius.rXl,
+          border: Border.all(color: AppColors.border),
+          boxShadow: AppShadows.elevated,
         ),
-        child: BottomNavigationBar(
-          currentIndex: selectedIndex,
-          onTap: (idx) => _onItemTapped(idx, context),
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: AppColors.surface,
-          selectedItemColor: AppColors.primary,
-          unselectedItemColor: AppColors.textMuted,
-          selectedFontSize: 12,
-          unselectedFontSize: 12,
-          elevation: 0,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(LucideIcons.home),
-              activeIcon: Icon(LucideIcons.home, color: AppColors.primary),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(LucideIcons.camera),
-              activeIcon: Icon(LucideIcons.camera, color: AppColors.primary),
-              label: 'Sell',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(LucideIcons.packageCheck),
-              activeIcon: Icon(LucideIcons.packageCheck, color: AppColors.primary),
-              label: 'Orders',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(LucideIcons.award),
-              activeIcon: Icon(LucideIcons.award, color: AppColors.primary),
-              label: 'Rewards',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(LucideIcons.user),
-              activeIcon: Icon(LucideIcons.user, color: AppColors.primary),
-              label: 'Profile',
-            ),
-          ],
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: List.generate(_items.length, (i) {
+            final item = _items[i];
+            final selected = i == selectedIndex;
+            final color = selected ? AppColors.primary : AppColors.textMuted;
+
+            return Expanded(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => context.go(item.route),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeInOut,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    color: selected ? AppColors.primaryLight : Colors.transparent,
+                    borderRadius: AppRadius.rLg,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(selected ? item.activeIcon : item.icon, size: 21, color: color),
+                      const SizedBox(height: 3),
+                      Text(
+                        item.label,
+                        style: AppTypography.labelSmall.copyWith(
+                          fontSize: 10.5,
+                          color: color,
+                          fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
         ),
       ),
     );

@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/app_shadows.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
+import '../../../shared/widgets/common.dart';
+import '../../../shared/widgets/empty_state_widget.dart';
 import '../../../providers/rewards_provider.dart';
 
 class ScrapJourneyScreen extends ConsumerWidget {
@@ -17,121 +22,147 @@ class ScrapJourneyScreen extends ConsumerWidget {
     return Scaffold(
       appBar: const CustomAppBar(title: 'Scrap Journey & Traceability'),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: journeysAsync.when(
-            data: (journeys) {
-              if (journeys.isEmpty) return const Center(child: Text('No journey records'));
-              final jrn = journeys.first;
-              return Column(
+        bottom: false,
+        child: journeysAsync.when(
+          data: (journeys) {
+            if (journeys.isEmpty) {
+              return const EmptyStateWidget(
+                icon: LucideIcons.gitCommit,
+                title: 'No journey records yet',
+                description: 'Your recycling traceability timeline will appear here after your first completed pickup.',
+              );
+            }
+            final jrn = journeys.first;
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Certificate Banner
+                  // ── Certificate banner ──
                   Container(
-                    padding: const EdgeInsets.all(20),
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(AppSpacing.xl),
                     decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(20),
+                      gradient: AppColors.heroGradient,
+                      borderRadius: AppRadius.rXl,
+                      boxShadow: AppShadows.glowingGreen,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            const Icon(LucideIcons.award, color: AppColors.surface, size: 28),
-                            const SizedBox(width: 10),
-                            Text(
-                              'Verified Recycling Certificate',
-                              style: AppTypography.titleMedium.copyWith(color: AppColors.surface),
+                            const Icon(LucideIcons.badgeCheck, color: AppColors.surface, size: 26),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: Text(
+                                'Verified Recycling Certificate',
+                                style: AppTypography.titleMedium.copyWith(color: AppColors.surface),
+                              ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: AppSpacing.lg),
                         Text(
-                          'Batch ID: ${jrn.certificateId}',
-                          style: AppTypography.labelSmall.copyWith(color: AppColors.primaryLight),
+                          'BATCH ${jrn.certificateId}',
+                          style: AppTypography.labelSmall.copyWith(color: AppColors.primaryMedium, fontSize: 10, letterSpacing: 1),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${jrn.materialCategory} • ${jrn.weightKg} kg Recycled',
-                          style: AppTypography.titleLarge.copyWith(color: AppColors.surface, fontSize: 20),
+                          '${jrn.materialCategory} • ${jrn.weightKg} kg recycled',
+                          style: AppTypography.titleLarge.copyWith(color: AppColors.surface, fontSize: 19),
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 28),
+                  ).animate().fadeIn(duration: 350.ms).slideY(begin: 0.05, end: 0),
+                  const SizedBox(height: AppSpacing.xxxl),
 
-                  Text('End-to-End Material Traceability Timeline', style: AppTypography.titleMedium),
-                  const SizedBox(height: 16),
+                  Text('End-to-End Material Traceability', style: AppTypography.titleMedium),
+                  const SizedBox(height: AppSpacing.xl),
 
-                  // Vertical Timeline Steps
+                  // ── Timeline ──
                   ...List.generate(jrn.steps.length, (index) {
                     final step = jrn.steps[index];
                     final isLast = index == jrn.steps.length - 1;
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Column(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: step.isCompleted ? AppColors.primary : AppColors.surfaceVariant,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                step.isCompleted ? LucideIcons.check : LucideIcons.circle,
-                                size: 16,
-                                color: step.isCompleted ? AppColors.surface : AppColors.textMuted,
-                              ),
-                            ),
-                            if (!isLast)
+                    return IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Column(
+                            children: [
                               Container(
-                                width: 2,
-                                height: 50,
-                                color: step.isCompleted ? AppColors.primary : AppColors.border,
+                                width: 34,
+                                height: 34,
+                                decoration: BoxDecoration(
+                                  color: step.isCompleted ? AppColors.primary : AppColors.surfaceVariant,
+                                  shape: BoxShape.circle,
+                                  border: step.isCompleted ? null : Border.all(color: AppColors.borderStrong),
+                                ),
+                                child: Icon(
+                                  step.isCompleted ? LucideIcons.check : LucideIcons.circle,
+                                  size: 15,
+                                  color: step.isCompleted ? AppColors.surface : AppColors.textMuted,
+                                ),
                               ),
-                          ],
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 20),
-                            child: CustomCard(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(step.title, style: AppTypography.titleSmall),
-                                      Text(step.timestamp, style: AppTypography.bodySmall),
-                                    ],
+                              if (!isLast)
+                                Expanded(
+                                  child: Container(
+                                    width: 2,
+                                    color: step.isCompleted ? AppColors.primary : AppColors.border,
                                   ),
-                                  const SizedBox(height: 4),
-                                  Text(step.description, style: AppTypography.bodySmall),
-                                  const SizedBox(height: 6),
-                                  Row(
-                                    children: [
-                                      const Icon(LucideIcons.mapPin, size: 14, color: AppColors.primary),
-                                      const SizedBox(width: 4),
-                                      Text(step.location, style: AppTypography.labelSmall.copyWith(color: AppColors.primary)),
-                                    ],
-                                  ),
-                                ],
+                                ),
+                            ],
+                          ),
+                          const SizedBox(width: AppSpacing.lg),
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.only(bottom: isLast ? 0 : AppSpacing.xl),
+                              child: CustomCard(
+                                padding: const EdgeInsets.all(AppSpacing.lg),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(child: Text(step.title, style: AppTypography.titleSmall)),
+                                        Text(step.timestamp, style: AppTypography.bodySmall),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(step.description, style: AppTypography.bodySmall, maxLines: 2, overflow: TextOverflow.ellipsis),
+                                    const SizedBox(height: AppSpacing.sm),
+                                    Row(
+                                      children: [
+                                        const Icon(LucideIcons.mapPin, size: 13, color: AppColors.primary),
+                                        const SizedBox(width: 4),
+                                        Flexible(
+                                          child: Text(
+                                            step.location,
+                                            style: AppTypography.labelSmall.copyWith(color: AppColors.primary, fontSize: 10),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    );
+                        ],
+                      ),
+                    ).animate(delay: (80.ms * index)).fadeIn(duration: 300.ms).slideY(begin: 0.06, end: 0);
                   }),
+                  const SizedBox(height: AppSpacing.xl),
                 ],
-              );
-            },
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, s) => Text('Error: $e'),
+              ),
+            );
+          },
+          loading: () => const LoadingView(message: 'Loading your scrap journey…', icon: LucideIcons.gitCommit),
+          error: (e, s) => ErrorView(
+            message: 'Could not load traceability records.',
+            onRetry: () => ref.invalidate(recyclingJourneysProvider),
           ),
         ),
       ),

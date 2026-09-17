@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
 
 class CollectorVoiceScreen extends StatefulWidget {
@@ -15,43 +16,43 @@ class CollectorVoiceScreen extends StatefulWidget {
 
 class _CollectorVoiceScreenState extends State<CollectorVoiceScreen> {
   bool _isListening = false;
-  String _recognizedText = 'Tap the microphone and speak...';
+  String _recognizedText = 'Tap the microphone and speak…';
 
-  void _startListening(String command) async {
+  Future<void> _startListening(String command) async {
     setState(() {
       _isListening = true;
-      _recognizedText = 'Listening... ("$command")';
+      _recognizedText = 'Listening… ("$command")';
     });
     await Future.delayed(const Duration(seconds: 2));
-    if (mounted) {
-      setState(() {
-        _isListening = false;
-        _recognizedText = 'Recognized: "$command"';
-      });
-      // Execute command navigation demo
-      if (command.contains('nearby') || command.contains('pickups')) {
-        context.go('/collector/dashboard');
-      } else if (command.contains('Navigate')) {
-        context.go('/collector/navigation');
-      } else if (command.contains('complete')) {
-        context.go('/collector/verify');
-      }
+    if (!mounted) return;
+    setState(() {
+      _isListening = false;
+      _recognizedText = 'Recognized: "$command"';
+    });
+    // Execute command navigation demo
+    if (command.contains('nearby') || command.contains('pickups')) {
+      context.go('/collector/dashboard');
+    } else if (command.contains('Navigate')) {
+      context.go('/collector/navigation');
+    } else if (command.contains('complete')) {
+      context.go('/collector/verify');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Collector Voice Assistant', showBack: false),
+      appBar: const CustomAppBar(title: 'Voice Assistant', showBack: false),
       body: SafeArea(
+        bottom: false,
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
 
-              // Voice Visualizer Circle
+              // ── Mic button ──
               GestureDetector(
                 onTap: () => _startListening('Show nearby pickups'),
                 child: Stack(
@@ -59,44 +60,46 @@ class _CollectorVoiceScreenState extends State<CollectorVoiceScreen> {
                   children: [
                     if (_isListening)
                       Container(
-                        width: 220,
-                        height: 220,
+                        width: 210,
+                        height: 210,
                         decoration: BoxDecoration(
                           color: AppColors.techBlueLight,
                           shape: BoxShape.circle,
                         ),
-                      ).animate(onPlay: (c) => c.repeat()).scale(begin: const Offset(0.9, 0.9), end: const Offset(1.3, 1.3), duration: 1000.ms),
+                      ).animate(onPlay: (c) => c.repeat()).scale(begin: const Offset(0.85, 0.85), end: const Offset(1.35, 1.35), duration: 1000.ms, curve: Curves.easeOut),
                     Container(
-                      width: 150,
-                      height: 150,
-                      decoration: const BoxDecoration(
-                        color: AppColors.techBlue,
+                      width: 140,
+                      height: 140,
+                      decoration: BoxDecoration(
+                        color: _isListening ? AppColors.techBlue : AppColors.techBlue.withValues(alpha: 0.85),
                         shape: BoxShape.circle,
-                        boxShadow: [BoxShadow(color: Color(0x330284C7), blurRadius: 20, spreadRadius: 4)],
+                        boxShadow: [BoxShadow(color: AppColors.techBlue.withValues(alpha: 0.25), blurRadius: 24, spreadRadius: 4)],
                       ),
                       child: Icon(
-                        _isListening ? LucideIcons.micOff : LucideIcons.mic,
-                        size: 70,
+                        _isListening ? LucideIcons.activity : LucideIcons.mic,
+                        size: 62,
                         color: AppColors.surface,
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 36),
+              const SizedBox(height: AppSpacing.huge),
 
               Text(
-                'Say what you want to do',
-                style: AppTypography.displayMedium.copyWith(fontSize: 24),
+                _isListening ? 'Listening…' : 'Say what you want to do',
+                style: AppTypography.displayMedium.copyWith(fontSize: 23),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.lg),
 
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                 decoration: BoxDecoration(
                   color: AppColors.surfaceVariant,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: AppRadius.rLg,
+                  border: Border.all(color: AppColors.border),
                 ),
                 child: Text(
                   _recognizedText,
@@ -104,11 +107,11 @@ class _CollectorVoiceScreenState extends State<CollectorVoiceScreen> {
                   textAlign: TextAlign.center,
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: AppSpacing.xxl),
 
-              // Voice Command Quick Action Shortcuts
+              // ── Quick commands ──
               Text('Quick Voice Commands', style: AppTypography.titleMedium),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.lg),
 
               Wrap(
                 spacing: 10,
@@ -132,8 +135,11 @@ class _CollectorVoiceScreenState extends State<CollectorVoiceScreen> {
   Widget _buildCommandChip(String command) {
     return ActionChip(
       avatar: const Icon(LucideIcons.volume2, size: 16, color: AppColors.techBlue),
-      label: Text(command, style: AppTypography.labelLarge.copyWith(color: AppColors.techBlue)),
+      label: Text(command, style: AppTypography.labelLarge.copyWith(color: AppColors.techBlue, fontSize: 12.5)),
       backgroundColor: AppColors.techBlueLight,
+      side: BorderSide.none,
+      shape: RoundedRectangleBorder(borderRadius: AppRadius.rPill),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       onPressed: () => _startListening(command),
     );
   }

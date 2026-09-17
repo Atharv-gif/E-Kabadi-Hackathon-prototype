@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_text_field.dart';
@@ -31,41 +33,56 @@ class _CollectorVerificationScreenState extends ConsumerState<CollectorVerificat
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(color: AppColors.primaryLight, shape: BoxShape.circle),
-              child: const Icon(LucideIcons.checkCircle2, color: AppColors.primary, size: 48),
-            ),
-            const SizedBox(height: 16),
-            Text('Collection Completed!', style: AppTypography.titleMedium),
-            const SizedBox(height: 8),
-            Text('Citizen payment of ₹${amount.toStringAsFixed(0)} processed via UPI.', style: AppTypography.bodyMedium, textAlign: TextAlign.center),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: AppColors.rewardOrangeLight, borderRadius: BorderRadius.circular(12)),
-              child: Row(
-                children: [
-                  const Icon(LucideIcons.coins, color: AppColors.rewardOrange, size: 24),
-                  const SizedBox(width: 10),
-                  Text('+150 Eco Coins Earned!', style: AppTypography.titleSmall.copyWith(color: AppColors.rewardOrange)),
-                ],
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.rXl),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.xxl),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: const BoxDecoration(color: AppColors.successLight, shape: BoxShape.circle),
+                child: const Icon(LucideIcons.checkCircle2, color: AppColors.success, size: 44),
+              ).animate().scale(duration: 450.ms, curve: Curves.elasticOut),
+              const SizedBox(height: AppSpacing.lg),
+              Text('Collection Completed!', style: AppTypography.titleMedium),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                'Citizen payment of \u20B9${amount.toStringAsFixed(0)} processed via UPI.',
+                style: AppTypography.bodyMedium,
+                textAlign: TextAlign.center,
               ),
-            ),
-            const SizedBox(height: 20),
-            CustomButton(
-              text: 'Back to Dashboard',
-              onPressed: () {
-                Navigator.pop(context);
-                context.go('/collector/dashboard');
-              },
-            ),
-          ],
+              const SizedBox(height: AppSpacing.lg),
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(color: AppColors.rewardOrangeLight, borderRadius: AppRadius.rMd),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(LucideIcons.coins, color: AppColors.rewardOrange, size: 22),
+                    const SizedBox(width: AppSpacing.sm),
+                    Text(
+                      '+150 Eco Coins Earned!',
+                      style: AppTypography.titleSmall.copyWith(color: AppColors.rewardOrange),
+                    ),
+                  ],
+                ),
+              )
+                  .animate(delay: 300.ms)
+                  .fadeIn(duration: 300.ms)
+                  .then()
+                  .shake(duration: 400.ms, hz: 3),
+              const SizedBox(height: AppSpacing.xl),
+              CustomButton(
+                text: 'Back to Dashboard',
+                onPressed: () {
+                  Navigator.pop(context);
+                  context.go('/collector/dashboard');
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -76,16 +93,30 @@ class _CollectorVerificationScreenState extends ConsumerState<CollectorVerificat
     return Scaffold(
       appBar: const CustomAppBar(title: 'Verify & Weigh Scrap'),
       body: SafeArea(
+        bottom: false,
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Handshake OTP Verification', style: AppTypography.titleMedium),
-              const SizedBox(height: 8),
-              Text('Ask the citizen for their 4-digit verification code to confirm pickup start.', style: AppTypography.bodySmall),
-              const SizedBox(height: 12),
-
+              // ── OTP verification ──
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(color: AppColors.primaryLight, borderRadius: AppRadius.rSm),
+                    child: const Icon(LucideIcons.key, size: 18, color: AppColors.primary),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(child: Text('Handshake OTP Verification', style: AppTypography.titleMedium)),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                'Ask the citizen for their 4-digit code to confirm the pickup.',
+                style: AppTypography.bodySmall,
+              ),
+              const SizedBox(height: AppSpacing.md),
               CustomTextField(
                 label: 'Citizen OTP Code',
                 hint: '4829',
@@ -93,13 +124,23 @@ class _CollectorVerificationScreenState extends ConsumerState<CollectorVerificat
                 keyboardType: TextInputType.number,
                 prefixIcon: const Icon(LucideIcons.key, color: AppColors.primary),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.xxl),
 
-              Text('Scrap Weighing & Pricing', style: AppTypography.titleMedium),
-              const SizedBox(height: 12),
-
+              // ── Weighing ──
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(color: AppColors.techBlueLight, borderRadius: AppRadius.rSm),
+                    child: const Icon(LucideIcons.scale, size: 18, color: AppColors.techBlue),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(child: Text('Scrap Weighing & Pricing', style: AppTypography.titleMedium)),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.md),
               CustomCard(
-                padding: const EdgeInsets.all(18),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 child: Column(
                   children: [
                     Row(
@@ -113,10 +154,10 @@ class _CollectorVerificationScreenState extends ConsumerState<CollectorVerificat
                             prefixIcon: const Icon(LucideIcons.scale, color: AppColors.textMuted),
                           ),
                         ),
-                        const SizedBox(width: 14),
+                        const SizedBox(width: AppSpacing.md),
                         Expanded(
                           child: CustomTextField(
-                            label: 'Final Payout (₹)',
+                            label: 'Final Payout (\u20B9)',
                             hint: '118.00',
                             controller: _amountController,
                             keyboardType: TextInputType.number,
@@ -125,15 +166,20 @@ class _CollectorVerificationScreenState extends ConsumerState<CollectorVerificat
                         ),
                       ],
                     ),
-                    const SizedBox(height: 14),
-                    Text(
-                      'AI Suggested Rate: ₹70 (Plastic) + ₹48 (Paper) = ₹118.00',
-                      style: AppTypography.bodySmall.copyWith(color: AppColors.primary),
+                    const SizedBox(height: AppSpacing.md),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      decoration: BoxDecoration(color: AppColors.surfaceVariant, borderRadius: AppRadius.rSm),
+                      child: Text(
+                        'AI Suggested Rate: \u20B970 (Plastic) + \u20B948 (Paper) = \u20B9118.00',
+                        style: AppTypography.bodySmall.copyWith(color: AppColors.primary, fontWeight: FontWeight.w600),
+                      ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppSpacing.xxl),
 
               CustomButton(
                 text: 'Confirm Collection & Send Payment',

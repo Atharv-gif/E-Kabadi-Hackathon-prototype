@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../models/user_model.dart';
 import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
@@ -16,42 +17,51 @@ class CollectorProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Collector Profile & Verification', showBack: false),
+      appBar: const CustomAppBar(title: 'Collector Profile', showBack: false),
       body: SafeArea(
+        bottom: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 110),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Collector Card Header
+              // ── Collector header ──
               CustomCard(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(AppSpacing.xl),
                 child: Row(
                   children: [
                     CircleAvatar(
-                      radius: 34,
+                      radius: 32,
                       backgroundColor: AppColors.techBlue,
                       child: Text('RK', style: AppTypography.displayMedium.copyWith(color: AppColors.surface)),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: AppSpacing.lg),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
-                              Text('Ramesh Kumar', style: AppTypography.titleMedium),
+                              Flexible(
+                                child: Text('Ramesh Kumar', style: AppTypography.titleMedium, overflow: TextOverflow.ellipsis),
+                              ),
                               const SizedBox(width: 6),
-                              const Icon(LucideIcons.badgeCheck, size: 20, color: AppColors.techBlue),
+                              const Icon(LucideIcons.badgeCheck, size: 18, color: AppColors.techBlue),
                             ],
                           ),
                           const SizedBox(height: 2),
                           Text('ID: COL-EK-892 • Sector 62 Zone', style: AppTypography.bodySmall),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 6),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(color: AppColors.success.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(100)),
-                            child: Text('KYC VERIFIED', style: AppTypography.labelSmall.copyWith(color: AppColors.success)),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: AppColors.successLight,
+                              borderRadius: AppRadius.rPill,
+                            ),
+                            child: Text(
+                              'KYC VERIFIED',
+                              style: AppTypography.labelSmall.copyWith(color: AppColors.success, fontSize: 9.5),
+                            ),
                           ),
                         ],
                       ),
@@ -59,11 +69,11 @@ class CollectorProfileScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: AppSpacing.xl),
 
-              // Switch to Citizen Role Option
+              // ── Switch role card ──
               CustomCard(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 color: AppColors.primaryLight,
                 border: Border.all(color: AppColors.primary, width: 1.5),
                 onTap: () async {
@@ -77,33 +87,35 @@ class CollectorProfileScreen extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
-                      child: const Icon(LucideIcons.home, color: AppColors.surface, size: 20),
+                      child: const Icon(LucideIcons.home, color: AppColors.surface, size: 19),
                     ),
-                    const SizedBox(width: 14),
+                    const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Switch to Citizen Household Mode', style: AppTypography.titleSmall.copyWith(color: AppColors.primaryDark)),
+                          Text(
+                            'Switch to Citizen Mode',
+                            style: AppTypography.titleSmall.copyWith(color: AppColors.primaryDark),
+                          ),
                           Text('Sell household scrap & track pickups', style: AppTypography.bodySmall),
                         ],
                       ),
                     ),
-                    const Icon(LucideIcons.arrowRight, color: AppColors.primary),
+                    const Icon(LucideIcons.arrowRight, size: 18, color: AppColors.primary),
                   ],
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: AppSpacing.xxl),
 
               Text('Verification & Vehicle Details', style: AppTypography.titleMedium),
-              const SizedBox(height: 12),
-
+              const SizedBox(height: AppSpacing.md),
               _buildDetailTile(LucideIcons.shieldCheck, 'Aadhaar & KYC Document', 'Verified • Unique ID 8912-****'),
               _buildDetailTile(LucideIcons.truck, 'Registered Vehicle', 'Mahindra Pickup • UP16 ET 4912'),
               _buildDetailTile(LucideIcons.building, 'ULB & Recycler License', 'Authorized Partner #REC-2026'),
               _buildDetailTile(LucideIcons.star, 'Customer Service Rating', '4.8 / 5.0 (480 Reviews)'),
+              const SizedBox(height: AppSpacing.xxl),
 
-              const SizedBox(height: 24),
               CustomButton(
                 text: 'Log Out',
                 onPressed: () async {
@@ -124,19 +136,26 @@ class CollectorProfileScreen extends ConsumerWidget {
 
   Widget _buildDetailTile(IconData icon, String title, String subtitle) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: CustomCard(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Row(
           children: [
-            Icon(icon, color: AppColors.textPrimary, size: 22),
-            const SizedBox(width: 14),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceVariant,
+                borderRadius: AppRadius.rSm,
+              ),
+              child: Icon(icon, color: AppColors.textPrimary, size: 19),
+            ),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title, style: AppTypography.titleSmall),
-                  Text(subtitle, style: AppTypography.bodySmall),
+                  Text(subtitle, style: AppTypography.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),
                 ],
               ),
             ),

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../models/user_model.dart';
 import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
@@ -20,7 +21,7 @@ class CitizenProfileScreen extends ConsumerStatefulWidget {
 class _CitizenProfileScreenState extends ConsumerState<CitizenProfileScreen> {
   String _selectedLanguage = 'English';
 
-  void _switchRole() async {
+  Future<void> _switchRole() async {
     await ref.read(authProvider.notifier).setRole(UserRole.collector);
     if (mounted) {
       context.go('/collector/dashboard');
@@ -33,16 +34,17 @@ class _CitizenProfileScreenState extends ConsumerState<CitizenProfileScreen> {
     final user = authState.user;
 
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Citizen Profile', showBack: false),
+      appBar: const CustomAppBar(title: 'Profile', showBack: false),
       body: SafeArea(
+        bottom: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 110),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // User Profile Header Card
+              // ── User header card ──
               CustomCard(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(AppSpacing.xl),
                 child: Row(
                   children: [
                     CircleAvatar(
@@ -53,27 +55,41 @@ class _CitizenProfileScreenState extends ConsumerState<CitizenProfileScreen> {
                         style: AppTypography.displayMedium.copyWith(color: AppColors.primaryDark),
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: AppSpacing.lg),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(user?.name ?? 'Aarav Sharma', style: AppTypography.titleMedium),
+                          Text(
+                            user?.name ?? 'Aarav Sharma',
+                            style: AppTypography.titleMedium,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                           const SizedBox(height: 2),
                           Text(user?.phone ?? '+91 98765 12345', style: AppTypography.bodySmall),
-                          const SizedBox(height: 2),
-                          Text('Role: Citizen Household', style: AppTypography.labelSmall.copyWith(color: AppColors.primary)),
+                          const SizedBox(height: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryLight,
+                              borderRadius: AppRadius.rPill,
+                            ),
+                            child: Text(
+                              'CITIZEN HOUSEHOLD',
+                              style: AppTypography.labelSmall.copyWith(color: AppColors.primaryDark, fontSize: 9.5),
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: AppSpacing.xl),
 
-              // Switch Role Action Card
+              // ── Switch role card ──
               CustomCard(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 color: AppColors.techBlueLight,
                 border: Border.all(color: AppColors.techBlue, width: 1.5),
                 onTap: _switchRole,
@@ -85,27 +101,32 @@ class _CitizenProfileScreenState extends ConsumerState<CitizenProfileScreen> {
                         color: AppColors.techBlue,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(LucideIcons.truck, color: AppColors.surface, size: 20),
+                      child: const Icon(LucideIcons.truck, color: AppColors.surface, size: 19),
                     ),
-                    const SizedBox(width: 14),
+                    const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Switch to Scrap Collector Mode', style: AppTypography.titleSmall.copyWith(color: AppColors.techBlue)),
-                          Text('Collect scrap, earn Eco Coins & route pickups', style: AppTypography.bodySmall),
+                          Text(
+                            'Switch to Collector Mode',
+                            style: AppTypography.titleSmall.copyWith(color: AppColors.techBlue),
+                          ),
+                          Text(
+                            'Collect scrap, earn Eco Coins & route pickups',
+                            style: AppTypography.bodySmall,
+                          ),
                         ],
                       ),
                     ),
-                    const Icon(LucideIcons.arrowRight, color: AppColors.techBlue),
+                    const Icon(LucideIcons.arrowRight, size: 18, color: AppColors.techBlue),
                   ],
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: AppSpacing.xxl),
 
               Text('Account Settings', style: AppTypography.titleMedium),
-              const SizedBox(height: 12),
-
+              const SizedBox(height: AppSpacing.md),
               _buildOptionTile(
                 icon: LucideIcons.mapPin,
                 title: 'Saved Addresses',
@@ -130,7 +151,7 @@ class _CitizenProfileScreenState extends ConsumerState<CitizenProfileScreen> {
                 subtitle: '24/7 Helpline & FAQs',
                 onTap: () {},
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.xxl),
 
               CustomButton(
                 text: 'Log Out',
@@ -157,24 +178,31 @@ class _CitizenProfileScreenState extends ConsumerState<CitizenProfileScreen> {
     required VoidCallback onTap,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: CustomCard(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         onTap: onTap,
         child: Row(
           children: [
-            Icon(icon, color: AppColors.textPrimary, size: 22),
-            const SizedBox(width: 14),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceVariant,
+                borderRadius: AppRadius.rSm,
+              ),
+              child: Icon(icon, color: AppColors.textPrimary, size: 19),
+            ),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title, style: AppTypography.titleSmall),
-                  Text(subtitle, style: AppTypography.bodySmall),
+                  Text(subtitle, style: AppTypography.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),
                 ],
               ),
             ),
-            const Icon(LucideIcons.chevronRight, size: 18, color: AppColors.textMuted),
+            const Icon(LucideIcons.chevronRight, size: 17, color: AppColors.textMuted),
           ],
         ),
       ),
