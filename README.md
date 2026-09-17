@@ -1,616 +1,536 @@
 # ♻️ E-Kabadi
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Flutter-3.38.3-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter"/>
-  <img src="https://img.shields.io/badge/Dart-3.x-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart"/>
-  <img src="https://img.shields.io/badge/Riverpod-State%20Management-00BFA6?style=for-the-badge" alt="Riverpod"/>
-  <img src="https://img.shields.io/badge/GoRouter-Navigation-02569B?style=for-the-badge" alt="GoRouter"/>
-  <img src="https://img.shields.io/badge/AI-Powered-8E44AD?style=for-the-badge" alt="AI"/>
+  <strong>AI-Powered Smart Scrap Collection & Reward Ecosystem</strong>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/stars/Atharv-gif/E-Kabadi-Hackathon-prototype?style=flat-square" alt="Stars"/>
-  <img src="https://img.shields.io/github/forks/Atharv-gif/E-Kabadi-Hackathon-prototype?style=flat-square" alt="Forks"/>
-  <img src="https://img.shields.io/github/last-commit/Atharv-gif/E-Kabadi-Hackathon-prototype?style=flat-square" alt="Last Commit"/>
-</p>
-
-<h3 align="center">
-  AI-Powered Smart Scrap Collection & Reward Ecosystem
-</h3>
-
-<p align="center">
-  <b>Turning waste into value through AI, digital collection, transparent pricing and sustainable rewards.</b>
+  Turning everyday waste into value for citizens, collectors, and the planet.
 </p>
 
 <p align="center">
-  🌱 <b>Identify</b> &nbsp;→&nbsp;
-  💰 <b>Estimate</b> &nbsp;→&nbsp;
-  📍 <b>Connect</b> &nbsp;→&nbsp;
-  🚛 <b>Collect</b> &nbsp;→&nbsp;
-  💳 <b>Pay</b> &nbsp;→&nbsp;
-  ♻️ <b>Reward</b>
+  <img src="https://img.shields.io/badge/Flutter-3.38.3-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter">
+  <img src="https://img.shields.io/badge/Dart-3.x-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart">
+  <img src="https://img.shields.io/badge/Riverpod-State%20Management-00A86B?style=for-the-badge" alt="Riverpod">
+  <img src="https://img.shields.io/badge/GoRouter-Navigation-0A7BDE?style=for-the-badge" alt="GoRouter">
+  <img src="https://img.shields.io/badge/AI-Assisted-8E44AD?style=for-the-badge" alt="AI">
+</p>
+
+<p align="center">
+  <a href="#-prototype-preview">Prototype Preview</a> •
+  <a href="#-problem">Problem</a> •
+  <a href="#-solution">Solution</a> •
+  <a href="#-features">Features</a> •
+  <a href="#-tech-stack">Tech Stack</a> •
+  <a href="#-getting-started">Getting Started</a>
 </p>
 
 ---
 
-# 🌍 Overview
+## 📱 Prototype Preview
 
-**E-Kabadi** is a smart scrap collection platform designed to digitally connect **citizens, scrap collectors and administrators** in one ecosystem.
+> **This section is intentionally placed near the top so hackathon judges can see the product experience immediately.**
 
-The platform addresses the traditional problems of scrap collection by introducing:
+### ♻️ E-Kabadi — From Scrap to Reward
 
-* 🤖 AI-assisted scrap identification
-* 💰 Intelligent value estimation
-* 📍 Location-based collector discovery
-* 🚛 Digital pickup management
-* 💳 Digital transaction workflows
-* 🎁 Citizen Eco Points
-* 🪙 Collector Eco Coins
-* 🖥️ Administrative management
-* 📊 A scalable digital ecosystem for waste collection
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="docs/screenshots/01-role-selection.jpeg" width="300" alt="E-Kabadi role selection screen">
+      <br><strong>Role Selection</strong><br>
+      <sub>Choose between Citizen and Scrap Collector experiences.</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="docs/screenshots/02-citizen-home.jpeg" width="300" alt="E-Kabadi citizen home screen">
+      <br><strong>Citizen Dashboard</strong><br>
+      <sub>Sell scrap, track environmental impact and view recent pickups.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="docs/screenshots/03-sell-scrap.jpeg" width="300" alt="E-Kabadi sell scrap screen">
+      <br><strong>AI Scrap Identification</strong><br>
+      <sub>Capture or upload scrap and view material rates.</sub>
+    </td>
+    <td align="center">
+      <img src="docs/screenshots/04-nearby-collectors.jpeg" width="300" alt="E-Kabadi nearby collectors screen">
+      <br><strong>Nearby Collectors</strong><br>
+      <sub>Compare availability, distance, queue and ratings.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="docs/screenshots/05-payment-received.jpeg" width="300" alt="E-Kabadi payment received screen">
+      <br><strong>Payment & Rewards</strong><br>
+      <sub>UPI payment confirmation with Eco Points and scrap details.</sub>
+    </td>
+    <td align="center">
+      <img src="docs/screenshots/06-collector-dashboard.jpeg" width="300" alt="E-Kabadi collector dashboard">
+      <br><strong>Collector Dashboard</strong><br>
+      <sub>Go online, manage pickup requests and track earnings.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" colspan="2">
+      <img src="docs/screenshots/07-eco-coins.jpeg" width="300" alt="E-Kabadi Eco Coins screen">
+      <br><strong>Eco Coin Marketplace</strong><br>
+      <sub>Collectors earn Eco Coins and redeem them for ecosystem benefits.</sub>
+    </td>
+  </tr>
+</table>
 
-The objective is simple:
+---
 
-> ### Make selling recyclable waste as simple as ordering a service.
+# 🌍 About E-Kabadi
 
-Instead of the traditional process:
+**E-Kabadi** is a smart scrap collection platform that digitally connects **citizens, scrap collectors and administrators** in one ecosystem.
+
+The platform is designed around a simple idea:
+
+> ### Make recycling as easy as ordering a service.
+
+E-Kabadi combines AI-assisted scrap identification, scrap-rate information, location-based collector discovery, pickup workflows, digital payments and incentive mechanisms into one experience.
+
+### The core journey
 
 ```text
-Find a Kabadi
-      ↓
-Call / Negotiate
-      ↓
-Wait for Collection
-      ↓
-Manual Weighing
-      ↓
-Manual Price Calculation
-      ↓
-Cash Payment
-```
-
-E-Kabadi proposes:
-
-```text
-Capture Scrap
-      ↓
-AI Identification
-      ↓
-Value Estimation
-      ↓
-Request Pickup
-      ↓
-Collector Assignment
-      ↓
-Scrap Collection
-      ↓
-Digital Transaction
-      ↓
-Rewards
+📸 Capture Scrap
+       ↓
+🤖 AI-Assisted Identification
+       ↓
+💰 Value Estimation
+       ↓
+📍 Find / Assign Collector
+       ↓
+🚛 Scrap Pickup
+       ↓
+💳 Digital Payment
+       ↓
+🎁 Rewards
+       ↓
+♻️ Recycling
 ```
 
 ---
 
-# 🚨 Problem Statement
+# 🚨 Problem
 
-The informal scrap collection process faces several challenges.
+Traditional scrap collection can be:
 
-### 1. Lack of convenience
+- Difficult to arrange
+- Dependent on phone calls and local contacts
+- Unclear about material prices
+- Manual and time-consuming
+- Difficult to track from request to completion
+- Limited in digital incentives
+- Inefficient for both citizens and collectors
 
-Citizens often have no simple digital way to request a scrap pickup.
+At the same time, recyclable materials with economic value can be lost in mixed-waste streams.
 
-### 2. Manual identification
-
-Different recyclable materials can have significantly different values, making manual identification and estimation difficult.
-
-### 3. Price uncertainty
-
-Citizens may not know the approximate value of their recyclable materials before collection.
-
-### 4. Unorganized collection
-
-Collectors often depend on calls, local contacts and manual coordination.
-
-### 5. Limited transparency
-
-The transaction journey from pickup request to payment is difficult to track.
-
-### 6. Lack of incentives
-
-There is limited digital motivation for citizens and collectors to consistently participate in organized recycling.
-
-### 7. Missed economic value
-
-Recyclable materials can enter mixed-waste streams instead of being efficiently routed toward recycling.
+E-Kabadi addresses this by creating a structured digital workflow between the person generating scrap and the person collecting it.
 
 ---
 
-# 💡 Our Solution
+# 💡 Solution
 
-E-Kabadi creates a digital ecosystem connecting:
-
-```text
-        👤 CITIZENS
-             │
-             ▼
-       ♻️ E-KABADI
-             │
-      ┌──────┴──────┐
-      ▼             ▼
- 🚛 COLLECTORS   🖥️ ADMIN
-      │
-      ▼
- ♻️ RECYCLING ECOSYSTEM
-```
-
-The platform provides separate experiences for:
+E-Kabadi provides three connected experiences.
 
 ### 👤 Citizen
 
-Upload scrap → Identify → Estimate → Request pickup → Track → Get paid → Earn rewards
+```text
+Sell Scrap
+   ↓
+Upload / Capture Image
+   ↓
+AI-Assisted Identification
+   ↓
+View Scrap Rates / Estimate
+   ↓
+Choose Collector
+   ↓
+Pickup
+   ↓
+UPI Payment
+   ↓
+Eco Points
+```
 
-### 🚛 Collector
+### 🚛 Scrap Collector
 
-Go online → Receive request → Accept → Navigate → Collect → Complete transaction → Earn Eco Coins
+```text
+Go Online
+   ↓
+Receive Nearby Requests
+   ↓
+View Scrap & Estimated Value
+   ↓
+Accept Request
+   ↓
+Navigate to Citizen
+   ↓
+Collect & Verify
+   ↓
+Complete Transaction
+   ↓
+Earn Eco Coins
+```
 
 ### 🖥️ Admin
 
-Manage and monitor the ecosystem through the administrative interface.
+The administrative layer provides a foundation for managing users, collectors, transactions, pricing, rewards and platform operations.
 
 ---
 
-# ✨ Core Features
+# ✨ Features
 
-## 👤 Citizen Mode
+## 👤 Citizen Experience
 
-### 📸 1. Scrap Identification
+### 📸 AI-Assisted Scrap Identification
 
-Citizens can capture or upload an image of scrap.
+Citizens can take a photo using the camera or select one from the gallery.
 
-The AI-assisted workflow can help identify the material category and support the valuation process.
+The prototype presents an AI-assisted workflow for identifying material categories such as:
 
-Example categories may include:
-
-* 📰 Paper
-* 🥤 Plastic
-* 🔩 Metal
-* 📦 Cardboard
-* 🔌 E-waste
-* 🧴 Other recyclable materials
+- Plastic
+- Paper & Cardboard
+- Metal & Aluminium
+- E-Waste
+- Electronics
+- Appliances
 
 ---
 
-### 💰 2. Scrap Value Estimation
+### 💰 Scrap Rate Discovery
 
-After identifying the material, the application can provide an estimated value based on the pricing logic used by the prototype.
+The Sell Scrap screen presents material-wise scrap rates so users have a clearer understanding of potential value.
 
-This gives the citizen a clearer idea of the expected transaction value.
+Example prototype rates include:
+
+| Material | Prototype Rate |
+|---|---:|
+| Plastic | ₹35 – ₹60 / kg |
+| Paper & Cardboard | ₹14 – ₹22 / kg |
+| Metal & Aluminium | ₹45 – ₹220 / kg |
+| E-Waste | ₹80 – ₹450 / unit |
+| Electronics | Prototype rate |
+| Appliances | Prototype rate |
+
+> Rates shown in the prototype are demonstration data and should be replaced with verified live market data for production.
 
 ---
 
-### 📍 3. Collector Discovery
+### 📍 Nearby Collector Matching
 
-Citizens can request scrap collection and connect with available collectors.
+Citizens can compare nearby collectors using:
+
+- Distance
+- Estimated arrival time
+- Availability
+- Current queue
+- Rating
+- Previous pickup count
+
+The prototype also provides an **auto-assignment** option for selecting a suitable collector.
 
 ---
 
-### 🚛 4. Pickup Workflow
+### 💳 Digital Payment
 
-The citizen can follow the pickup process from request to collection.
+After collection, the citizen receives a transaction confirmation showing:
+
+- Payment amount
+- Payment method
+- Transaction ID
+- Date & time
+- Collector
+- Verified weight
+- Eco Points earned
+
+The prototype demonstrates a **UPI / GPay Direct** payment confirmation experience.
+
+---
+
+### 🎁 Citizen Eco Points
+
+The prototype uses a threshold-based citizen reward model:
 
 ```text
-Request
-   ↓
-Pending
-   ↓
-Accepted
-   ↓
-Collector Arriving
-   ↓
-Collected
-   ↓
-Completed
-```
-
----
-
-### 💳 5. Digital Transaction
-
-Once the scrap collection is completed, the transaction can be recorded digitally.
-
-This creates a more transparent experience compared with purely cash-based informal transactions.
-
----
-
-### 🎁 6. Citizen Eco Points
-
-Citizens become eligible for Eco Points when their scrap bill reaches the defined threshold.
-
-### Reward Rule
-
-```text
-If Bill >= ₹500
-
-Eco Points = 10% of Bill Value
+Bill ≥ ₹500
+      ↓
+10% of bill value
+      ↓
+Citizen Eco Points
 ```
 
 Example:
 
 ```text
-Scrap Bill = ₹800
+Bill = ₹800
 
-Eco Points
-= 10% × ₹800
-= ₹80 worth of Eco Points
+Eco Points = 10% × ₹800
+           = ₹80
 ```
 
-This creates an incentive for citizens to participate in organized recycling.
-
 ---
 
-# 🚛 Collector Mode
+## 🚛 Collector Experience
 
-Collectors have a separate workflow optimized for pickup operations.
+### 🟢 Online Status
 
-## 🟢 1. Online / Offline Status
+Collectors can switch their availability and receive pickup requests while online.
 
-Collectors can indicate their availability to receive pickup requests.
+### 📦 Nearby Pickup Requests
 
----
+Collectors can see:
 
-## 📦 2. Pickup Requests
+- Citizen name
+- Location
+- Distance
+- Scrap type
+- Approximate weight
+- Estimated transaction value
+- Request status
 
-Available collectors can receive collection requests from nearby citizens.
+### 🗺️ Navigation
 
----
+Location information supports the pickup journey from collector to citizen.
 
-## 🤖 3. AI-Assisted Scrap Identification
+### 💰 Earnings Dashboard
 
-The collector workflow can use the same AI-assisted identification concept to understand the material involved in the transaction.
+Collectors can view:
 
----
+- Today's earnings
+- Pickups completed
+- Scrap collected
+- Eco Coin balance
 
-## 📍 4. Navigation
+### 🪙 Eco Coins
 
-Location-based functionality helps collectors reach the citizen's pickup location.
-
----
-
-## 💰 5. Transaction Management
-
-Collectors can complete the transaction after the scrap has been collected.
-
----
-
-## 🪙 6. Eco Coins
-
-Collectors receive Eco Coins from **every completed transaction**.
-
-Unlike citizen rewards, collectors have **no minimum transaction threshold**.
+Collectors earn Eco Coins on completed transactions.
 
 ```text
 Every Completed Transaction
-             ↓
-          10%
-             ↓
-        Eco Coins
+            ↓
+           10%
+            ↓
+       Eco Coins
 ```
+
+There is no minimum transaction threshold for collector Eco Coins in the prototype model.
+
+---
+
+## 🎁 Eco Coin Marketplace
+
+Collectors can redeem accumulated Eco Coins for supported benefits.
+
+The prototype demonstrates categories such as:
+
+- 🛒 Household ration
+- 🏥 Healthcare benefits
+- 🛠️ Tools and equipment
 
 Example:
 
 ```text
-Transaction = ₹300
-
-Collector Eco Coins
-= 10% × ₹300
-= 30 Eco Coins
+500 Coins → Monthly Household Ration Kit
+300 Coins → Healthcare Voucher
+400 Coins → Gloves + Digital Scale
 ```
 
 ---
 
-## 🎁 7. Eco Coin Redemption
-
-Collected Eco Coins can be used within the proposed reward ecosystem for supported benefits such as:
-
-* 🛒 Ration-related benefits
-* 🏥 Medical facilities
-* 🎁 Other supported rewards
-
----
-
-# 🖥️ Admin Panel
-
-E-Kabadi also contains a dedicated **Admin Panel**.
-
-The administration layer is designed to provide centralized control over the platform ecosystem.
-
-Potential administrative responsibilities include:
-
-* 👤 User management
-* 🚛 Collector management
-* ♻️ Scrap category management
-* 💰 Pricing management
-* 📦 Transaction monitoring
-* 🎁 Reward management
-* 📊 Platform analytics
-* 🛡️ Operational oversight
-
-The admin layer allows the platform to move beyond a simple mobile application toward a complete ecosystem.
-
----
-
-# 🔄 Complete User Journey
-
-## 👤 Citizen Flow
+# 🔄 End-to-End Workflow
 
 ```text
-┌──────────────┐
-│    LOGIN     │
-└──────┬───────┘
-       ↓
-┌──────────────┐
-│  DASHBOARD   │
-└──────┬───────┘
-       ↓
-┌──────────────┐
-│ CAPTURE SCRAP│
-└──────┬───────┘
-       ↓
-┌──────────────┐
-│ AI DETECTION │
-└──────┬───────┘
-       ↓
-┌──────────────┐
-│   ESTIMATE   │
-└──────┬───────┘
-       ↓
-┌──────────────┐
-│REQUEST PICKUP│
-└──────┬───────┘
-       ↓
-┌──────────────┐
-│  COLLECTOR   │
-│   ACCEPTS    │
-└──────┬───────┘
-       ↓
-┌──────────────┐
-│    PICKUP    │
-└──────┬───────┘
-       ↓
-┌──────────────┐
-│   PAYMENT    │
-└──────┬───────┘
-       ↓
-┌──────────────┐
-│ ECO POINTS   │
-└──────────────┘
+                         ♻️ E-KABADI
+                              │
+              ┌───────────────┴───────────────┐
+              │                               │
+              ▼                               ▼
+          👤 CITIZEN                      🚛 COLLECTOR
+              │                               │
+        Upload Scrap                    Go Online
+              │                               │
+              ▼                               ▼
+       🤖 AI Identification             Pickup Requests
+              │                               │
+              ▼                               ▼
+        💰 Estimation                    Accept Pickup
+              │                               │
+              └───────────────┬───────────────┘
+                              ▼
+                       📍 Collection
+                              │
+                              ▼
+                       ⚖️ Verification
+                              │
+                              ▼
+                       💳 Digital Payment
+                              │
+                 ┌────────────┴────────────┐
+                 ▼                         ▼
+           👤 Eco Points             🚛 Eco Coins
+                 │                         │
+                 └────────────┬────────────┘
+                              ▼
+                         ♻️ RECYCLING
 ```
 
 ---
 
-## 🚛 Collector Flow
+# 🧠 AI Layer
+
+AI is used as an assistance layer in the scrap-selling workflow.
+
+### Current prototype concept
 
 ```text
-┌──────────────┐
-│    LOGIN     │
-└──────┬───────┘
-       ↓
-┌──────────────┐
-│  DASHBOARD   │
-└──────┬───────┘
-       ↓
-┌──────────────┐
-│   GO ONLINE  │
-└──────┬───────┘
-       ↓
-┌──────────────┐
-│   REQUESTS   │
-└──────┬───────┘
-       ↓
-┌──────────────┐
-│ ACCEPT PICKUP│
-└──────┬───────┘
-       ↓
-┌──────────────┐
-│   NAVIGATE   │
-└──────┬───────┘
-       ↓
-┌──────────────┐
-│ COLLECT SCRAP│
-└──────┬───────┘
-       ↓
-┌──────────────┐
-│   COMPLETE   │
-│ TRANSACTION  │
-└──────┬───────┘
-       ↓
-┌──────────────┐
-│  ECO COINS   │
-└──────────────┘
+Scrap Image
+    ↓
+AI-Assisted Classification
+    ↓
+Material Category
+    ↓
+Pricing / Estimation Workflow
 ```
+
+### Future AI capabilities
+
+The platform can be extended with:
+
+- Multi-material detection
+- Detection confidence scores
+- Quantity / weight estimation
+- Contamination detection
+- Image quality validation
+- Price recommendation
+- Historical price analysis
+- Demand prediction
+- AI-powered route optimization
 
 ---
 
-# 🧠 AI Integration
+# 📍 Smart Collector Matching
 
-AI is a key component of the E-Kabadi concept.
+The collector selection interface demonstrates a multi-factor matching concept.
 
-The AI workflow is designed to assist with:
+Collectors can be compared using:
 
-### ♻️ Material Identification
+```text
+Distance
+   +
+Availability
+   +
+Queue
+   +
+Rating
+   +
+Pickup History
+```
 
-Analyze the uploaded/captured scrap image and determine its likely material category.
+This allows the system to move beyond simply selecting the geographically closest collector.
 
-### 💰 Valuation Assistance
+The prototype also provides:
 
-Use the detected material as an input to the pricing workflow.
+> **Skip & Auto-assign Best Match**
 
-### 🧠 Intelligent Assistance
-
-The AI layer can be extended to provide additional information about recyclable materials and collection decisions.
-
-### Future AI Improvements
-
-The production version can introduce:
-
-* Multi-material detection
-* Confidence scores
-* Quantity estimation
-* Image quality validation
-* Contamination detection
-* Automated price recommendations
-* Historical price learning
-* AI-powered demand prediction
+for a more automated experience.
 
 ---
 
-# 📍 Geospatial Collection
+# 🪙 Dual Reward System
 
-Location is an important part of the E-Kabadi ecosystem.
+E-Kabadi separates rewards for citizens and collectors.
 
-The platform can use geospatial information to connect:
+| Participant | Reward | Prototype Rule |
+|---|---|---|
+| 👤 Citizen | Eco Points | 10% when bill ≥ ₹500 |
+| 🚛 Collector | Eco Coins | 10% on every completed transaction |
 
-```text
-Citizen
-   │
-   │ Pickup Request
-   ▼
-Nearby Collectors
-   │
-   ▼
-Available Collector
-   │
-   ▼
-Navigation
-   │
-   ▼
-Collection
-```
-
-This can reduce unnecessary travel and improve the efficiency of scrap collection.
-
----
-
-# 🪙 Reward Ecosystem
-
-E-Kabadi uses two different reward mechanisms.
-
-| User         | Reward     | Eligibility                 |
-| ------------ | ---------- | --------------------------- |
-| 👤 Citizen   | Eco Points | Bill ≥ ₹500                 |
-| 🚛 Collector | Eco Coins  | Every completed transaction |
-
-### Citizen
+This creates two incentive loops:
 
 ```text
-Bill >= ₹500
-      ↓
-10%
-      ↓
-Eco Points
-```
-
-### Collector
-
-```text
-Every Transaction
-      ↓
-10%
-      ↓
-Eco Coins
-```
-
-This creates two complementary incentive loops:
-
-```text
-Citizen
+CITIZEN
    ↓
-More Scrap Collection
+Sell More Recyclables
    ↓
-More Recycling
+Receive Eco Points
    ↓
-Eco Points
+More Participation
 ```
 
-and
-
 ```text
-Collector
+COLLECTOR
    ↓
-More Completed Pickups
+Complete More Pickups
    ↓
-More Eco Coins
+Earn Eco Coins
    ↓
-More Incentives
+Redeem Benefits
+   ↓
+More Participation
 ```
 
 ---
 
-# 🏗️ High-Level Architecture
+# 🏗️ System Architecture
 
 ```text
-                         ┌──────────────────────┐
-                         │      E-KABADI        │
-                         │      PLATFORM        │
-                         └──────────┬───────────┘
-                                    │
-                    ┌───────────────┼───────────────┐
-                    │               │               │
-                    ▼               ▼               ▼
-             ┌────────────┐ ┌────────────┐ ┌────────────┐
-             │   CITIZEN  │ │ COLLECTOR  │ │   ADMIN    │
-             │    APP     │ │    APP     │ │   PANEL    │
-             └─────┬──────┘ └─────┬──────┘ └─────┬──────┘
-                   │              │              │
-                   └──────────────┼──────────────┘
-                                  ▼
-                       ┌────────────────────┐
-                       │ APPLICATION LOGIC  │
-                       └─────────┬──────────┘
-                                 │
-            ┌────────────────────┼────────────────────┐
-            │                    │                    │
-            ▼                    ▼                    ▼
+                    ┌───────────────────────┐
+                    │       E-KABADI        │
+                    │      APPLICATION      │
+                    └───────────┬───────────┘
+                                │
+              ┌─────────────────┼─────────────────┐
+              │                 │                 │
+              ▼                 ▼                 ▼
+       ┌────────────┐    ┌────────────┐    ┌────────────┐
+       │   CITIZEN  │    │ COLLECTOR  │    │   ADMIN    │
+       │ EXPERIENCE  │    │ EXPERIENCE │    │   PANEL    │
+       └──────┬─────┘    └──────┬─────┘    └──────┬─────┘
+              │                 │                 │
+              └─────────────────┼─────────────────┘
+                                ▼
+                    ┌───────────────────────┐
+                    │  APPLICATION LOGIC    │
+                    └───────────┬───────────┘
+                                │
+           ┌────────────────────┼────────────────────┐
+           │                    │                    │
+           ▼                    ▼                    ▼
       ┌───────────┐       ┌────────────┐       ┌────────────┐
-      │ AI ENGINE │       │  LOCATION  │       │ TRANSACTION│
-      │           │       │  SERVICES  │       │   SYSTEM   │
+      │ AI LAYER  │       │  LOCATION  │       │ TRANSACTION│
+      │           │       │  SERVICES  │       │  & REWARD  │
       └───────────┘       └────────────┘       └────────────┘
-            │                    │                    │
-            └────────────────────┼────────────────────┘
-                                 ▼
-                       ┌────────────────────┐
-                       │ DATA / CLOUD LAYER │
-                       └────────────────────┘
 ```
 
 ---
 
-# 🛠️ Technology Stack
+# 🛠️ Tech Stack
 
-## 📱 Application
-
-| Technology          | Usage                                  |
-| ------------------- | -------------------------------------- |
-| **Flutter**         | Cross-platform application development |
-| **Dart**            | Application programming language       |
-| **Riverpod**        | State management                       |
-| **GoRouter**        | Application navigation                 |
-| **Google Fonts**    | Typography                             |
-| **Flutter Animate** | UI animations                          |
-| **Lucide Icons**    | Interface icons                        |
-| **Intl**            | Formatting & localization utilities    |
-
-The current project dependencies are defined in `pubspec.yaml`.
+| Technology | Purpose |
+|---|---|
+| **Flutter** | Cross-platform application |
+| **Dart** | Programming language |
+| **Riverpod** | State management |
+| **GoRouter** | Navigation and routing |
+| **Google Fonts** | Typography |
+| **Flutter Animate** | UI animations |
+| **Lucide Icons** | Interface icons |
+| **Intl** | Formatting and localization utilities |
+| **AI Services** | Scrap identification / assistance |
+| **Geolocation / Maps** | Collector discovery and navigation |
+| **Admin Panel** | Platform administration |
 
 ---
 
-# 📂 Repository Structure
+# 📂 Project Structure
 
 ```text
 E-Kabadi-Hackathon-prototype/
 │
 ├── 📱 lib/
-│   ├── Application source code
 │   ├── Screens
 │   ├── Widgets
 │   ├── Models
@@ -623,36 +543,28 @@ E-Kabadi-Hackathon-prototype/
 ├── 🎨 assets/
 │   └── images/
 │
+├── 📸 docs/
+│   └── screenshots/
+│       ├── 01-role-selection.jpeg
+│       ├── 02-citizen-home.jpeg
+│       ├── 03-sell-scrap.jpeg
+│       ├── 04-nearby-collectors.jpeg
+│       ├── 05-payment-received.jpeg
+│       ├── 06-collector-dashboard.jpeg
+│       └── 07-eco-coins.jpeg
+│
 ├── 🤖 android/
-│   └── Android platform configuration
-│
 ├── 🍎 ios/
-│   └── iOS platform configuration
-│
 ├── 🌐 web/
-│   └── Web platform configuration
-│
 ├── 🪟 windows/
-│   └── Windows platform configuration
-│
 ├── 🐧 linux/
-│   └── Linux platform configuration
-│
 ├── 🍎 macos/
-│   └── macOS platform configuration
 │
 ├── 🧪 test/
-│   └── Test files
-│
 ├── pubspec.yaml
 ├── pubspec.lock
-├── analysis_options.yaml
-├── analyze_out.txt
-├── test_out.txt
 └── README.md
 ```
-
-The repository currently contains the Flutter source, assets, admin panel, platform targets and test directory.
 
 ---
 
@@ -660,16 +572,16 @@ The repository currently contains the Flutter source, assets, admin panel, platf
 
 ## Prerequisites
 
-Install the following before running the project:
+Install:
 
-* Flutter SDK
-* Dart SDK
-* Android Studio or VS Code
-* Android SDK
-* Git
-* Android emulator or physical Android device
+- Flutter SDK
+- Dart SDK
+- Android Studio / VS Code
+- Android SDK
+- Git
+- Android Emulator or physical Android device
 
-Verify Flutter:
+Verify your environment:
 
 ```bash
 flutter doctor
@@ -677,7 +589,7 @@ flutter doctor
 
 ---
 
-# 📥 Installation
+## 📥 Installation
 
 ### 1. Clone the repository
 
@@ -685,7 +597,7 @@ flutter doctor
 git clone https://github.com/Atharv-gif/E-Kabadi-Hackathon-prototype.git
 ```
 
-### 2. Enter the project
+### 2. Open the project
 
 ```bash
 cd E-Kabadi-Hackathon-prototype
@@ -697,7 +609,7 @@ cd E-Kabadi-Hackathon-prototype
 flutter pub get
 ```
 
-### 4. Check connected devices
+### 4. Check available devices
 
 ```bash
 flutter devices
@@ -711,29 +623,15 @@ flutter run
 
 ---
 
-# 📱 Running on Android
+# 📱 Android Build
 
-Connect an Android device through USB with **Developer Options** and **USB Debugging** enabled.
-
-Check:
-
-```bash
-flutter devices
-```
-
-Then:
-
-```bash
-flutter run
-```
-
-To build a release APK:
+To create a release APK:
 
 ```bash
 flutter build apk --release
 ```
 
-The generated APK can be found under:
+The generated APK will be available under:
 
 ```text
 build/app/outputs/flutter-apk/
@@ -741,251 +639,215 @@ build/app/outputs/flutter-apk/
 
 ---
 
-# 🧪 Testing
+# 🧪 Testing & Analysis
 
-Run Flutter tests with:
+Run tests:
 
 ```bash
 flutter test
 ```
 
-Analyze the project with:
+Run static analysis:
 
 ```bash
 flutter analyze
 ```
 
-The repository also contains generated analysis/test output files for development reference.
+---
+
+# 🎨 Design System
+
+E-Kabadi follows a clean, modern and eco-focused interface.
+
+### Visual direction
+
+- 🌱 Green-first sustainability identity
+- 🔵 Blue accents for collector workflows
+- 🟠 Orange accents for rewards
+- 🧼 Clean white surfaces
+- 📱 Mobile-first layouts
+- ✨ Subtle animations
+- 🎯 Clear call-to-action buttons
+- 📊 Card-based information architecture
+
+### UX principles
+
+**Simple → Clear → Fast → Rewarding**
+
+The interface is designed so a first-time user can understand the core journey without needing technical knowledge.
 
 ---
 
-# 🎨 Design Philosophy
+# 🎯 Hackathon Prototype Scope
 
-E-Kabadi follows a modern, clean and approachable visual direction.
+This repository represents a **hackathon prototype / proof of concept**.
 
-### Design principles
+The prototype focuses on demonstrating:
 
-* 🌱 Eco-friendly visual identity
-* 🧼 Clean interface
-* 📱 Mobile-first experience
-* 🎯 Simple user flows
-* 🧩 Modular components
-* ✨ Meaningful animations
-* ♿ Accessible interaction patterns
-* 📊 Information presented progressively
+- Citizen experience
+- Collector experience
+- Scrap identification workflow
+- Scrap rate discovery
+- Collector matching
+- Pickup workflow
+- Digital payment experience
+- Eco Points
+- Eco Coins
+- Reward marketplace
+- Administrative ecosystem
 
-The goal is to make waste management feel like a **modern digital service**, rather than a traditional manual process.
+Some values, transactions, identities, rates and integrations shown in the prototype are demonstration data.
 
----
-
-# 🔐 Security & Privacy Considerations
-
-A production deployment should implement:
-
-* 🔐 Secure authentication
-* 🛡️ Role-based authorization
-* 🔒 Encrypted communication
-* 👤 Identity verification
-* 💳 Secure payment processing
-* 📍 Controlled location access
-* 🗄️ Secure data storage
-* 🚨 Fraud detection
-* 📜 Privacy policies and consent management
-
-The current repository should be considered a **hackathon prototype**, not a production-ready financial or identity-verification system.
+For a production system, these would be connected to verified services and secure backend infrastructure.
 
 ---
 
-# 🎯 Prototype Scope
+# 🔐 Production Considerations
 
-This repository represents the **hackathon prototype of E-Kabadi**.
+Before production deployment, the following would require additional engineering:
 
-The objective is to demonstrate the product concept, user experience and core workflows.
-
-Some components may use prototype implementations, simulated data, predefined logic or demonstration flows.
-
-Production deployment would require additional engineering, infrastructure, verification and security work.
+- Secure authentication
+- Role-based authorization
+- Collector KYC / verification
+- Secure payment processing
+- Verified market-rate feeds
+- Production AI model/API
+- Location privacy and consent
+- Fraud detection
+- Secure cloud database
+- Audit logs
+- Data encryption
+- Notification infrastructure
+- Scalable backend
+- Regulatory and compliance review
 
 ---
 
-# 🔮 Future Roadmap
+# 🔮 Roadmap
 
 ## Phase 1 — Hackathon Prototype
 
-* [x] Citizen experience
-* [x] Collector experience
-* [x] AI-assisted scrap identification concept
-* [x] Scrap valuation workflow
-* [x] Pickup workflow
-* [x] Reward mechanism
-* [x] Eco Points
-* [x] Eco Coins
-* [x] Admin interface
-* [x] Responsive application structure
-
----
+- [x] Citizen workflow
+- [x] Collector workflow
+- [x] AI-assisted identification concept
+- [x] Scrap rate interface
+- [x] Collector matching
+- [x] Pickup workflow
+- [x] Payment confirmation
+- [x] Citizen Eco Points
+- [x] Collector Eco Coins
+- [x] Eco Coin marketplace
+- [x] Admin interface
 
 ## Phase 2 — Production Platform
 
-* [ ] Production backend
-* [ ] Secure authentication
-* [ ] Collector verification
-* [ ] Real-time scrap prices
-* [ ] Secure payment gateway
-* [ ] Real-time pickup tracking
-* [ ] Automated collector assignment
-* [ ] Advanced analytics
-* [ ] Fraud detection
-* [ ] Notification system
+- [ ] Production backend
+- [ ] Real-time scrap market rates
+- [ ] Verified collectors
+- [ ] Secure UPI/payment integration
+- [ ] Real-time location tracking
+- [ ] Automated collector assignment
+- [ ] Push notifications
+- [ ] Analytics dashboard
+- [ ] Fraud prevention
+
+## Phase 3 — Smart Circular Economy
+
+- [ ] 🧠 Advanced AI material recognition
+- [ ] ⚖️ AI-based weight estimation
+- [ ] 🚛 AI route optimization
+- [ ] 📊 Waste-generation analytics
+- [ ] 📈 Predictive scrap pricing
+- [ ] 🌱 Carbon-credit integration
+- [ ] 📡 IoT collection tracking
+- [ ] 🏭 B2B recycling marketplace
+- [ ] 🏛️ Municipal integration
+- [ ] 🌍 Regional recycling intelligence
 
 ---
 
-## Phase 3 — Intelligent Waste Network
+# 🌱 Environmental Impact Vision
 
-* [ ] 🧠 Advanced AI material recognition
-* [ ] 📦 Quantity estimation
-* [ ] 🚛 AI route optimization
-* [ ] 📊 Waste-generation analytics
-* [ ] 📈 Predictive scrap pricing
-* [ ] 🌱 Carbon-credit integration
-* [ ] 📡 IoT-enabled collection tracking
-* [ ] 🏭 B2B recycling marketplace
-* [ ] 🏛️ Municipal waste-management integration
-* [ ] 🌍 Regional recycling intelligence
-
----
-
-# 🌱 Environmental Impact
-
-E-Kabadi aims to contribute to a circular waste ecosystem by encouraging recyclable materials to move through organized collection channels.
-
-The proposed ecosystem can help:
+The long-term goal is to make recyclable waste easier to identify, collect and route toward appropriate recycling channels.
 
 ```text
-More Organized Collection
-          ↓
-Better Material Segregation
-          ↓
+Better Identification
+        ↓
+Better Segregation
+        ↓
+Organized Collection
+        ↓
 Higher Recycling Participation
-          ↓
-Reduced Valuable Waste Loss
-          ↓
-More Efficient Resource Recovery
+        ↓
+Better Resource Recovery
+        ↓
+♻️ Circular Economy
 ```
 
-The platform's long-term vision is to connect citizens, collectors, recyclers and institutions into a digitally coordinated ecosystem.
+E-Kabadi aims to create a system where waste is treated not simply as something to dispose of, but as a recoverable resource.
 
 ---
 
-# 💡 Future Expansion Opportunities
+# 💡 Future Use Cases
 
-E-Kabadi can eventually expand beyond individual household scrap collection.
+The platform can be extended beyond individual households.
 
 ### 🏢 Businesses
 
-Businesses could schedule bulk recyclable-material pickups.
+Schedule bulk scrap pickups.
 
-### 🏫 Educational Institutions
+### 🏫 Schools & Universities
 
-Schools and universities could run organized recycling campaigns.
+Run recycling drives and reward participation.
 
-### 🏘️ Residential Communities
+### 🏘️ Housing Societies
 
-Apartment complexes and housing societies could have dedicated collection schedules.
+Create scheduled community collection programs.
 
 ### 🏭 Recycling Facilities
 
-Recyclers could receive structured information about material availability.
+Connect recyclers with structured material supply.
 
 ### 🏛️ Municipal Bodies
 
-Municipalities could use aggregated data to understand local waste-generation patterns.
+Use aggregated insights to understand local waste patterns.
 
 ---
 
 # 🏆 Why E-Kabadi?
 
-The platform brings multiple parts of the recycling process together:
+E-Kabadi connects multiple parts of the scrap ecosystem:
 
 ```text
-             ♻️ E-KABADI
-                  │
-     ┌────────────┼────────────┐
-     │            │            │
-     ▼            ▼            ▼
-    AI       COLLECTION     REWARDS
-     │            │            │
-     └────────────┼────────────┘
-                  ▼
-          DIGITAL ECOSYSTEM
-                  │
-                  ▼
-          ♻️ CIRCULAR ECONOMY
+       🤖 AI
+        │
+        ▼
+   ♻️ IDENTIFICATION
+        │
+        ▼
+   💰 VALUATION
+        │
+        ▼
+   📍 MATCHING
+        │
+        ▼
+   🚛 COLLECTION
+        │
+        ▼
+   💳 PAYMENT
+        │
+        ▼
+   🎁 REWARDS
+        │
+        ▼
+   🌱 RECYCLING
 ```
 
-Instead of solving only one part of scrap management, E-Kabadi attempts to connect:
+Instead of solving only one step, E-Kabadi brings together:
 
 **Identification + Valuation + Collection + Location + Payment + Incentives**
 
-into a single user experience.
-
----
-
-# 📊 Project Highlights
-
-| Area                    | Implementation          |
-| ----------------------- | ----------------------- |
-| 📱 Mobile Application   | Flutter                 |
-| 👤 Citizen Experience   | ✅                       |
-| 🚛 Collector Experience | ✅                       |
-| 🖥️ Admin Panel         | ✅                       |
-| 🤖 AI Integration       | AI-assisted workflow    |
-| 💰 Scrap Valuation      | ✅                       |
-| 📍 Pickup Workflow      | ✅                       |
-| 🎁 Citizen Rewards      | Eco Points              |
-| 🪙 Collector Rewards    | Eco Coins               |
-| 🧭 Navigation           | Location-based workflow |
-| 🧪 Testing              | Flutter test structure  |
-| 🎨 Modern UI            | Flutter UI + animations |
-
----
-
-# 🤝 Contributing
-
-This project was created as a hackathon prototype.
-
-If you would like to contribute:
-
-```bash
-git fork
-```
-
-Create a feature branch:
-
-```bash
-git checkout -b feature/your-feature
-```
-
-Make your changes and commit:
-
-```bash
-git add .
-git commit -m "feat: add your feature"
-```
-
-Push your branch:
-
-```bash
-git push origin feature/your-feature
-```
-
-Then open a Pull Request.
-
----
-
-# 📜 License
-
-This project is currently a **hackathon prototype of WeDev**.
+into one digital experience.
 
 ---
 
@@ -995,18 +857,15 @@ This project is currently a **hackathon prototype of WeDev**.
 
 ## 🚀 Team WeDev
 
-<b>Bhavya Bothera, Atharv Giri, Rehan Memom</b>
-<b>Building technology for a cleaner and smarter future.</b>
-
-<br><br>
-
-♻️   🤖   📍   💳   🌱
+<strong>Building technology for a cleaner, smarter and more sustainable future.</strong>
 
 </p>
 
 ---
 
 # 🏁 Hackathon Submission
+
+### Project
 
 # ♻️ E-Kabadi
 
@@ -1020,17 +879,13 @@ This project is currently a **hackathon prototype of WeDev**.
 
 ---
 
-# 🌍 Our Vision
+# 🌍 Vision
 
 ## **Turn Waste Into Value.**
 
-We believe recycling shouldn't be complicated.
-
-It should be:
+Recycling should be:
 
 **Simple. Digital. Transparent. Rewarding. Sustainable.**
-
-E-Kabadi is a step toward building that ecosystem.
 
 ---
 
@@ -1040,8 +895,8 @@ E-Kabadi is a step toward building that ecosystem.
 
 ### <i>Every Scrap Has Value. Let's Unlock It.</i>
 
-<br>
+<br><br>
 
-**Made with ❤️ by Team WeDev**
+<strong>Made with ❤️ by Team WeDev</strong>
 
 </p>
