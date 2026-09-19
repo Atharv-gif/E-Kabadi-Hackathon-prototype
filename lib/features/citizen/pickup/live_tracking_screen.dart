@@ -11,6 +11,7 @@ import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
 import '../../../shared/widgets/pickup_timeline.dart';
+import '../../../shared/widgets/bottom_nav_metrics.dart';
 import '../../../providers/pickup_provider.dart';
 
 class LiveTrackingScreen extends ConsumerWidget {
@@ -109,9 +110,10 @@ class LiveTrackingScreen extends ConsumerWidget {
                     ),
                   ),
 
-                  // Collector info + actions
+                  // Collector info + actions — raised above the floating
+                  // bottom navigation bar so buttons stay accessible.
                   Positioned(
-                    bottom: 16,
+                    bottom: BottomNavBarMetrics.totalHeight + 16,
                     left: 20,
                     right: 20,
                     child: Container(
@@ -183,7 +185,7 @@ class LiveTrackingScreen extends ConsumerWidget {
             if (status != null)
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, BottomNavBarMetrics.bottomMargin + 8),
                 decoration: BoxDecoration(
                   color: AppColors.surface,
                   border: Border(top: BorderSide(color: AppColors.border)),

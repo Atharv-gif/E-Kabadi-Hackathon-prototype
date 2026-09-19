@@ -9,7 +9,9 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/metric_card.dart';
+import '../../../shared/widgets/bottom_nav_metrics.dart';
 import '../../../providers/collector_provider.dart';
+import '../../../providers/rewards_provider.dart';
 
 class CollectorDashboardScreen extends ConsumerWidget {
   const CollectorDashboardScreen({super.key});
@@ -17,13 +19,15 @@ class CollectorDashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final collectorState = ref.watch(collectorProvider);
+    final ecoCoins = ref.watch(collectorEcoCoinsProvider);
     final isAvailable = collectorState.isAvailable;
 
     return Scaffold(
       body: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 110),
+          // Reserve space for the floating bottom navigation bar.
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, BottomNavBarMetrics.contentPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -178,7 +182,10 @@ class CollectorDashboardScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('Eco Coins Balance', style: AppTypography.bodySmall),
-                          Text('1,250 coins • Gold Tier', style: AppTypography.titleSmall.copyWith(color: AppColors.rewardOrange)),
+                          Text(
+                            '$ecoCoins coins • 10% on every pickup',
+                            style: AppTypography.titleSmall.copyWith(color: AppColors.rewardOrange),
+                          ),
                         ],
                       ),
                     ),

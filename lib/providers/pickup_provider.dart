@@ -4,6 +4,7 @@ import '../models/scrap_item_model.dart';
 import '../models/payment_model.dart';
 import '../repositories/pickup_repository.dart';
 import '../repositories/payment_repository.dart';
+import '../services/reward_rules_service.dart';
 
 final pickupRepositoryProvider = Provider<PickupRepository>((ref) {
   return MockPickupRepository();
@@ -108,6 +109,10 @@ class PickupNotifier extends StateNotifier<PickupState> {
 
   Future<void> completePickupAndPay(double finalWeight, double finalAmount) async {
     if (state.activePickup != null) {
+      // Rewards are ALWAYS derived from the FINAL VERIFIED bill amount —
+      // never from approximate weight or AI estimates.
+      final ecoPoints = RewardRules.citizenEcoPoints(finalAmount);
+
       final completed = await _pickupRepo.verifyAndCompletePickup(
         state.activePickup!.id,
         finalWeight,
@@ -122,10 +127,14 @@ class PickupNotifier extends StateNotifier<PickupState> {
         status: 'SUCCESS',
         transactionId: 'TXN${DateTime.now().millisecondsSinceEpoch}',
         timestamp: 'Just Now',
-        ecoPointsEarned: 20,
+        ecoPointsEarned: ecoPoints,
       );
 
       await _paymentRepo.recordPayment(payment);
+
+      // Credit the citizen ledger only when the bill qualifies (₹500+).
+      // Below ₹500 this awards 0 points and the UI shows the threshold message.
+      RewardLedger.awardCitizenPointsForBill(finalAmount);
 
       state = state.copyWith(
         activePickup: completed,

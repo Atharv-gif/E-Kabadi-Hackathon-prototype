@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/pickup_request_model.dart';
 import '../repositories/pickup_repository.dart';
+import '../services/reward_rules_service.dart';
 import 'pickup_provider.dart';
 
 class CollectorState {
@@ -12,6 +13,10 @@ class CollectorState {
   final double todayWeightKg;
   final bool isLoading;
 
+  /// Eco Coins earned from the most recently completed transaction.
+  /// Collectors earn on EVERY completed transaction — no ₹500 threshold.
+  final int lastCoinsEarned;
+
   const CollectorState({
     this.isAvailable = true,
     this.nearbyRequests = const [],
@@ -20,6 +25,7 @@ class CollectorState {
     this.todayPickupsCount = 7,
     this.todayWeightKg = 38.5,
     this.isLoading = false,
+    this.lastCoinsEarned = 0,
   });
 
   CollectorState copyWith({
@@ -30,6 +36,7 @@ class CollectorState {
     int? todayPickupsCount,
     double? todayWeightKg,
     bool? isLoading,
+    int? lastCoinsEarned,
   }) {
     return CollectorState(
       isAvailable: isAvailable ?? this.isAvailable,
@@ -39,6 +46,7 @@ class CollectorState {
       todayPickupsCount: todayPickupsCount ?? this.todayPickupsCount,
       todayWeightKg: todayWeightKg ?? this.todayWeightKg,
       isLoading: isLoading ?? this.isLoading,
+      lastCoinsEarned: lastCoinsEarned ?? this.lastCoinsEarned,
     );
   }
 }
@@ -77,11 +85,16 @@ class CollectorNotifier extends StateNotifier<CollectorState> {
 
   void completeCollection(double weight, double amount) {
     if (state.currentAssignedPickup != null) {
+      // Eco Coins on EVERY completed transaction — 10% of the final
+      // verified amount, NO ₹500 threshold (citizens-only rule).
+      final coinsEarned = RewardLedger.awardCollectorCoinsForTransaction(amount);
+
       state = state.copyWith(
         todayEarnings: state.todayEarnings + amount,
         todayPickupsCount: state.todayPickupsCount + 1,
         todayWeightKg: state.todayWeightKg + weight,
         currentAssignedPickup: null,
+        lastCoinsEarned: coinsEarned,
       );
     }
   }

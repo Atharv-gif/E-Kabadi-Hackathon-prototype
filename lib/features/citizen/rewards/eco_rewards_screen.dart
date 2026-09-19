@@ -9,7 +9,9 @@ import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
 import '../../../shared/widgets/common.dart';
+import '../../../shared/widgets/bottom_nav_metrics.dart';
 import '../../../providers/rewards_provider.dart';
+import '../../../repositories/rewards_repository.dart';
 
 class EcoRewardsScreen extends ConsumerWidget {
   const EcoRewardsScreen({super.key});
@@ -18,13 +20,15 @@ class EcoRewardsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final couponsAsync = ref.watch(availableCouponsProvider);
     final historyAsync = ref.watch(citizenPointHistoryProvider);
+    final points = ref.watch(citizenEcoPointsProvider);
 
     return Scaffold(
       appBar: const CustomAppBar(title: 'Eco Rewards', showBack: false),
       body: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 110),
+          // Reserve space for the floating bottom navigation bar.
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, BottomNavBarMetrics.contentPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -54,7 +58,7 @@ class EcoRewardsScreen extends ConsumerWidget {
                             borderRadius: AppRadius.rPill,
                           ),
                           child: Text(
-                            'RECYCLER LEVEL',
+                            'CITIZEN • ECO POINTS',
                             style: AppTypography.labelSmall.copyWith(color: AppColors.surface, fontSize: 9.5),
                           ),
                         ),
@@ -67,7 +71,7 @@ class EcoRewardsScreen extends ConsumerWidget {
                         const Icon(LucideIcons.award, size: 36, color: AppColors.surface),
                         const SizedBox(width: AppSpacing.md),
                         Text(
-                          '840',
+                          '$points',
                           style: AppTypography.displayLarge.copyWith(color: AppColors.surface, fontSize: 42),
                         ),
                         const SizedBox(width: AppSpacing.sm),
@@ -78,19 +82,27 @@ class EcoRewardsScreen extends ConsumerWidget {
                       ],
                     ),
                     const SizedBox(height: AppSpacing.lg),
-                    ClipRRect(
-                      borderRadius: AppRadius.rPill,
-                      child: const LinearProgressIndicator(
-                        value: 0.84,
-                        minHeight: 8,
-                        backgroundColor: Colors.white30,
-                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.surface),
+                    // The citizen rule: Eco Points are earned only when the
+                    // FINAL VERIFIED scrap bill is ₹500+ (10% of the bill).
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface.withValues(alpha: 0.14),
+                        borderRadius: AppRadius.rMd,
                       ),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      '160 points to reach Green Hero badge',
-                      style: AppTypography.bodySmall.copyWith(color: AppColors.surface.withValues(alpha: 0.9)),
+                      child: Row(
+                        children: [
+                          const Icon(LucideIcons.info, size: 15, color: AppColors.surface),
+                          const SizedBox(width: AppSpacing.sm),
+                          Expanded(
+                            child: Text(
+                              'Earn 10% Eco Points on every pickup with a final bill of \u20B9500 or more.',
+                              style: AppTypography.bodySmall.copyWith(color: AppColors.surface, fontSize: 11.5),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -103,6 +115,7 @@ class EcoRewardsScreen extends ConsumerWidget {
               couponsAsync.when(
                 data: (coupons) => Column(
                   children: coupons.map((c) {
+                    final affordable = points >= c.pointsCost;
                     return Padding(
                       padding: const EdgeInsets.only(bottom: AppSpacing.md),
                       child: CustomCard(
@@ -135,20 +148,30 @@ class EcoRewardsScreen extends ConsumerWidget {
                                     '${c.pointsCost} points required',
                                     style: AppTypography.labelSmall.copyWith(color: AppColors.rewardOrange, fontSize: 10),
                                   ),
+                                  if (!affordable) ...[
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'Need ${c.pointsCost - points} more points',
+                                      style: AppTypography.labelSmall.copyWith(color: AppColors.textMuted, fontSize: 10),
+                                    ),
+                                  ],
                                 ],
                               ),
                             ),
                             const SizedBox(width: AppSpacing.sm),
-                            CustomButton(
-                              text: 'Redeem',
-                              onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Redeemed ${c.title}! Coupon code: ${c.couponCode}')),
-                                );
-                              },
-                              type: ButtonType.secondary,
-                              width: 88,
-                              height: 40,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                CustomButton(
+                                  // Disabled (null onPressed) until the citizen
+                                  // has enough Eco Points — clearly greyed out.
+                                  text: 'Redeem',
+                                  onPressed: affordable ? () => _redeem(context, ref, c) : null,
+                                  type: ButtonType.secondary,
+                                  width: 88,
+                                  height: 40,
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -179,6 +202,7 @@ class EcoRewardsScreen extends ConsumerWidget {
                 data: (history) => Column(
                   children: history.map((item) {
                     final isEarned = item.type == 'earned';
+                    final isZeroAward = isEarned && item.points == 0;
                     return Padding(
                       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                       child: CustomCard(
@@ -188,12 +212,24 @@ class EcoRewardsScreen extends ConsumerWidget {
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: isEarned ? AppColors.successLight : AppColors.errorLight,
+                                color: isZeroAward
+                                    ? AppColors.warningLight
+                                    : isEarned
+                                        ? AppColors.successLight
+                                        : AppColors.errorLight,
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
-                                isEarned ? LucideIcons.arrowUpRight : LucideIcons.arrowDownLeft,
-                                color: isEarned ? AppColors.success : AppColors.error,
+                                isZeroAward
+                                    ? LucideIcons.info
+                                    : isEarned
+                                        ? LucideIcons.arrowUpRight
+                                        : LucideIcons.arrowDownLeft,
+                                color: isZeroAward
+                                    ? AppColors.warning
+                                    : isEarned
+                                        ? AppColors.success
+                                        : AppColors.error,
                                 size: 16,
                               ),
                             ),
@@ -208,9 +244,13 @@ class EcoRewardsScreen extends ConsumerWidget {
                               ),
                             ),
                             Text(
-                              '${isEarned ? "+" : "-"}${item.points} pts',
+                              isZeroAward ? '+0 pts' : '${isEarned ? "+" : "-"}${item.points} pts',
                               style: AppTypography.titleSmall.copyWith(
-                                color: isEarned ? AppColors.success : AppColors.error,
+                                color: isZeroAward
+                                    ? AppColors.textMuted
+                                    : isEarned
+                                        ? AppColors.success
+                                        : AppColors.error,
                               ),
                             ),
                           ],
@@ -227,6 +267,19 @@ class EcoRewardsScreen extends ConsumerWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  void _redeem(BuildContext context, WidgetRef ref, RewardCoupon c) {
+    final ok = ref.read(citizenEcoPointsProvider.notifier).redeem(c.pointsCost);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          ok
+              ? 'Redeemed ${c.title}! Coupon code: ${c.couponCode}'
+              : 'Not enough Eco Points — you need ${c.pointsCost} points.',
         ),
       ),
     );

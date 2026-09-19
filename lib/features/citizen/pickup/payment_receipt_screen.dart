@@ -8,7 +8,9 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
+import '../../../shared/widgets/bottom_nav_metrics.dart';
 import '../../../providers/pickup_provider.dart';
+import '../../../providers/rewards_provider.dart';
 
 class PaymentReceiptScreen extends ConsumerWidget {
   const PaymentReceiptScreen({super.key});
@@ -16,10 +18,11 @@ class PaymentReceiptScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final payment = ref.watch(pickupProvider).lastPayment;
+    final ecoPoints = ref.watch(citizenEcoPointsProvider);
 
     final amount = payment != null ? '\u20B9${payment.amount.toStringAsFixed(2)}' : '\u20B9118.00';
     final txnId = payment?.transactionId ?? 'TXN948102948';
-    final points = payment?.ecoPointsEarned ?? 20;
+    final points = payment?.ecoPointsEarned ?? 0;
     final method = payment?.method ?? 'UPI / Google Pay';
 
     return Scaffold(
@@ -27,7 +30,8 @@ class PaymentReceiptScreen extends ConsumerWidget {
       body: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          // Reserve space for the floating bottom navigation bar.
+          padding: EdgeInsets.fromLTRB(24, 32, 24, BottomNavBarMetrics.contentPadding),
           child: Column(
             children: [
               const SizedBox(height: AppSpacing.lg),
@@ -82,27 +86,41 @@ class PaymentReceiptScreen extends ConsumerWidget {
               ),
               const SizedBox(height: AppSpacing.lg),
 
-              // ── Eco reward banner ──
+              // ── Eco reward banner (₹500 threshold aware) ──
               Container(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 decoration: BoxDecoration(
-                  gradient: AppColors.rewardGradient,
+                  gradient: points > 0
+                      ? AppColors.rewardGradient
+                      : const LinearGradient(
+                          colors: [Color(0xFF64748B), Color(0xFF475569)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                   borderRadius: AppRadius.rLg,
                 ),
                 child: Row(
                   children: [
-                    const Icon(LucideIcons.award, color: AppColors.surface, size: 30),
+                    Icon(
+                      points > 0 ? LucideIcons.award : LucideIcons.info,
+                      color: AppColors.surface,
+                      size: 30,
+                    ),
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '+$points Eco Points Awarded!',
+                            points > 0
+                                ? '+$points Eco Points Awarded!'
+                                : 'No Eco Points This Time',
                             style: AppTypography.titleSmall.copyWith(color: AppColors.surface),
                           ),
                           Text(
-                            'You have unlocked Recycler Level 2!',
+                            points > 0
+                                ? 'New balance: $ecoPoints Eco Points.'
+                                : 'Eco Points start at a \u20B9500 final bill — this bill was below that.',
                             style: AppTypography.bodySmall.copyWith(color: AppColors.surface.withValues(alpha: 0.9)),
                           ),
                         ],

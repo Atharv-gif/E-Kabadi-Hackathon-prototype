@@ -8,6 +8,7 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
+import '../../../shared/widgets/bottom_nav_metrics.dart';
 import '../../../providers/rewards_provider.dart';
 
 class EcoCoinsScreen extends ConsumerWidget {
@@ -16,13 +17,15 @@ class EcoCoinsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final coinHistoryAsync = ref.watch(collectorCoinHistoryProvider);
+    final coins = ref.watch(collectorEcoCoinsProvider);
 
     return Scaffold(
       appBar: const CustomAppBar(title: 'Eco Coins', showBack: false),
       body: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 110),
+          // Reserve space for the floating bottom navigation bar.
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, BottomNavBarMetrics.contentPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -52,7 +55,7 @@ class EcoCoinsScreen extends ConsumerWidget {
                             borderRadius: AppRadius.rPill,
                           ),
                           child: Text(
-                            'GOLD TIER',
+                            'COLLECTOR • ECO COINS',
                             style: AppTypography.labelSmall.copyWith(color: AppColors.surface, fontSize: 9.5),
                           ),
                         ),
@@ -65,7 +68,7 @@ class EcoCoinsScreen extends ConsumerWidget {
                         const Icon(LucideIcons.coins, size: 34, color: AppColors.surface),
                         const SizedBox(width: AppSpacing.md),
                         Text(
-                          '1,250',
+                          '$coins',
                           style: AppTypography.displayLarge.copyWith(color: AppColors.surface, fontSize: 42),
                         ),
                         const SizedBox(width: AppSpacing.sm),
@@ -79,9 +82,27 @@ class EcoCoinsScreen extends ConsumerWidget {
                       ],
                     ).animate(delay: 200.ms).fadeIn(duration: 400.ms).slideY(begin: 0.15, end: 0),
                     const SizedBox(height: AppSpacing.lg),
-                    Text(
-                      'Earn coins on every pickup — redeem for ration, healthcare & tools.',
-                      style: AppTypography.bodySmall.copyWith(color: AppColors.surface.withValues(alpha: 0.9), height: 1.45),
+                    // Collector rule: 10% Eco Coins on EVERY completed
+                    // transaction — no ₹500 minimum (that's citizen-only).
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface.withValues(alpha: 0.14),
+                        borderRadius: AppRadius.rMd,
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(LucideIcons.info, size: 15, color: AppColors.surface),
+                          const SizedBox(width: AppSpacing.sm),
+                          Expanded(
+                            child: Text(
+                              'Earn 10% Eco Coins on EVERY completed pickup — no minimum amount.',
+                              style: AppTypography.bodySmall.copyWith(color: AppColors.surface, fontSize: 11.5),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -99,8 +120,8 @@ class EcoCoinsScreen extends ConsumerWidget {
                         children: [
                           const Icon(LucideIcons.trendingUp, size: 20, color: AppColors.success),
                           const SizedBox(height: AppSpacing.sm),
-                          Text('+150', style: AppTypography.titleLarge.copyWith(fontSize: 19)),
-                          Text('Earned Today', style: AppTypography.bodySmall),
+                          Text('+$coins', style: AppTypography.titleLarge.copyWith(fontSize: 19)),
+                          Text('Coins Balance', style: AppTypography.bodySmall),
                         ],
                       ),
                     ),
@@ -129,6 +150,7 @@ class EcoCoinsScreen extends ConsumerWidget {
               const SizedBox(height: AppSpacing.md),
               _buildBenefitCard(
                 context,
+                ref,
                 title: 'Monthly Household Ration Kit',
                 subtitle: 'Includes 10kg Atta, 5kg Basmati Rice, 2L Oil & Pulses.',
                 coins: 500,
@@ -136,6 +158,7 @@ class EcoCoinsScreen extends ConsumerWidget {
               ),
               _buildBenefitCard(
                 context,
+                ref,
                 title: 'Free Family Healthcare Voucher',
                 subtitle: 'Valid for full body health checkup at Apollo Clinic.',
                 coins: 300,
@@ -143,6 +166,7 @@ class EcoCoinsScreen extends ConsumerWidget {
               ),
               _buildBenefitCard(
                 context,
+                ref,
                 title: 'Heavy Duty Gloves & Digital Scale',
                 subtitle: 'Professional 100kg digital scale + Kevlar grip gloves.',
                 coins: 400,
@@ -210,12 +234,15 @@ class EcoCoinsScreen extends ConsumerWidget {
   }
 
   Widget _buildBenefitCard(
-    BuildContext context, {
+    BuildContext context,
+    WidgetRef ref, {
     required String title,
     required String subtitle,
     required int coins,
     required IconData icon,
   }) {
+    final balance = ref.watch(collectorEcoCoinsProvider);
+    final affordable = balance >= coins;
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: CustomCard(
@@ -245,22 +272,37 @@ class EcoCoinsScreen extends ConsumerWidget {
                     '$coins Eco Coins',
                     style: AppTypography.labelSmall.copyWith(color: AppColors.rewardOrange, fontSize: 10),
                   ),
+                  if (!affordable) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      'Need ${coins - balance} more coins',
+                      style: AppTypography.labelSmall.copyWith(color: AppColors.textMuted, fontSize: 10),
+                    ),
+                  ],
                 ],
               ),
             ),
             const SizedBox(width: AppSpacing.sm),
             CustomButton(
               text: 'Redeem',
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Successfully redeemed "$title"!')),
-                );
-              },
+              // Disabled until the collector has enough Eco Coins.
+              onPressed: affordable ? () => _redeem(context, ref, title, coins) : null,
               type: ButtonType.secondary,
               width: 88,
               height: 40,
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  void _redeem(BuildContext context, WidgetRef ref, String title, int cost) {
+    final ok = ref.read(collectorEcoCoinsProvider.notifier).redeem(cost);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          ok ? 'Successfully redeemed "$title"!' : 'Not enough Eco Coins for "$title".',
         ),
       ),
     );

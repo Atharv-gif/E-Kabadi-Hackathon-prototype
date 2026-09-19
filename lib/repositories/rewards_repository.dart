@@ -1,6 +1,7 @@
 import '../models/eco_point_model.dart';
 import '../models/eco_coin_model.dart';
 import '../models/recycling_journey_model.dart';
+import '../services/reward_rules_service.dart';
 
 class RewardCoupon {
   final String id;
@@ -30,26 +31,28 @@ abstract class RewardsRepository {
 }
 
 class MockRewardsRepository implements RewardsRepository {
+  /// CITIZEN history — reflects the official rule: Eco Points are earned
+  /// ONLY when the final verified bill is ₹500+ (10% of the bill).
   @override
   Future<List<EcoPointModel>> getCitizenPointHistory() async {
-    return const [
-      EcoPointModel(
+    return [
+      const EcoPointModel(
         id: 'PT-101',
-        points: 20,
+        points: 120,
         type: 'earned',
         title: 'Pickup Completed',
-        description: 'Recycled 4.6 kg mixed plastic & paper',
+        description: 'Final verified bill ₹1,200 • 10% Eco Points',
         timestamp: '18 Sep 2026',
       ),
-      EcoPointModel(
+      const EcoPointModel(
         id: 'PT-102',
-        points: 170,
+        points: 0,
         type: 'earned',
-        title: 'E-Waste Recycling Bonus',
-        description: 'Recycled smartphone & charger',
+        title: 'Pickup Completed',
+        description: 'Final verified bill ₹430 • Below ₹500 — no Eco Points',
         timestamp: '15 Sep 2026',
       ),
-      EcoPointModel(
+      const EcoPointModel(
         id: 'PT-103',
         points: 100,
         type: 'redeemed',
@@ -60,24 +63,27 @@ class MockRewardsRepository implements RewardsRepository {
     ];
   }
 
+  /// COLLECTOR history — Eco Coins on EVERY completed transaction (10%,
+  /// no ₹500 threshold). Coins earned must always come from the final
+  /// verified transaction amount via [RewardRules.collectorEcoCoins].
   @override
   Future<List<EcoCoinModel>> getCollectorCoinHistory() async {
     return const [
       EcoCoinModel(
         id: 'CN-201',
-        coins: 150,
-        title: 'Pickup Milestone Completed',
-        description: 'Completed 5 pickups in a day',
-        category: 'Bonus',
+        coins: 45,
+        title: 'Pickup Completed',
+        description: 'Final transaction \u20B9450 • 10% Eco Coins',
+        category: 'Transaction',
         isCredit: true,
         timestamp: '18 Sep 2026',
       ),
       EcoCoinModel(
         id: 'CN-202',
-        coins: 50,
-        title: 'Prompt Arrival Bonus',
-        description: 'Arrived within ETA window',
-        category: 'Performance',
+        coins: 20,
+        title: 'Pickup Completed',
+        description: 'Final transaction \u20B9200 • 10% Eco Coins',
+        category: 'Transaction',
         isCredit: true,
         timestamp: '17 Sep 2026',
       ),

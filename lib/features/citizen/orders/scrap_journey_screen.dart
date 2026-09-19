@@ -10,6 +10,7 @@ import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
 import '../../../shared/widgets/common.dart';
 import '../../../shared/widgets/empty_state_widget.dart';
+import '../../../shared/widgets/bottom_nav_metrics.dart';
 import '../../../providers/rewards_provider.dart';
 
 class ScrapJourneyScreen extends ConsumerWidget {
@@ -34,7 +35,8 @@ class ScrapJourneyScreen extends ConsumerWidget {
             }
             final jrn = journeys.first;
             return SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              // Reserve space for the floating bottom navigation bar.
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, BottomNavBarMetrics.contentPadding),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

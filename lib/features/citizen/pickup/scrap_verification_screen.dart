@@ -9,6 +9,8 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
+import '../../../shared/widgets/bottom_nav_metrics.dart';
+import '../../../services/reward_rules_service.dart';
 import '../../../providers/pickup_provider.dart';
 
 class ScrapVerificationScreen extends ConsumerStatefulWidget {
@@ -36,7 +38,8 @@ class _ScrapVerificationScreenState extends ConsumerState<ScrapVerificationScree
       body: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          // Reserve space for the floating bottom navigation bar.
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, BottomNavBarMetrics.contentPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -129,33 +132,57 @@ class _ScrapVerificationScreenState extends ConsumerState<ScrapVerificationScree
               ),
               const SizedBox(height: AppSpacing.xl),
 
-              // ── Eco points banner ──
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                decoration: BoxDecoration(
-                  color: AppColors.rewardOrangeLight,
-                  borderRadius: AppRadius.rLg,
-                  border: Border.all(color: AppColors.rewardOrange.withValues(alpha: 0.4)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(LucideIcons.award, color: AppColors.rewardOrange, size: 26),
-                    const SizedBox(width: AppSpacing.md),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('+20 Eco Points Reward', style: AppTypography.titleSmall.copyWith(color: AppColors.rewardOrange)),
-                          Text(
-                            'You will earn 20 Eco Points once payment completes.',
-                            style: AppTypography.bodySmall,
-                          ),
-                        ],
-                      ),
+              // ── Eco points banner (₹500 threshold aware) ──
+              Builder(builder: (context) {
+                // Preview uses the verified bill shown on this screen;
+                // points are only CREDITED after payment completes.
+                const previewBill = 118.0;
+                final previewPoints = RewardRules.citizenEcoPoints(previewBill);
+                final eligible = RewardRules.isCitizenEligible(previewBill);
+                return Container(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  decoration: BoxDecoration(
+                    color: eligible ? AppColors.rewardOrangeLight : AppColors.surfaceVariant,
+                    borderRadius: AppRadius.rLg,
+                    border: Border.all(
+                      color: eligible
+                          ? AppColors.rewardOrange.withValues(alpha: 0.4)
+                          : AppColors.border,
                     ),
-                  ],
-                ),
-              ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        eligible ? LucideIcons.award : LucideIcons.info,
+                        color: eligible ? AppColors.rewardOrange : AppColors.textMuted,
+                        size: 26,
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              eligible
+                                  ? '+$previewPoints Eco Points After Payment'
+                                  : 'Eco Points Need a \u20B9500 Bill',
+                              style: AppTypography.titleSmall.copyWith(
+                                color: eligible ? AppColors.rewardOrange : AppColors.textSecondary,
+                              ),
+                            ),
+                            Text(
+                              eligible
+                                  ? 'You will earn $previewPoints Eco Points (10%) once payment completes.'
+                                  : 'This bill is \u20B9${previewBill.toStringAsFixed(0)} — earn 10% Eco Points on bills of \u20B9500 or more.',
+                              style: AppTypography.bodySmall,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
               const SizedBox(height: AppSpacing.xxxl),
 
               CustomButton(

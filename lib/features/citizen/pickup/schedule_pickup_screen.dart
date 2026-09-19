@@ -10,6 +10,7 @@ import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_text_field.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
+import '../../../shared/widgets/bottom_nav_metrics.dart';
 import '../../../models/scrap_item_model.dart';
 import '../../../providers/scrap_provider.dart';
 import '../../../providers/pickup_provider.dart';
@@ -85,7 +86,8 @@ class _SchedulePickupScreenState extends ConsumerState<SchedulePickupScreen> {
       body: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
+          // Reserve space for the floating bottom navigation bar.
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, BottomNavBarMetrics.contentPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

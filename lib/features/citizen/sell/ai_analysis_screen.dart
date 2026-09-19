@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -9,13 +11,64 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
+import '../../../shared/widgets/bottom_nav_metrics.dart';
 import '../../../providers/scrap_provider.dart';
 
-class AiAnalysisScreen extends ConsumerWidget {
+class AiAnalysisScreen extends ConsumerStatefulWidget {
   const AiAnalysisScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AiAnalysisScreen> createState() => _AiAnalysisScreenState();
+}
+
+class _AiAnalysisScreenState extends ConsumerState<AiAnalysisScreen> {
+  // Manual weight entry — one controller per detected item.
+  // Starts EMPTY by design: AI must NEVER pre-fill or auto-generate weights.
+  final Map<String, TextEditingController> _weightControllers = {};
+  final Map<String, String?> _weightErrors = {};
+
+  TextEditingController _controllerFor(String id) {
+    return _weightControllers.putIfAbsent(id, () => TextEditingController());
+  }
+
+  @override
+  void dispose() {
+    for (final c in _weightControllers.values) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  bool _validateWeights(List<String> ids) {
+    var valid = true;
+    for (final id in ids) {
+      final text = _controllerFor(id).text.trim();
+      final value = double.tryParse(text);
+      if (text.isEmpty || value == null || value <= 0) {
+        _weightErrors[id] = 'Enter a valid weight';
+        valid = false;
+      } else {
+        _weightErrors[id] = null;
+      }
+    }
+    setState(() {});
+    return valid;
+  }
+
+  void _applyManualWeights() {
+    final scanState = ref.read(scrapScanProvider);
+    final weights = <String, double>{
+      for (final item in scanState.analyzedItems)
+        if (double.tryParse(_controllerFor(item.id).text.trim()) case final v? when v > 0)
+          item.id: v,
+    };
+    if (weights.isNotEmpty) {
+      ref.read(scrapScanProvider.notifier).applyManualWeights(weights);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final scanState = ref.watch(scrapScanProvider);
 
     return Scaffold(
@@ -23,13 +76,15 @@ class AiAnalysisScreen extends ConsumerWidget {
       body: SafeArea(
         bottom: false,
         child: scanState.isAnalyzing
-            ? _AnalyzingView()
+            ? const _AnalyzingView()
             : SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
+                // Reserve space for the floating bottom navigation bar so the
+                // Confirm / Retake / Edit buttons are never covered.
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, BottomNavBarMetrics.contentPadding),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // ── Image preview with AI tag ──
+                    // ── Image preview (real captured photo when available) ──
                     Stack(
                       children: [
                         ClipRRect(
@@ -38,16 +93,7 @@ class AiAnalysisScreen extends ConsumerWidget {
                             height: 210,
                             width: double.infinity,
                             color: AppColors.surfaceVariant,
-                            child: Image.asset(
-                              'assets/images/img 1.png',
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) => Container(
-                                decoration: const BoxDecoration(gradient: AppColors.heroGradient),
-                                child: const Center(
-                                  child: Icon(LucideIcons.recycle, size: 72, color: AppColors.surface),
-                                ),
-                              ),
-                            ),
+                            child: _previewImage(scanState),
                           ),
                         ),
                         Positioned(
@@ -93,41 +139,36 @@ class AiAnalysisScreen extends ConsumerWidget {
                         padding: const EdgeInsets.only(bottom: AppSpacing.md),
                         child: CustomCard(
                           padding: const EdgeInsets.all(AppSpacing.lg),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          child: Row(
                             children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: const BoxDecoration(
-                                      color: AppColors.primaryLight,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(LucideIcons.package, color: AppColors.primary, size: 20),
-                                  ),
-                                  const SizedBox(width: AppSpacing.md),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(item.category, style: AppTypography.titleSmall),
-                                        Text(item.subType, style: AppTypography.bodySmall),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.techBlueLight,
-                                      borderRadius: AppRadius.rPill,
-                                    ),
-                                    child: Text(
-                                      '${(item.confidenceScore * 100).toStringAsFixed(0)}% match',
-                                      style: AppTypography.labelSmall.copyWith(color: AppColors.techBlue, fontSize: 10),
-                                    ),
-                                  ),
-                                ],
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: const BoxDecoration(
+                                  color: AppColors.primaryLight,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(LucideIcons.package, color: AppColors.primary, size: 20),
+                              ),
+                              const SizedBox(width: AppSpacing.md),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(item.category, style: AppTypography.titleSmall),
+                                    Text(item.subType, style: AppTypography.bodySmall),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: AppColors.techBlueLight,
+                                  borderRadius: AppRadius.rPill,
+                                ),
+                                child: Text(
+                                  '${(item.confidenceScore * 100).toStringAsFixed(0)}% match',
+                                  style: AppTypography.labelSmall.copyWith(color: AppColors.techBlue, fontSize: 10),
+                                ),
                               ),
                             ],
                           ),
@@ -136,11 +177,11 @@ class AiAnalysisScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: AppSpacing.lg),
 
-                    // ── Citizen-entered weight (clearly separated) ──
+                    // ── Citizen-entered weight (manual, starts EMPTY) ──
                     Text('Approximate Weight (you enter)', style: AppTypography.titleMedium),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
-                      'AI cannot measure physical weight from a photo — please estimate.',
+                      'AI cannot measure physical weight from a photo — please type your estimate below.',
                       style: AppTypography.bodySmall,
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -151,50 +192,40 @@ class AiAnalysisScreen extends ConsumerWidget {
                           for (var i = 0; i < scanState.analyzedItems.length; i++) ...[
                             if (i > 0) const Divider(height: AppSpacing.xxl),
                             _WeightRow(
+                              key: ValueKey(scanState.analyzedItems[i].id),
                               label: scanState.analyzedItems[i].subType,
-                              initialKg: scanState.analyzedItems[i].weightKg,
+                              controller: _controllerFor(scanState.analyzedItems[i].id),
+                              errorText: _weightErrors[scanState.analyzedItems[i].id],
                             ),
                           ],
-                          if (scanState.analyzedItems.isEmpty) ...[
-                            const _WeightRow(label: 'Mixed scrap', initialKg: 5.0),
-                          ],
+                          if (scanState.analyzedItems.isEmpty)
+                            _WeightRow(
+                              key: const ValueKey('mixed'),
+                              label: 'Mixed scrap',
+                              controller: _controllerFor('mixed'),
+                              errorText: _weightErrors['mixed'],
+                            ),
                         ],
                       ),
                     ),
                     const SizedBox(height: AppSpacing.lg),
 
-                    // ── Estimated value summary ──
+                    // ── Info banner: estimates only, no value promises ──
                     Container(
                       padding: const EdgeInsets.all(AppSpacing.lg),
                       decoration: BoxDecoration(
-                        gradient: AppColors.heroGradient,
+                        color: AppColors.techBlueLight,
                         borderRadius: AppRadius.rLg,
+                        border: Border.all(color: AppColors.techBlue.withValues(alpha: 0.35)),
                       ),
                       child: Row(
                         children: [
+                          const Icon(LucideIcons.info, size: 20, color: AppColors.techBlue),
+                          const SizedBox(width: AppSpacing.md),
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Estimated Value',
-                                  style: AppTypography.bodySmall.copyWith(color: AppColors.primaryLight),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  '\u20B9${_totalEstimate(scanState)}',
-                                  style: AppTypography.displayMedium.copyWith(color: AppColors.surface, fontSize: 28),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const Icon(LucideIcons.info, size: 18, color: AppColors.primaryLight),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            flex: 2,
                             child: Text(
-                              'Final amount is calculated after collector verification.',
-                              style: AppTypography.bodySmall.copyWith(color: AppColors.primaryLight),
+                              'Your weight is only an initial estimate. Final payment is based on the weight and bill verified by the collector at your doorstep.',
+                              style: AppTypography.bodySmall.copyWith(color: AppColors.techBlue, height: 1.45),
                             ),
                           ),
                         ],
@@ -204,7 +235,15 @@ class AiAnalysisScreen extends ConsumerWidget {
 
                     CustomButton(
                       text: 'Confirm & Schedule Pickup',
-                      onPressed: () => context.push('/citizen/schedule-pickup'),
+                      onPressed: () {
+                        final ids = [
+                          ...scanState.analyzedItems.map((i) => i.id),
+                          if (scanState.analyzedItems.isEmpty) 'mixed',
+                        ];
+                        if (!_validateWeights(ids)) return;
+                        _applyManualWeights();
+                        context.push('/citizen/schedule-pickup');
+                      },
                       icon: LucideIcons.calendarCheck,
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -236,60 +275,78 @@ class AiAnalysisScreen extends ConsumerWidget {
     );
   }
 
-  String _totalEstimate(ScrapScanState state) {
-    final total = state.analyzedItems.fold<double>(0, (sum, i) => sum + i.estimatedTotal);
-    return total.toStringAsFixed(0);
+  Widget _previewImage(ScrapScanState state) {
+    final path = state.imagePath;
+    if (path != null && path.isNotEmpty && !path.startsWith('assets/') && !path.startsWith('http')) {
+      final file = File(path);
+      if (file.existsSync()) {
+        return Image.file(
+          file,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => _assetFallback(),
+        );
+      }
+    }
+    return _assetFallback();
+  }
+
+  Widget _assetFallback() {
+    return Image.asset(
+      'assets/images/img 1.png',
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) => Container(
+        decoration: const BoxDecoration(gradient: AppColors.heroGradient),
+        child: const Center(
+          child: Icon(LucideIcons.recycle, size: 72, color: AppColors.surface),
+        ),
+      ),
+    );
   }
 }
 
-class _WeightRow extends StatefulWidget {
+class _WeightRow extends StatelessWidget {
   final String label;
-  final double initialKg;
+  final TextEditingController controller;
+  final String? errorText;
 
-  const _WeightRow({required this.label, required this.initialKg});
-
-  @override
-  State<_WeightRow> createState() => _WeightRowState();
-}
-
-class _WeightRowState extends State<_WeightRow> {
-  late final TextEditingController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(text: widget.initialKg.toStringAsFixed(1));
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  const _WeightRow({
+    super.key,
+    required this.label,
+    required this.controller,
+    required this.errorText,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(widget.label, style: AppTypography.bodyMedium.copyWith(color: AppColors.textPrimary)),
+              Text(label, style: AppTypography.bodyMedium.copyWith(color: AppColors.textPrimary)),
               Text('approximate weight', style: AppTypography.bodySmall),
             ],
           ),
         ),
+        const SizedBox(width: AppSpacing.md),
         SizedBox(
-          width: 110,
+          width: 150,
           child: TextField(
-            controller: _controller,
+            controller: controller,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'^\d{0,3}[.]?\d{0,2}')),
+            ],
             textAlign: TextAlign.right,
             style: AppTypography.titleSmall.copyWith(color: AppColors.primaryDark),
             decoration: InputDecoration(
+              hintText: 'Enter weight',
+              hintStyle: AppTypography.bodySmall.copyWith(color: AppColors.textMuted),
               suffixText: 'kg',
               suffixStyle: AppTypography.bodySmall,
+              errorText: errorText,
               contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               fillColor: AppColors.surface,
             ),
@@ -301,6 +358,8 @@ class _WeightRowState extends State<_WeightRow> {
 }
 
 class _AnalyzingView extends StatelessWidget {
+  const _AnalyzingView();
+
   @override
   Widget build(BuildContext context) {
     return Center(

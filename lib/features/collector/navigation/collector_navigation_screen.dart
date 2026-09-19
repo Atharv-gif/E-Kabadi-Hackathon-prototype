@@ -9,6 +9,7 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
+import '../../../shared/widgets/bottom_nav_metrics.dart';
 
 class CollectorNavigationScreen extends ConsumerWidget {
   const CollectorNavigationScreen({super.key});
@@ -105,9 +106,10 @@ class CollectorNavigationScreen extends ConsumerWidget {
                     ),
                   ),
 
-                  // Floating arrive card
+                  // Floating arrive card — raised above the floating
+                  // bottom navigation bar so the button stays accessible.
                   Positioned(
-                    bottom: 16,
+                    bottom: BottomNavBarMetrics.totalHeight + 16,
                     left: 20,
                     right: 20,
                     child: Container(

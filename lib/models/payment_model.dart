@@ -6,6 +6,9 @@ class PaymentModel {
   final String status;
   final String transactionId;
   final String timestamp;
+
+  /// Eco reward derived from the FINAL VERIFIED bill.
+  /// Citizen: 10% when bill ≥ ₹500, otherwise 0.
   final int ecoPointsEarned;
 
   const PaymentModel({
@@ -16,6 +19,6 @@ class PaymentModel {
     this.status = 'SUCCESS',
     required this.transactionId,
     required this.timestamp,
-    this.ecoPointsEarned = 20,
+    this.ecoPointsEarned = 0,
   });
 }

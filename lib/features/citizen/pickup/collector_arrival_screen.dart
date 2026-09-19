@@ -10,6 +10,7 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
+import '../../../shared/widgets/bottom_nav_metrics.dart';
 import '../../../providers/pickup_provider.dart';
 
 class CollectorArrivalScreen extends ConsumerWidget {
@@ -27,7 +28,8 @@ class CollectorArrivalScreen extends ConsumerWidget {
       body: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          // Reserve space for the floating bottom navigation bar.
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, BottomNavBarMetrics.contentPadding),
           child: Column(
             children: [
               const SizedBox(height: AppSpacing.lg),

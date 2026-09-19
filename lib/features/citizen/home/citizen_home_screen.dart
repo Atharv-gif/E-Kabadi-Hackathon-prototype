@@ -11,8 +11,10 @@ import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/common.dart';
 import '../../../shared/widgets/metric_card.dart';
+import '../../../shared/widgets/bottom_nav_metrics.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/pickup_provider.dart';
+import '../../../providers/rewards_provider.dart';
 import '../../../models/pickup_request_model.dart';
 
 class CitizenHomeScreen extends ConsumerWidget {
@@ -40,6 +42,7 @@ class CitizenHomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
     final pickupState = ref.watch(pickupProvider);
+    final ecoPoints = ref.watch(citizenEcoPointsProvider);
     final userName = authState.user?.name ?? 'Aarav Sharma';
     final active = pickupState.activePickup;
     final hasActive = active != null &&
@@ -57,7 +60,8 @@ class CitizenHomeScreen extends ConsumerWidget {
           },
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 110),
+            // Reserve space for the floating bottom navigation bar.
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, BottomNavBarMetrics.contentPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -260,7 +264,7 @@ class CitizenHomeScreen extends ConsumerWidget {
                         icon: LucideIcons.award,
                         iconColor: AppColors.rewardOrange,
                         iconBg: AppColors.rewardOrangeLight,
-                        value: '840',
+                        value: '$ecoPoints',
                         label: 'Eco Points',
                       ),
                     ),
@@ -341,7 +345,11 @@ class CitizenHomeScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text('+ \u20B9118', style: AppTypography.titleSmall.copyWith(color: AppColors.success)),
-                          Text('+20 Points', style: AppTypography.bodySmall.copyWith(color: AppColors.rewardOrange)),
+                          // ₹118 bill is below the ₹500 minimum → no Eco Points.
+                          Text(
+                            'No Eco Points',
+                            style: AppTypography.bodySmall.copyWith(color: AppColors.textMuted),
+                          ),
                         ],
                       ),
                     ],

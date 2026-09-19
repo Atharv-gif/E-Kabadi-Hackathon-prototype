@@ -10,6 +10,8 @@ import '../../../shared/widgets/custom_card.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_text_field.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
+import '../../../shared/widgets/bottom_nav_metrics.dart';
+import '../../../services/reward_rules_service.dart';
 import '../../../providers/collector_provider.dart';
 
 class CollectorVerificationScreen extends ConsumerStatefulWidget {
@@ -25,8 +27,12 @@ class _CollectorVerificationScreenState extends ConsumerState<CollectorVerificat
   final TextEditingController _amountController = TextEditingController(text: '118.00');
 
   void _onCompleteCollection() {
-    final weight = double.tryParse(_weightController.text) ?? 4.6;
-    final amount = double.tryParse(_amountController.text) ?? 118.0;
+    final weight = double.tryParse(_weightController.text) ?? 0.0;
+    final amount = double.tryParse(_amountController.text) ?? 0.0;
+
+    // Eco Coins on EVERY completed transaction — 10% of the final verified
+    // amount. No ₹500 threshold for collectors (citizen-only rule).
+    final coinsEarned = RewardRules.collectorEcoCoins(amount);
 
     ref.read(collectorProvider.notifier).completeCollection(weight, amount);
 
@@ -63,7 +69,7 @@ class _CollectorVerificationScreenState extends ConsumerState<CollectorVerificat
                     const Icon(LucideIcons.coins, color: AppColors.rewardOrange, size: 22),
                     const SizedBox(width: AppSpacing.sm),
                     Text(
-                      '+150 Eco Coins Earned!',
+                      '+$coinsEarned Eco Coins Earned!',
                       style: AppTypography.titleSmall.copyWith(color: AppColors.rewardOrange),
                     ),
                   ],
@@ -95,7 +101,8 @@ class _CollectorVerificationScreenState extends ConsumerState<CollectorVerificat
       body: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          // Reserve space for the floating bottom navigation bar.
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, BottomNavBarMetrics.contentPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
+import '../../../shared/widgets/bottom_nav_metrics.dart';
 
 class CollectorVoiceScreen extends StatefulWidget {
   const CollectorVoiceScreen({super.key});
@@ -45,13 +46,13 @@ class _CollectorVoiceScreenState extends State<CollectorVoiceScreen> {
       appBar: const CustomAppBar(title: 'Voice Assistant', showBack: false),
       body: SafeArea(
         bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.all(24),
+        child: SingleChildScrollView(
+          // Reserve space for the floating bottom navigation bar; keeps the
+          // quick-command chips reachable on small phone screens.
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, BottomNavBarMetrics.contentPadding),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Spacer(),
-
               // ── Mic button ──
               GestureDetector(
                 onTap: () => _startListening('Show nearby pickups'),
@@ -124,7 +125,7 @@ class _CollectorVoiceScreenState extends State<CollectorVoiceScreen> {
                   _buildCommandChip('Mark pickup complete'),
                 ],
               ),
-              const Spacer(),
+              const SizedBox(height: AppSpacing.xxl),
             ],
           ),
         ),
