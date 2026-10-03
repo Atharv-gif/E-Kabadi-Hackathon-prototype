@@ -166,9 +166,14 @@
                 <div class="chart-container">
                     <div class="chart-header">
                         <h3><i class="fa-solid fa-chart-line"></i> Real-Time Scrap Volume</h3>
-                        <span class="chart-chip">Weekly (Kg)</span>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <span class="chart-chip" id="chart-total-chip"><i class="fa-solid fa-scale-balanced"></i> 1,450 Kg Total</span>
+                            <span class="chart-chip" style="background: rgba(59, 130, 246, 0.12); color: var(--accent-blue);"><i class="fa-solid fa-calendar-week"></i> Weekly</span>
+                        </div>
                     </div>
-                    <canvas id="scrapChart" height="230"></canvas>
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="scrapChart"></canvas>
+                    </div>
                 </div>
                 
                 <div class="table-container">
