@@ -4,15 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>E-Kabadi Admin Command Center</title>
-    <link rel="stylesheet" href="css/style.css">
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <!-- SIDEBAR NAVIGATION -->
     <aside class="sidebar">
         <div class="sidebar-header">
-            <h2>E-Kabadi <i class="fa-solid fa-leaf"></i></h2>
+            <div class="brand-wrapper">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-leaf"></i>
+                </div>
+                <div>
+                    <div class="brand-title">E-Kabadi</div>
+                </div>
+            </div>
+            <span class="brand-badge">Command</span>
         </div>
+        
         <ul class="sidebar-menu" id="nav-menu">
             <li class="active" data-target="dashboard-view"><i class="fa-solid fa-chart-pie"></i> Dashboard</li>
             <li data-target="citizens-view"><i class="fa-solid fa-users"></i> Citizens</li>
@@ -20,92 +36,160 @@
             <li data-target="pickups-view"><i class="fa-solid fa-clipboard-list"></i> Live Pickups</li>
             <li data-target="ratecard-view"><i class="fa-solid fa-tags"></i> Rate Card</li>
         </ul>
+
+        <!-- System Health Footer & Reset Option -->
+        <div class="sidebar-footer">
+            <div class="system-status-indicator">
+                <div class="pulse-dot"></div>
+                <div>
+                    <div class="system-status-text">Dispatch Radar</div>
+                    <div class="system-status-sub">All systems operational</div>
+                </div>
+            </div>
+            <button class="sidebar-reset-btn" onclick="resetDemoData()" title="Reset to initial default demo data">
+                <i class="fa-solid fa-arrow-rotate-left"></i> Reset Demo Data
+            </button>
+        </div>
     </aside>
 
+    <!-- MAIN CONTENT AREA -->
     <main class="main-content">
+        <!-- TOPBAR -->
         <header class="topbar">
-            <button class="menu-toggle"><i class="fa-solid fa-bars"></i></button>
-            <div class="search-bar">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" placeholder="Search requests, users...">
+            <div class="topbar-left">
+                <button class="menu-toggle" id="menu-toggle-btn" title="Toggle Navigation"><i class="fa-solid fa-bars"></i></button>
+                <div class="search-bar">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="global-search" placeholder="Search requests, citizens, collectors...">
+                </div>
             </div>
-            <div class="profile">
-                <span>System Monitor</span>
-                <img src="https://ui-avatars.com/api/?name=Admin&background=2ecc71&color=fff" alt="Admin" style="border-radius: 50%; width: 35px;">
+
+            <div class="topbar-right">
+                <!-- Theme Toggle Button -->
+                <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Dark/Light Mode">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+
+                <!-- Profile Badge -->
+                <div class="profile" title="Administrator Profile">
+                    <img src="https://ui-avatars.com/api/?name=Admin+Ops&background=10b981&color=fff&bold=true" alt="Admin" class="profile-avatar">
+                    <div class="profile-info">
+                        <span class="profile-name">Command Admin</span>
+                        <span class="profile-role">Super Admin</span>
+                    </div>
+                </div>
             </div>
         </header>
 
         <!-- DASHBOARD VIEW -->
         <section id="dashboard-view" class="view-section">
-            <div style="padding: 30px 30px 0 30px;">
-                <h2 style="color: #2c3e50; font-size: 1.2rem;">Environmental Impact (ESG)</h2>
+            <div class="section-label">
+                <h2><i class="fa-solid fa-seedling"></i> Environmental Impact (ESG Metrics)</h2>
+                <span class="chart-chip"><i class="fa-solid fa-globe"></i> Live Ecosystem</span>
             </div>
+
             <div class="cards">
                 <div class="card esg-card">
                     <div class="card-info">
-                        <h3>4.2 <span style="font-size: 1rem;">Tons</span></h3>
-                        <p>Total CO2 Offset</p>
+                        <h3>4.2 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 600;">Tons</span></h3>
+                        <p>Total CO₂ Offset</p>
+                        <span class="card-trend"><i class="fa-solid fa-arrow-trend-up"></i> +18.4% this month</span>
                     </div>
-                    <i class="fa-solid fa-cloud card-icon" style="color: #7f8c8d; background: rgba(127,140,141,0.1);"></i>
+                    <div class="card-icon" style="color: #64748b; background: rgba(100, 116, 139, 0.12);">
+                        <i class="fa-solid fa-cloud"></i>
+                    </div>
                 </div>
+
                 <div class="card esg-card">
                     <div class="card-info">
                         <h3>114</h3>
                         <p>Trees Equivalent Saved</p>
+                        <span class="card-trend"><i class="fa-solid fa-arrow-trend-up"></i> +12 new trees</span>
                     </div>
-                    <i class="fa-solid fa-tree card-icon"></i>
+                    <div class="card-icon" style="color: #10b981; background: var(--primary-light);">
+                        <i class="fa-solid fa-tree"></i>
+                    </div>
                 </div>
+
                 <div class="card esg-card">
                     <div class="card-info">
-                        <h3>1,250 <span style="font-size: 1rem;">Kg</span></h3>
-                        <p>Scrap Diverted from Landfill</p>
+                        <h3>1,250 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 600;">Kg</span></h3>
+                        <p>Diverted from Landfill</p>
+                        <span class="card-trend"><i class="fa-solid fa-arrow-trend-up"></i> +320 kg this week</span>
                     </div>
-                    <i class="fa-solid fa-recycle card-icon" style="color: #3498db; background: rgba(52,152,219,0.1);"></i>
+                    <div class="card-icon" style="color: #3b82f6; background: var(--accent-blue-light);">
+                        <i class="fa-solid fa-recycle"></i>
+                    </div>
                 </div>
             </div>
 
-            <div style="padding: 0 30px;">
-                <h2 style="color: #2c3e50; font-size: 1.2rem;">Platform Overview</h2>
+            <div class="section-label">
+                <h2><i class="fa-solid fa-gauge-high"></i> Platform Fleet & Activity</h2>
             </div>
+
             <div class="cards">
                 <div class="card">
                     <div class="card-info">
                         <h3 id="stat-citizens">0</h3>
                         <p>Registered Citizens</p>
+                        <span class="card-trend"><i class="fa-solid fa-circle-check"></i> Active Accounts</span>
                     </div>
-                    <i class="fa-solid fa-users card-icon" style="color: #9b59b6; background: rgba(155,89,182,0.1);"></i>
+                    <div class="card-icon" style="color: #8b5cf6; background: var(--accent-purple-light);">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
                 </div>
+
                 <div class="card">
                     <div class="card-info">
                         <h3 id="stat-collectors">0</h3>
                         <p>Active Collectors</p>
+                        <span class="card-trend"><i class="fa-solid fa-signal"></i> Online on Radar</span>
                     </div>
-                    <i class="fa-solid fa-truck card-icon" style="color: #e67e22; background: rgba(230,126,34,0.1);"></i>
+                    <div class="card-icon" style="color: #f59e0b; background: var(--accent-amber-light);">
+                        <i class="fa-solid fa-truck"></i>
+                    </div>
                 </div>
+
                 <div class="card">
                     <div class="card-info">
                         <h3 id="stat-pickups">0</h3>
                         <p>Live Auto-Matching</p>
+                        <span class="card-trend" style="color: #ef4444;"><i class="fa-solid fa-satellite-dish"></i> In Dispatch</span>
                     </div>
-                    <i class="fa-solid fa-satellite-dish card-icon" style="color: #e74c3c; background: rgba(231,76,60,0.1);"></i>
+                    <div class="card-icon" style="color: #ef4444; background: var(--accent-coral-light);">
+                        <i class="fa-solid fa-satellite-dish"></i>
+                    </div>
                 </div>
             </div>
 
             <div class="dashboard-grid">
                 <div class="chart-container">
-                    <h3>Real-Time Scrap Volume (Weekly)</h3>
-                    <canvas id="scrapChart"></canvas>
+                    <div class="chart-header">
+                        <h3><i class="fa-solid fa-chart-line"></i> Real-Time Scrap Volume</h3>
+                        <span class="chart-chip">Weekly (Kg)</span>
+                    </div>
+                    <canvas id="scrapChart" height="230"></canvas>
                 </div>
                 
                 <div class="table-container">
-                    <h3>Live System Dispatch Queue</h3>
+                    <div class="chart-header">
+                        <h3><i class="fa-solid fa-list-check"></i> Live Dispatch Queue</h3>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-small btn-primary" onclick="simulateNewPickup()" title="Simulate incoming citizen scrap request">
+                                <i class="fa-solid fa-plus"></i> Simulate Live
+                            </button>
+                            <button class="btn btn-small btn-outline" onclick="exportPickupsCSV()" title="Download Dispatch Report CSV">
+                                <i class="fa-solid fa-file-csv"></i> CSV
+                            </button>
+                        </div>
+                    </div>
                     <table>
                         <thead>
                             <tr>
                                 <th>Req ID</th>
                                 <th>Citizen</th>
-                                <th>Matched Collector</th>
-                                <th>Live Status</th>
+                                <th>Collector</th>
+                                <th>Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -118,8 +202,10 @@
         <!-- CITIZENS VIEW -->
         <section id="citizens-view" class="view-section hidden">
             <div class="view-header">
-                <h2>Citizen Accounts</h2>
-                <button class="btn btn-primary" onclick="openModalById('registerCitizenModal')"><i class="fa-solid fa-plus"></i> Register Citizen</button>
+                <h2>Citizen Accounts Directory</h2>
+                <button class="btn btn-primary" onclick="openModalById('registerCitizenModal')">
+                    <i class="fa-solid fa-plus"></i> Register Citizen
+                </button>
             </div>
             <div class="tables-section">
                 <div class="table-container">
@@ -127,10 +213,10 @@
                         <thead>
                             <tr>
                                 <th>User ID</th>
-                                <th>Name</th>
-                                <th>Location</th>
-                                <th>Eco-Coins</th>
-                                <th>Action</th>
+                                <th>Citizen Profile</th>
+                                <th>Primary Location</th>
+                                <th>Eco Points</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="citizens-table-body"></tbody>
@@ -142,8 +228,10 @@
         <!-- COLLECTORS VIEW -->
         <section id="collectors-view" class="view-section hidden">
             <div class="view-header">
-                <h2>Collector Fleet Status</h2>
-                <button class="btn btn-primary" onclick="openModalById('onboardCollectorModal')"><i class="fa-solid fa-plus"></i> Onboard Collector</button>
+                <h2>Collector Fleet Management</h2>
+                <button class="btn btn-primary" onclick="openModalById('onboardCollectorModal')">
+                    <i class="fa-solid fa-plus"></i> Onboard Collector
+                </button>
             </div>
             <div class="tables-section">
                 <div class="table-container">
@@ -151,10 +239,10 @@
                         <thead>
                             <tr>
                                 <th>Collector ID</th>
-                                <th>Name</th>
-                                <th>Vehicle No.</th>
+                                <th>Collector Name</th>
+                                <th>Vehicle Reg. No</th>
                                 <th>Fleet Status</th>
-                                <th>Action</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="collectors-table-body"></tbody>
@@ -166,8 +254,26 @@
         <!-- PICKUPS VIEW -->
         <section id="pickups-view" class="view-section hidden">
             <div class="view-header">
-                <h2>Pickup System Operations</h2>
+                <h2>Pickup System Operations & Dispatches</h2>
+                <div class="header-actions">
+                    <button class="btn btn-outline" onclick="exportPickupsCSV()">
+                        <i class="fa-solid fa-file-csv"></i> Export CSV
+                    </button>
+                    <button class="btn btn-primary" onclick="simulateNewPickup()">
+                        <i class="fa-solid fa-satellite-dish"></i> Simulate Live Request
+                    </button>
+                </div>
             </div>
+
+            <!-- Filter Pills -->
+            <div class="filter-bar" id="pickup-filter-bar">
+                <button class="filter-pill active" onclick="setPickupFilter('all')">All <span class="count" id="count-all">0</span></button>
+                <button class="filter-pill" onclick="setPickupFilter('matching')">Matching <span class="count" id="count-matching">0</span></button>
+                <button class="filter-pill" onclick="setPickupFilter('accepted')">Accepted <span class="count" id="count-accepted">0</span></button>
+                <button class="filter-pill" onclick="setPickupFilter('completed')">Completed <span class="count" id="count-completed">0</span></button>
+                <button class="filter-pill" onclick="setPickupFilter('unassigned')">Unassigned <span class="count" id="count-unassigned">0</span></button>
+            </div>
+
             <div class="tables-section">
                 <div class="table-container">
                     <table>
@@ -175,7 +281,7 @@
                             <tr>
                                 <th>Req ID</th>
                                 <th>Citizen</th>
-                                <th>Matched Collector</th>
+                                <th>Assigned Collector</th>
                                 <th>Scrap Category</th>
                                 <th>Dispatch Status</th>
                                 <th>Inspect</th>
@@ -190,8 +296,10 @@
         <!-- RATE CARD VIEW -->
         <section id="ratecard-view" class="view-section hidden">
             <div class="view-header">
-                <h2>Scrap Market Pricing</h2>
-                <button class="btn btn-primary" onclick="syncRates()"><i class="fa-solid fa-rotate"></i> Save & Sync Global Rates</button>
+                <h2>Scrap Market Pricing & Live Rates</h2>
+                <button class="btn btn-primary" onclick="syncRates()">
+                    <i class="fa-solid fa-rotate"></i> Save & Sync Global Rates
+                </button>
             </div>
             <div class="tables-section">
                 <div class="table-container">
@@ -199,7 +307,7 @@
                         <thead>
                             <tr>
                                 <th>Material Type</th>
-                                <th>Current Rate (₹/Kg)</th>
+                                <th>Current Rate (₹ / Kg)</th>
                                 <th>Market Trend</th>
                                 <th>Quick Action</th>
                             </tr>
@@ -213,10 +321,11 @@
 
     <!-- Register Citizen Modal -->
     <div id="registerCitizenModal" class="modal">
-        <div class="modal-content" style="width: 450px;">
+        <div class="modal-content">
             <span class="close-btn" onclick="closeModal('registerCitizenModal')">&times;</span>
             <h2>Register New Citizen</h2>
-            <form id="citizenForm" onsubmit="submitCitizen(event)" style="margin-top: 20px;">
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 20px;">Add a household user to the E-Kabadi recycling network.</p>
+            <form id="citizenForm" onsubmit="submitCitizen(event)">
                 <div class="form-group">
                     <label>Full Name</label>
                     <input type="text" id="reg-cit-name" class="form-input" placeholder="e.g. Ramesh Singh" required>
@@ -231,25 +340,28 @@
                 </div>
                 <div class="form-group">
                     <label>Primary Location / Sector</label>
-                    <input type="text" id="reg-cit-location" class="form-input" placeholder="e.g. Sector 14" required>
+                    <input type="text" id="reg-cit-location" class="form-input" placeholder="e.g. Sector 14, Main Road" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 12px;">Create Citizen Account</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px; padding: 13px;">
+                    <i class="fa-solid fa-user-plus"></i> Create Citizen Account
+                </button>
             </form>
         </div>
     </div>
 
     <!-- Onboard Collector Modal -->
     <div id="onboardCollectorModal" class="modal">
-        <div class="modal-content" style="width: 450px;">
+        <div class="modal-content">
             <span class="close-btn" onclick="closeModal('onboardCollectorModal')">&times;</span>
             <h2>Onboard Collector Fleet</h2>
-            <form id="collectorForm" onsubmit="submitCollector(event)" style="margin-top: 20px;">
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 20px;">Verify and approve a scrap collector into the live dispatch fleet.</p>
+            <form id="collectorForm" onsubmit="submitCollector(event)">
                 <div class="form-group">
                     <label>Driver Full Name</label>
                     <input type="text" id="reg-col-name" class="form-input" placeholder="e.g. Salim Khan" required>
                 </div>
                 <div class="form-group">
-                    <label>Phone Number (App Login)</label>
+                    <label>Phone Number (Mobile App Login)</label>
                     <input type="tel" id="reg-col-phone" class="form-input" placeholder="+91 91234 56789" required>
                 </div>
                 <div class="form-group">
@@ -258,108 +370,128 @@
                 </div>
                 <div class="form-group">
                     <label>Assigned Zone</label>
-                    <select id="reg-col-zone" class="form-input" required>
+                    <select id="reg-col-zone" class="form-select" required>
                         <option value="">Select Operational Zone...</option>
-                        <option value="North Zone">North Zone</option>
-                        <option value="South Zone">South Zone</option>
-                        <option value="East Zone">East Zone</option>
-                        <option value="West Zone">West Zone</option>
+                        <option value="North Zone">North Zone (Sectors 10 - 25)</option>
+                        <option value="South Zone">South Zone (Sectors 26 - 45)</option>
+                        <option value="East Zone">East Zone (Sectors 46 - 65)</option>
+                        <option value="West Zone">West Zone (Sectors 66 - 85)</option>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 12px;">Approve & Add to Fleet</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px; padding: 13px;">
+                    <i class="fa-solid fa-truck-ramp-box"></i> Approve & Add to Fleet
+                </button>
             </form>
         </div>
     </div>
 
     <!-- Inspect Pickup Modal -->
     <div id="actionModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="width: 540px;">
             <span class="close-btn" onclick="closeModal('actionModal')">&times;</span>
             <h2 id="modal-title">Pickup Dispatch Inspector</h2>
+            <p style="color: var(--text-muted); font-size: 0.88rem;">Live sensor telemetry and AI model categorization.</p>
+            
             <div class="modal-grid">
-                <div class="modal-info">
-                    <p><strong>Citizen:</strong> <span id="modal-citizen"></span></p>
+                <div class="modal-info" style="font-size: 0.92rem; line-height: 1.8;">
+                    <p><strong>Citizen:</strong> <span id="modal-citizen" style="color: var(--primary);"></span></p>
                     <p><strong>Address:</strong> Sector 14, Main Road, City</p>
                     <p><strong>Reported Type:</strong> <span id="modal-type"></span></p>
-                    <p><strong>Current Match:</strong> <span id="modal-collector-status" style="font-weight: bold;"></span></p>
+                    <p><strong>Current Match:</strong> <span id="modal-collector-status" style="font-weight: 700;"></span></p>
                 </div>
                 <div class="modal-ai-box">
-                    <h4>AI Model Classification</h4>
-                    <p><i class="fa-solid fa-robot"></i> <strong>Detected Category:</strong> <span id="modal-ai-type" style="color:var(--primary-color);"></span></p>
-                    <p><i class="fa-solid fa-bullseye"></i> <strong>Model Confidence:</strong> <span id="modal-ai-conf">94%</span></p>
-                    <p><i class="fa-solid fa-shield-halved"></i> <strong>Validation Status:</strong> Verified</p>
+                    <h4><i class="fa-solid fa-robot" style="color: var(--primary);"></i> AI Vision Classification</h4>
+                    <p><strong>Detected Category:</strong> <span id="modal-ai-type" style="color: var(--primary); font-weight: 700;"></span></p>
+                    <p><strong>Model Confidence:</strong> <span id="modal-ai-conf" style="font-weight: 700;">94%</span></p>
+                    <p><strong>Validation:</strong> <span class="badge completed" style="padding: 2px 8px; font-size: 0.7rem;">Verified</span></p>
                 </div>
             </div>
-            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 15px 0;">
-            <h4 style="margin-bottom: 10px;">Admin Override Controls</h4>
-            <div class="modal-actions">
-                <select id="collector-select" class="form-select">
-                    <option value="">Manual Override / Force Reassign...</option>
-                    <option value="Ravi Kumar">Ravi Kumar (Active - 0.8 km away)</option>
-                    <option value="Ajay Verma">Ajay Verma (Active - 1.4 km away)</option>
-                </select>
-                <button class="btn btn-primary" onclick="assignCollector()">Force Reassign</button>
+
+            <div style="margin-top: 10px;">
+                <h4 style="margin-bottom: 8px; font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">
+                    <i class="fa-solid fa-sliders" style="color: var(--primary);"></i> Manual Dispatch Override
+                </h4>
+                <div class="modal-actions" style="margin-top: 10px; padding-top: 0; border-top: none;">
+                    <select id="collector-select" class="form-select">
+                        <option value="">Select Collector for Manual Override...</option>
+                        <option value="Ravi Kumar">Ravi Kumar (Active - 0.8 km away)</option>
+                        <option value="Ajay Verma">Ajay Verma (Active - 1.4 km away)</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="assignCollector()">
+                        <i class="fa-solid fa-arrows-rotate"></i> Force Reassign
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- View Citizen Details Modal (NEW) -->
+    <!-- View Citizen Details Modal -->
     <div id="citizenDetailsModal" class="modal">
-        <div class="modal-content" style="width: 450px;">
+        <div class="modal-content">
             <span class="close-btn" onclick="closeModal('citizenDetailsModal')">&times;</span>
             <h2>Citizen Profile</h2>
-            <div style="margin-top: 20px; line-height: 1.8; font-size: 1.05rem;">
-                <p><i class="fa-solid fa-user" style="color: var(--primary-color); width: 25px;"></i> <strong>Name:</strong> <span id="detail-cit-name"></span></p>
-                <p><i class="fa-solid fa-id-badge" style="color: var(--primary-color); width: 25px;"></i> <strong>User ID:</strong> <span id="detail-cit-id"></span></p>
-                <p><i class="fa-solid fa-phone" style="color: var(--primary-color); width: 25px;"></i> <strong>Phone:</strong> <span id="detail-cit-phone"></span></p>
-                <p><i class="fa-solid fa-envelope" style="color: var(--primary-color); width: 25px;"></i> <strong>Email:</strong> <span id="detail-cit-email"></span></p>
-                <p><i class="fa-solid fa-location-dot" style="color: var(--primary-color); width: 25px;"></i> <strong>Location:</strong> <span id="detail-cit-location"></span></p>
-                <p><i class="fa-solid fa-coins" style="color: #f1c40f; width: 25px;"></i> <strong>Eco-Coins:</strong> <span id="detail-cit-coins" style="font-weight: bold;"></span></p>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 16px;">Comprehensive account & loyalty balance details.</p>
+            <div style="line-height: 2; font-size: 0.95rem; background: var(--bg-surface-subtle); padding: 18px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+                <p><i class="fa-solid fa-user" style="color: var(--primary); width: 25px;"></i> <strong>Name:</strong> <span id="detail-cit-name"></span></p>
+                <p><i class="fa-solid fa-id-badge" style="color: var(--primary); width: 25px;"></i> <strong>User ID:</strong> <span id="detail-cit-id"></span></p>
+                <p><i class="fa-solid fa-phone" style="color: var(--primary); width: 25px;"></i> <strong>Phone:</strong> <span id="detail-cit-phone"></span></p>
+                <p><i class="fa-solid fa-envelope" style="color: var(--primary); width: 25px;"></i> <strong>Email:</strong> <span id="detail-cit-email"></span></p>
+                <p><i class="fa-solid fa-location-dot" style="color: var(--primary); width: 25px;"></i> <strong>Location:</strong> <span id="detail-cit-location"></span></p>
+                <p><i class="fa-solid fa-coins" style="color: #f59e0b; width: 25px;"></i> <strong>Eco Points:</strong> <span id="detail-cit-coins" style="font-weight: 800; color: #f59e0b;"></span></p>
             </div>
-            <button class="btn btn-primary" style="width: 100%; margin-top: 20px; padding: 10px;" onclick="closeModal('citizenDetailsModal')">Close Profile</button>
+            <button class="btn btn-secondary" style="width: 100%; justify-content: center; margin-top: 20px;" onclick="closeModal('citizenDetailsModal')">Close Profile</button>
         </div>
     </div>
 
     <!-- Manage Citizen Modal -->
     <div id="citizenModal" class="modal">
-        <div class="modal-content" style="width: 400px; min-width: 300px;">
+        <div class="modal-content" style="width: 440px;">
             <span class="close-btn" onclick="closeModal('citizenModal')">&times;</span>
-            <h2>Manage Citizen</h2>
-            <div style="margin: 15px 0;">
-                <p><strong>Name:</strong> <span id="manage-cit-name"></span></p>
-                <p><strong>ID:</strong> <span id="manage-cit-id"></span></p>
-                <p><strong>Eco-Coins:</strong> <span id="manage-cit-coins" style="color: #f1c40f; font-weight: bold; font-size: 1.1rem;"></span> <i class="fa-solid fa-coins" style="color:#f1c40f"></i></p>
+            <h2>Manage Citizen Account</h2>
+            <div style="margin: 16px 0; background: var(--bg-surface-subtle); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                <p style="margin-bottom: 6px;"><strong>Name:</strong> <span id="manage-cit-name" style="color: var(--primary); font-weight: 700;"></span></p>
+                <p style="margin-bottom: 6px;"><strong>ID:</strong> <span id="manage-cit-id"></span></p>
+                <p><strong>Eco Points:</strong> <span id="manage-cit-coins" style="color: #f59e0b; font-weight: 800; font-size: 1.15rem;"></span> <i class="fa-solid fa-award" style="color: #f59e0b;"></i></p>
             </div>
-            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 15px 0;">
-            <h4 style="margin-bottom: 10px;">Coin Adjustments</h4>
+            
+            <h4 style="margin-bottom: 10px; font-size: 0.95rem; color: var(--text-primary);"><i class="fa-solid fa-award" style="color: #f59e0b;"></i> Adjust Eco Points Balance</h4>
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <input type="number" id="coin-amount" class="form-select" placeholder="Amount..." style="width: 100px;">
-                <button class="btn btn-primary" onclick="modifyCoins('add')">Reward</button>
-                <button class="btn" style="background: #95a5a6; color: white;" onclick="modifyCoins('deduct')">Deduct</button>
+                <input type="number" id="coin-amount" class="form-input" placeholder="Points..." style="width: 130px;">
+                <button class="btn btn-primary" onclick="modifyCoins('add')"><i class="fa-solid fa-plus"></i> Reward</button>
+                <button class="btn btn-secondary" onclick="modifyCoins('deduct')"><i class="fa-solid fa-minus"></i> Deduct</button>
             </div>
-            <button class="btn btn-small" style="width: 100%; padding: 10px;" onclick="deleteUser('citizens')">Suspend Account</button>
+            <button class="btn btn-small" style="width: 100%; justify-content: center; padding: 12px; background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);" onclick="deleteUser('citizens')">
+                <i class="fa-solid fa-ban"></i> Suspend Citizen Account
+            </button>
         </div>
     </div>
 
     <!-- Manage Collector Modal -->
     <div id="collectorModal" class="modal">
-        <div class="modal-content" style="width: 400px; min-width: 300px;">
+        <div class="modal-content" style="width: 440px;">
             <span class="close-btn" onclick="closeModal('collectorModal')">&times;</span>
             <h2>Manage Collector</h2>
-            <div style="margin: 15px 0;">
-                <p><strong>Name:</strong> <span id="col-name"></span></p>
-                <p><strong>ID:</strong> <span id="col-id"></span></p>
-                <p><strong>Current Status:</strong> <span id="col-status" class="badge"></span></p>
+            <div style="margin: 16px 0; background: var(--bg-surface-subtle); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                <p style="margin-bottom: 6px;"><strong>Name:</strong> <span id="col-name" style="color: var(--primary); font-weight: 700;"></span></p>
+                <p style="margin-bottom: 6px;"><strong>ID:</strong> <span id="col-id"></span></p>
+                <p><strong>Fleet Status:</strong> <span id="col-status" class="badge"></span></p>
             </div>
-            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 15px 0;">
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <button class="btn btn-primary" style="width: 100%; padding: 10px;" onclick="toggleCollectorStatus()">Toggle Status (Active/Offline)</button>
-                <button class="btn btn-small" style="width: 100%; padding: 10px;" onclick="deleteUser('collectors')">Remove from Fleet</button>
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
+                <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="toggleCollectorStatus()">
+                    <i class="fa-solid fa-power-off"></i> Toggle Status (Active / Offline)
+                </button>
+                <button class="btn btn-small" style="width: 100%; justify-content: center; padding: 12px; background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);" onclick="deleteUser('collectors')">
+                    <i class="fa-solid fa-trash"></i> Remove from Collector Fleet
+                </button>
             </div>
         </div>
     </div>
 
-    <div id="toast" class="toast">System Action Logged</div>
+    <!-- FLOATING TOAST NOTIFICATION -->
+    <div id="toast" class="toast">
+        <i class="fa-solid fa-circle-check" style="color: var(--primary); font-size: 1.1rem;"></i>
+        <span id="toast-text">System Action Logged</span>
+    </div>
 
     <script src="js/script.js"></script>
 </body>
