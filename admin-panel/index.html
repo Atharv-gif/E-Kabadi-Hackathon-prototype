@@ -14,6 +14,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Leaflet Map CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -34,6 +37,7 @@
 
         <ul class="sidebar-menu" id="nav-menu">
             <li class="active" data-target="dashboard-view"><i class="fa-solid fa-chart-pie"></i> Dashboard</li>
+            <li data-target="radar-view"><i class="fa-solid fa-map-location-dot"></i> Fleet Radar <span class="nav-live-badge">LIVE</span></li>
             <li data-target="citizens-view"><i class="fa-solid fa-users"></i> Citizens</li>
             <li data-target="collectors-view"><i class="fa-solid fa-truck"></i> Collectors</li>
             <li data-target="pickups-view"><i class="fa-solid fa-clipboard-list"></i> Live Pickups</li>
@@ -69,6 +73,11 @@
             </div>
 
             <div class="topbar-right">
+                <!-- Audio Chime Toggle Button -->
+                <button id="audio-toggle-btn" class="theme-toggle-btn" title="Toggle Dispatch Sound Chime" onclick="toggleAudioChime()">
+                    <i class="fa-solid fa-volume-high" id="audio-toggle-icon" style="color: var(--primary);"></i>
+                </button>
+
                 <!-- Theme Toggle Button -->
                 <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Dark/Light Mode">
                     <i class="fa-solid fa-moon"></i>
@@ -171,15 +180,20 @@
             </div>
 
             <div class="dashboard-grid">
+                <!-- Real-Time Scrap Volume Line Chart with Timeframe Toggles -->
                 <div class="chart-container">
                     <div class="chart-header">
-                        <h3><i class="fa-solid fa-chart-line"></i> Real-Time Scrap Volume</h3>
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            <span class="chart-chip" id="chart-total-chip"><i class="fa-solid fa-scale-balanced"></i>
-                                1,450 Kg Total</span>
-                            <span class="chart-chip"
-                                style="background: rgba(59, 130, 246, 0.12); color: var(--accent-blue);"><i
-                                    class="fa-solid fa-calendar-week"></i> Weekly</span>
+                        <div>
+                            <h3><i class="fa-solid fa-chart-line"></i> Real-Time Scrap Volume</h3>
+                            <span class="chart-subtitle">Aggregated weight diverted from city landfills</span>
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                            <span class="chart-chip" id="chart-total-chip"><i class="fa-solid fa-scale-balanced"></i> 1,450 Kg Total</span>
+                            <div class="timeframe-toggle-group">
+                                <button class="timeframe-btn" id="tf-daily" onclick="setTimeframe('daily')">Daily</button>
+                                <button class="timeframe-btn active" id="tf-weekly" onclick="setTimeframe('weekly')">Weekly</button>
+                                <button class="timeframe-btn" id="tf-monthly" onclick="setTimeframe('monthly')">Monthly</button>
+                            </div>
                         </div>
                     </div>
                     <div class="chart-canvas-wrapper">
@@ -187,9 +201,31 @@
                     </div>
                 </div>
 
+                <!-- Scrap Material Composition Doughnut Chart -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <h3><i class="fa-solid fa-chart-pie"></i> Material Composition</h3>
+                            <span class="chart-subtitle">Category breakdown (% of total volume)</span>
+                        </div>
+                        <span class="chart-chip" style="background: rgba(59, 130, 246, 0.12); color: var(--accent-blue);">
+                            <i class="fa-solid fa-layer-group"></i> 5 Streams
+                        </span>
+                    </div>
+                    <div class="chart-canvas-wrapper" style="position: relative; display: flex; align-items: center; justify-content: center;">
+                        <canvas id="compositionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lower Dashboard Grid: Live Dispatch Queue & Radar Mini-Card -->
+            <div class="dashboard-lower-grid">
                 <div class="table-container">
                     <div class="chart-header">
-                        <h3><i class="fa-solid fa-list-check"></i> Live Dispatch Queue</h3>
+                        <div>
+                            <h3><i class="fa-solid fa-list-check"></i> Live Dispatch Queue</h3>
+                            <span class="chart-subtitle">Auto-matching requests awaiting or undergoing collection</span>
+                        </div>
                         <div style="display: flex; gap: 8px;">
                             <button class="btn btn-small btn-primary" onclick="simulateNewPickup()"
                                 title="Simulate incoming citizen scrap request">
@@ -214,17 +250,182 @@
                         <tbody id="dashboard-table-body"></tbody>
                     </table>
                 </div>
+
+                <!-- Quick GPS Fleet Radar Snapshot Card -->
+                <div class="chart-container radar-preview-card">
+                    <div class="chart-header" style="margin-bottom: 12px;">
+                        <div>
+                            <h3><i class="fa-solid fa-map-location-dot"></i> GPS Fleet Radar</h3>
+                            <span class="chart-subtitle">Delhi-NCR Sector 14-62 Hub</span>
+                        </div>
+                        <button class="btn btn-small btn-outline" onclick="navigateToTab('radar-view')">
+                            Full Radar <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="radar-mini-stats">
+                        <div class="mini-stat-pill">
+                            <span class="pulse-dot-inline" style="background: #10b981;"></span>
+                            <span><strong>3</strong> Collectors Active</span>
+                        </div>
+                        <div class="mini-stat-pill">
+                            <span class="pulse-dot-inline" style="background: #f59e0b;"></span>
+                            <span><strong>4</strong> Live Requests</span>
+                        </div>
+                        <div class="mini-stat-pill">
+                            <span class="pulse-dot-inline" style="background: #ef4444;"></span>
+                            <span><strong>1</strong> E-Waste</span>
+                        </div>
+                    </div>
+                    <div class="radar-preview-map-box" onclick="navigateToTab('radar-view')" title="Click to open Full GPS Radar">
+                        <div class="radar-scan-line"></div>
+                        <div class="radar-blip blip-truck" style="top: 35%; left: 35%;" title="Ravi Kumar (Active)"></div>
+                        <div class="radar-blip blip-truck" style="top: 65%; left: 70%;" title="Ajay Verma (Active)"></div>
+                        <div class="radar-blip blip-pickup" style="top: 38%; left: 52%;" title="Sector 14 Request"></div>
+                        <div class="radar-blip blip-ewaste" style="top: 25%; left: 75%;" title="E-Waste Sector 62"></div>
+                        <div class="radar-center-label"><i class="fa-solid fa-satellite-dish"></i> Click to Open Live Fleet Radar Map</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FLEET RADAR VIEW -->
+        <section id="radar-view" class="view-section hidden">
+            <div class="view-header">
+                <div>
+                    <h2><i class="fa-solid fa-map-location-dot" style="color: var(--primary);"></i> Live Fleet & Dispatch Radar</h2>
+                    <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">Real-time GPS telemetry, geofenced sectors, vehicle movement, and dynamic dispatch routing.</p>
+                </div>
+                <div class="header-actions">
+                    <span class="chart-chip" style="background: rgba(16, 185, 129, 0.15); color: var(--primary);">
+                        <i class="fa-solid fa-satellite-dish fa-fade"></i> GPS Stream Connected
+                    </span>
+                    <button class="btn btn-primary" onclick="simulateNewPickup()">
+                        <i class="fa-solid fa-plus"></i> Simulate Request
+                    </button>
+                    <button class="btn btn-outline" onclick="recenterMap()">
+                        <i class="fa-solid fa-crosshairs"></i> Recenter Hub
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mini radar metrics bar -->
+            <div class="radar-status-bar">
+                <div class="radar-metric">
+                    <div class="radar-metric-val" id="radar-active-vehicles">3</div>
+                    <div class="radar-metric-lbl">Active GPS Vehicles</div>
+                </div>
+                <div class="radar-metric">
+                    <div class="radar-metric-val" id="radar-pending-pickups">4</div>
+                    <div class="radar-metric-lbl">Live Geocoded Pickups</div>
+                </div>
+                <div class="radar-metric">
+                    <div class="radar-metric-val" id="radar-avg-eta">11.8 min</div>
+                    <div class="radar-metric-lbl">Average Fleet ETA</div>
+                </div>
+                <div class="radar-metric">
+                    <div class="radar-metric-val" style="color: var(--primary);">98.2%</div>
+                    <div class="radar-metric-lbl">Geofence Compliance</div>
+                </div>
+            </div>
+
+            <!-- Map Container -->
+            <div class="map-card-wrapper">
+                <div id="fleetMap" class="leaflet-map-container"></div>
+                <!-- Legend overlay -->
+                <div class="map-legend-overlay">
+                    <div class="legend-title"><i class="fa-solid fa-layer-group"></i> Radar Legend</div>
+                    <div class="legend-item"><span class="legend-dot matching-dot"></span> Matching Scrap Request</div>
+                    <div class="legend-item"><span class="legend-dot accepted-dot"></span> In Route / Accepted</div>
+                    <div class="legend-item"><span class="legend-dot ewaste-dot"></span> High-Priority E-Waste</div>
+                    <div class="legend-item"><span class="legend-truck-icon"><i class="fa-solid fa-truck"></i></span> Active Collector GPS</div>
+                </div>
             </div>
         </section>
 
         <!-- CITIZENS VIEW -->
         <section id="citizens-view" class="view-section hidden">
             <div class="view-header">
-                <h2>Citizen Accounts Directory</h2>
+                <div>
+                    <h2>Citizen Accounts Directory</h2>
+                    <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">Household recycling members, loyalty points balances, and environmental impact.</p>
+                </div>
                 <button class="btn btn-primary" onclick="openModalById('registerCitizenModal')">
                     <i class="fa-solid fa-plus"></i> Register Citizen
                 </button>
             </div>
+
+            <!-- Citizen Green Champions Leaderboard -->
+            <div class="section-label" style="padding-top: 0;">
+                <h2><i class="fa-solid fa-award"></i> Top Eco-Citizens (Green Champions)</h2>
+                <span class="chart-chip"><i class="fa-solid fa-medal"></i> Monthly Leaderboard</span>
+            </div>
+
+            <div class="leaderboard-podium-grid">
+                <!-- Rank 1 -->
+                <div class="podium-card gold-rank">
+                    <div class="podium-badge"><i class="fa-solid fa-crown"></i> Rank #1</div>
+                    <div class="podium-avatar">VS</div>
+                    <h3 class="podium-name">Vikram Singh</h3>
+                    <div class="podium-location"><i class="fa-solid fa-location-dot"></i> Kalyan Nagar, Sec 62</div>
+                    <div class="podium-stats">
+                        <div>
+                            <span class="podium-stat-val" style="color: #f59e0b;">890</span>
+                            <span class="podium-stat-lbl">Eco Points</span>
+                        </div>
+                        <div>
+                            <span class="podium-stat-val" style="color: var(--primary);">340 Kg</span>
+                            <span class="podium-stat-lbl">Scrap Diverted</span>
+                        </div>
+                    </div>
+                    <div class="podium-tags">
+                        <span class="badge completed"><i class="fa-solid fa-shield-halved"></i> Zero-Waste Hero</span>
+                        <span class="badge" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6;"><i class="fa-solid fa-bolt"></i> E-Waste Champ</span>
+                    </div>
+                </div>
+
+                <!-- Rank 2 -->
+                <div class="podium-card silver-rank">
+                    <div class="podium-badge"><i class="fa-solid fa-medal"></i> Rank #2</div>
+                    <div class="podium-avatar">RS</div>
+                    <h3 class="podium-name">Rahul Sharma</h3>
+                    <div class="podium-location"><i class="fa-solid fa-location-dot"></i> Sector 14, Main Road</div>
+                    <div class="podium-stats">
+                        <div>
+                            <span class="podium-stat-val" style="color: #f59e0b;">450</span>
+                            <span class="podium-stat-lbl">Eco Points</span>
+                        </div>
+                        <div>
+                            <span class="podium-stat-val" style="color: var(--primary);">195 Kg</span>
+                            <span class="podium-stat-lbl">Scrap Diverted</span>
+                        </div>
+                    </div>
+                    <div class="podium-tags">
+                        <span class="badge completed"><i class="fa-solid fa-recycle"></i> Plastic Buster</span>
+                    </div>
+                </div>
+
+                <!-- Rank 3 -->
+                <div class="podium-card bronze-rank">
+                    <div class="podium-badge"><i class="fa-solid fa-award"></i> Rank #3</div>
+                    <div class="podium-avatar">PD</div>
+                    <h3 class="podium-name">Priya Desai</h3>
+                    <div class="podium-location"><i class="fa-solid fa-location-dot"></i> MG Road, Block 4</div>
+                    <div class="podium-stats">
+                        <div>
+                            <span class="podium-stat-val" style="color: #f59e0b;">120</span>
+                            <span class="podium-stat-lbl">Eco Points</span>
+                        </div>
+                        <div>
+                            <span class="podium-stat-val" style="color: var(--primary);">82 Kg</span>
+                            <span class="podium-stat-lbl">Scrap Diverted</span>
+                        </div>
+                    </div>
+                    <div class="podium-tags">
+                        <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;"><i class="fa-solid fa-box-open"></i> Paper Pioneer</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="tables-section">
                 <div class="table-container">
                     <table>
@@ -246,19 +447,69 @@
         <!-- COLLECTORS VIEW -->
         <section id="collectors-view" class="view-section hidden">
             <div class="view-header">
-                <h2>Collector Fleet Management</h2>
+                <div>
+                    <h2>Collector Fleet Management</h2>
+                    <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">Field logistics, performance KPIs, vehicle status, and live route assignments.</p>
+                </div>
                 <button class="btn btn-primary" onclick="openModalById('onboardCollectorModal')">
                     <i class="fa-solid fa-plus"></i> Onboard Collector
                 </button>
             </div>
+
+            <!-- Fleet KPIs & Utilization Bar -->
+            <div class="fleet-metrics-grid">
+                <div class="card">
+                    <div class="card-info">
+                        <h3 id="stat-fleet-total">3</h3>
+                        <p>Total Fleet Capacity</p>
+                        <span class="card-trend"><i class="fa-solid fa-truck"></i> Verified Drivers</span>
+                    </div>
+                    <div class="card-icon" style="color: #3b82f6; background: var(--accent-blue-light);">
+                        <i class="fa-solid fa-truck-pickup"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-info">
+                        <h3 id="stat-fleet-util">100%</h3>
+                        <p>Fleet Availability</p>
+                        <span class="card-trend" style="color: var(--primary);"><i class="fa-solid fa-circle-check"></i> High Coverage</span>
+                    </div>
+                    <div class="card-icon" style="color: var(--primary); background: var(--primary-light);">
+                        <i class="fa-solid fa-battery-three-quarters"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-info">
+                        <h3>96.4%</h3>
+                        <p>Avg Completion Rate</p>
+                        <span class="card-trend"><i class="fa-solid fa-arrow-trend-up"></i> +2.1% this week</span>
+                    </div>
+                    <div class="card-icon" style="color: #8b5cf6; background: var(--accent-purple-light);">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-info">
+                        <h3>★ 4.9</h3>
+                        <p>Fleet Rating</p>
+                        <span class="card-trend" style="color: #f59e0b;"><i class="fa-solid fa-star"></i> 142 Reviews</span>
+                    </div>
+                    <div class="card-icon" style="color: #f59e0b; background: var(--accent-amber-light);">
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                </div>
+            </div>
+
             <div class="tables-section">
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
                                 <th>Collector ID</th>
-                                <th>Collector Name</th>
-                                <th>Vehicle Reg. No</th>
+                                <th>Collector Profile</th>
+                                <th>Vehicle & Zone</th>
+                                <th>Completion Rate</th>
+                                <th>Citizen Rating</th>
                                 <th>Fleet Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -456,6 +707,12 @@
                     </button>
                 </div>
             </div>
+
+            <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-color); display: flex; gap: 10px;">
+                <button class="btn btn-outline" style="flex: 1; justify-content: center; padding: 10px;" onclick="openManifestModal(currentPickupId)">
+                    <i class="fa-solid fa-file-invoice"></i> Generate Waste Transfer Manifest
+                </button>
+            </div>
         </div>
     </div>
 
@@ -540,6 +797,117 @@
                     onclick="deleteUser('collectors')">
                     <i class="fa-solid fa-trash"></i> Remove from Collector Fleet
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WASTE TRANSFER MANIFEST & COMPLIANCE MODAL -->
+    <div id="manifestModal" class="modal">
+        <div class="modal-content manifest-modal-content">
+            <span class="close-btn no-print" onclick="closeModal('manifestModal')">&times;</span>
+            <div class="manifest-header-bar no-print">
+                <span class="badge completed"><i class="fa-solid fa-shield-check"></i> CPCB Compliant Form 3 (Rule 19)</span>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-primary" onclick="window.print()">
+                        <i class="fa-solid fa-print"></i> Print / Save as PDF
+                    </button>
+                    <button class="btn btn-secondary" onclick="closeModal('manifestModal')">
+                        Close
+                    </button>
+                </div>
+            </div>
+
+            <!-- Printable Manifest Document -->
+            <div class="printable-manifest" id="printable-manifest-doc">
+                <div class="manifest-doc-header">
+                    <div class="manifest-gov-seal">
+                        <i class="fa-solid fa-scale-balanced"></i>
+                    </div>
+                    <div class="manifest-title-area">
+                        <h2>CENTRAL POLLUTION CONTROL BOARD (CPCB)</h2>
+                        <h3>HAZARDOUS & SOLID WASTE RECYCLING TRANSFER MANIFEST</h3>
+                        <p>Under E-Waste Management & Solid Waste Handling Rules • Government of India</p>
+                    </div>
+                    <div class="manifest-doc-badge">
+                        <span>ORIGINAL</span>
+                        <strong>COPY 1 - DISPATCH</strong>
+                    </div>
+                </div>
+
+                <div class="manifest-meta-strip">
+                    <div><strong>Manifest ID:</strong> <span id="mnf-id">#MNF-2026-1045</span></div>
+                    <div><strong>Issue Date:</strong> <span id="mnf-date">03 Oct 2026, 11:20 AM</span></div>
+                    <div><strong>Digital Auth Code:</strong> <span id="mnf-hash" style="font-family: monospace;">EK-8A4F-92C1</span></div>
+                </div>
+
+                <div class="manifest-parties-grid">
+                    <div class="manifest-party-box">
+                        <h4>1. SENDER / GENERATOR (CITIZEN)</h4>
+                        <p><strong>Name:</strong> <span id="mnf-citizen-name">Rahul Sharma</span></p>
+                        <p><strong>Pickup Address:</strong> <span id="mnf-citizen-addr">Sector 14, Main Road, City</span></p>
+                        <p><strong>Contact:</strong> <span id="mnf-citizen-phone">+91 98765 43210</span></p>
+                    </div>
+
+                    <div class="manifest-party-box">
+                        <h4>2. AUTHORIZED TRANSPORTER (COLLECTOR)</h4>
+                        <p><strong>Driver Name:</strong> <span id="mnf-collector-name">Ravi Kumar</span></p>
+                        <p><strong>Vehicle Reg:</strong> <span id="mnf-collector-veh">MH 04 AB 1234</span></p>
+                        <p><strong>GPS Telemetry:</strong> <span class="badge completed" style="font-size: 0.65rem;">Active Telemetry</span></p>
+                    </div>
+
+                    <div class="manifest-party-box">
+                        <h4>3. DESTINATION RECYCLER (FACILITY)</h4>
+                        <p><strong>Facility:</strong> EcoHub Materials Recycling Facility (TSDF-04)</p>
+                        <p><strong>Registration:</strong> CPCB/W-098/RECYCLER</p>
+                        <p><strong>Audit Standard:</strong> ISO 14001:2015 Environmental</p>
+                    </div>
+                </div>
+
+                <div class="manifest-items-table-wrapper">
+                    <table class="manifest-table">
+                        <thead>
+                            <tr>
+                                <th>Item Code</th>
+                                <th>Material Stream Classification</th>
+                                <th>AI Vision Confidence</th>
+                                <th>Quantity / Net Weight</th>
+                                <th>Carbon Offset</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#CAT-EW</td>
+                                <td id="mnf-item-type">Mixed Electronics (Laptops & Components)</td>
+                                <td id="mnf-item-conf"><span class="badge completed">96% AI Verified</span></td>
+                                <td id="mnf-item-weight"><strong>18.5 Kg</strong></td>
+                                <td style="color: #10b981; font-weight: 700;">~24.2 Kg CO₂</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="manifest-footer-signatures">
+                    <div class="signature-box">
+                        <div class="sig-space">
+                            <span class="digital-stamp"><i class="fa-solid fa-stamp"></i> DIGITALLY SIGNED</span>
+                        </div>
+                        <p>Citizen / Generator Handover</p>
+                    </div>
+                    <div class="signature-box">
+                        <div class="sig-space">
+                            <span class="digital-stamp"><i class="fa-solid fa-truck"></i> VERIFIED ON-SITE</span>
+                        </div>
+                        <p>Collector Carrier Signature</p>
+                    </div>
+                    <div class="signature-box">
+                        <div class="sig-space">
+                            <div class="fake-qr-code">
+                                <i class="fa-solid fa-qrcode"></i>
+                            </div>
+                        </div>
+                        <p>Facility Verification Scan</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

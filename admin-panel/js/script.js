@@ -1,10 +1,89 @@
 document.addEventListener("DOMContentLoaded", () => {
     // =========================================================================
-    // 1. THEME ENGINE (DARK / LIGHT MODE)
+    // 1. THEME ENGINE & AUDIO CHIME SYSTEM
     // =========================================================================
     const themeToggleBtn = document.getElementById('theme-toggle');
     const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     const savedTheme = localStorage.getItem('ekabadi_admin_theme') || (prefersDark ? 'dark' : 'light');
+
+    // Audio chime toggle using Web Audio API (No external mp3 needed)
+    let audioContext = null;
+    let isAudioEnabled = localStorage.getItem('ekabadi_audio_enabled') !== 'false';
+
+    function initAudioContext() {
+        if (!audioContext) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) {
+                audioContext = new AudioCtx();
+            }
+        }
+    }
+
+    window.toggleAudioChime = function () {
+        isAudioEnabled = !isAudioEnabled;
+        localStorage.setItem('ekabadi_audio_enabled', isAudioEnabled ? 'true' : 'false');
+        updateAudioButtonUI();
+        if (isAudioEnabled) {
+            playDispatchChime();
+            showToast("Sound alerts enabled.");
+        } else {
+            showToast("Sound alerts muted.");
+        }
+    };
+
+    function updateAudioButtonUI() {
+        const icon = document.getElementById('audio-toggle-icon');
+        const btn = document.getElementById('audio-toggle-btn');
+        if (icon && btn) {
+            if (isAudioEnabled) {
+                icon.className = 'fa-solid fa-volume-high';
+                icon.style.color = 'var(--primary)';
+                btn.setAttribute('title', 'Mute Dispatch Alerts');
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark';
+                icon.style.color = 'var(--text-muted)';
+                btn.setAttribute('title', 'Enable Dispatch Alerts');
+            }
+        }
+    }
+    updateAudioButtonUI();
+
+    function playDispatchChime() {
+        if (!isAudioEnabled) return;
+        try {
+            initAudioContext();
+            if (!audioContext) return;
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            const now = audioContext.currentTime;
+
+            // Ascending dual-bell harmonic chime (A5 880Hz -> E6 1320Hz)
+            const osc1 = audioContext.createOscillator();
+            const gain1 = audioContext.createGain();
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(880, now);
+            gain1.gain.setValueAtTime(0.2, now);
+            gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+            osc1.connect(gain1);
+            gain1.connect(audioContext.destination);
+            osc1.start(now);
+            osc1.stop(now + 0.35);
+
+            const osc2 = audioContext.createOscillator();
+            const gain2 = audioContext.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(1320, now + 0.08);
+            gain2.gain.setValueAtTime(0.25, now + 0.08);
+            gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+            osc2.connect(gain2);
+            gain2.connect(audioContext.destination);
+            osc2.start(now + 0.08);
+            osc2.stop(now + 0.55);
+        } catch (e) {
+            console.warn('Audio chime omitted:', e);
+        }
+    }
 
     function applyTheme(theme) {
         document.documentElement.setAttribute('data-theme', theme);
@@ -17,9 +96,10 @@ document.addEventListener("DOMContentLoaded", () => {
             themeToggleBtn.setAttribute('title', `Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`);
         }
 
-        // Dynamically update Chart.js canvas colors
+        const isDark = theme === 'dark';
+
+        // Update Scrap Line Chart colors
         if (window.scrapChartInstance) {
-            const isDark = theme === 'dark';
             window.scrapChartInstance.options.scales.x.grid.color = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
             window.scrapChartInstance.options.scales.y.grid.color = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
             window.scrapChartInstance.options.scales.x.ticks.color = isDark ? '#94a3b8' : '#64748b';
@@ -29,6 +109,26 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.scrapChartInstance.options.plugins.tooltip.borderColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
             }
             window.scrapChartInstance.update();
+        }
+
+        // Update Composition Doughnut Chart colors
+        if (window.compositionChartInstance) {
+            window.compositionChartInstance.data.datasets[0].borderColor = isDark ? '#111827' : '#ffffff';
+            if (window.compositionChartInstance.options.plugins && window.compositionChartInstance.options.plugins.legend) {
+                window.compositionChartInstance.options.plugins.legend.labels.color = isDark ? '#cbd5e1' : '#475569';
+            }
+            if (window.compositionChartInstance.options.plugins && window.compositionChartInstance.options.plugins.tooltip) {
+                window.compositionChartInstance.options.plugins.tooltip.backgroundColor = isDark ? '#1f2937' : '#0f172a';
+            }
+            window.compositionChartInstance.update();
+        }
+
+        // Update Leaflet tile layer if loaded
+        if (window.mapTileLayer) {
+            const newTileUrl = isDark
+                ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+                : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+            window.mapTileLayer.setUrl(newTileUrl);
         }
     }
 
@@ -53,15 +153,15 @@ document.addEventListener("DOMContentLoaded", () => {
             { id: "C-003", name: "Vikram Singh", location: "Kalyan Nagar, Sector 62", coins: 890, phone: "+91 99887 76655", email: "vikram@email.com" }
         ],
         collectors: [
-            { id: "K-101", name: "Ravi Kumar", vehicle: "MH 04 AB 1234", status: "Active" },
-            { id: "K-102", name: "Suresh Yadav", vehicle: "MH 12 CD 5678", status: "Offline" },
-            { id: "K-103", name: "Ajay Verma", vehicle: "MH 02 EF 9012", status: "Active" }
+            { id: "K-101", name: "Ravi Kumar", vehicle: "MH 04 AB 1234", zone: "North Zone (Sec 10-25)", completionRate: 98, rating: 4.9, reviews: 54, status: "Active" },
+            { id: "K-102", name: "Suresh Yadav", vehicle: "MH 12 CD 5678", zone: "South Zone (Sec 26-45)", completionRate: 88, rating: 4.6, reviews: 38, status: "Offline" },
+            { id: "K-103", name: "Ajay Verma", vehicle: "MH 02 EF 9012", zone: "East Zone (Sec 46-65)", completionRate: 95, rating: 4.8, reviews: 50, status: "Active" }
         ],
         pickups: [
-            { id: "#EK-1045", citizen: "Rahul Sharma", collector: "Ravi Kumar", type: "Mixed Electronics", status: "Accepted", conf: "96%" },
-            { id: "#EK-1046", citizen: "Priya Desai", collector: "Searching Nearby...", type: "Paper & Cardboard", status: "Matching", conf: "89%" },
-            { id: "#EK-1047", citizen: "Vikram Singh", collector: "Suresh Yadav", type: "Hard Plastics", status: "Completed", conf: "94%" },
-            { id: "#EK-1048", citizen: "Neha Gupta", collector: "None (Timed Out)", type: "Scrap Metal", status: "Unassigned", conf: "91%" }
+            { id: "#EK-1045", citizen: "Rahul Sharma", collector: "Ravi Kumar", type: "Mixed Electronics", status: "Accepted", conf: "96%", lat: 28.5830, lng: 77.3200, isEwaste: true },
+            { id: "#EK-1046", citizen: "Priya Desai", collector: "Searching Nearby...", type: "Paper & Cardboard", status: "Matching", conf: "89%", lat: 28.5600, lng: 77.3550 },
+            { id: "#EK-1047", citizen: "Vikram Singh", collector: "Suresh Yadav", type: "Hard Plastics", status: "Completed", conf: "94%", lat: 28.5900, lng: 77.3700 },
+            { id: "#EK-1048", citizen: "Neha Gupta", collector: "None (Timed Out)", type: "Scrap Metal", status: "Unassigned", conf: "91%", lat: 28.5450, lng: 77.3300 }
         ],
         rates: [
             { material: "Newspaper (Paper)", price: 14, trend: "+1.5%", trendType: "up" },
@@ -70,7 +170,8 @@ document.addEventListener("DOMContentLoaded", () => {
             { material: "E-Waste (Mixed)", price: 45, trend: "+5.2%", trendType: "up" },
             { material: "Cardboard Cartons", price: 12, trend: "+0.5%", trendType: "up" }
         ],
-        weeklyScrap: [120, 190, 150, 220, 180, 310, 280]
+        weeklyScrap: [120, 190, 150, 220, 180, 310, 280],
+        composition: [464, 406, 261, 203, 116] // Paper, Plastic, E-Waste, Metal, Glass
     };
 
     let data;
@@ -83,6 +184,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!data.weeklyScrap || !Array.isArray(data.weeklyScrap) || data.weeklyScrap.length === 0) {
         data.weeklyScrap = [120, 190, 150, 220, 180, 310, 280];
+    }
+    if (!data.composition || !Array.isArray(data.composition)) {
+        data.composition = [464, 406, 261, 203, 116];
     }
 
     function saveData() {
@@ -99,6 +203,8 @@ document.addEventListener("DOMContentLoaded", () => {
             saveData();
             renderAll();
             initScrapChart();
+            initCompositionChart();
+            renderMapMarkers();
             showToast("Prototype demo data successfully reset!");
         }
     };
@@ -118,10 +224,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // =========================================================================
-    // 3. NAVIGATION LOGIC
+    // 3. NAVIGATION LOGIC & TAB RESIZE HOOKS
     // =========================================================================
     const navItems = document.querySelectorAll('.sidebar-menu li');
     const viewSections = document.querySelectorAll('.view-section');
+
+    window.navigateToTab = function (tabId) {
+        const item = document.querySelector(`.sidebar-menu li[data-target="${tabId}"]`);
+        if (item) item.click();
+    };
 
     navItems.forEach(item => {
         item.addEventListener('click', () => {
@@ -135,12 +246,29 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             document.querySelector(".sidebar").classList.remove("active");
 
-            // Chart tab switch fix: resize and update chart when switching back to dashboard
-            if (targetId === 'dashboard-view' && window.scrapChartInstance) {
+            // Chart tab switch fix: resize and update charts when switching back to dashboard
+            if (targetId === 'dashboard-view') {
                 setTimeout(() => {
-                    window.scrapChartInstance.resize();
-                    window.scrapChartInstance.update();
-                }, 50);
+                    if (window.scrapChartInstance) {
+                        window.scrapChartInstance.resize();
+                        window.scrapChartInstance.update();
+                    }
+                    if (window.compositionChartInstance) {
+                        window.compositionChartInstance.resize();
+                        window.compositionChartInstance.update();
+                    }
+                }, 60);
+            }
+
+            // Radar Map tab switch fix: Leaflet invalidateSize hook
+            if (targetId === 'radar-view') {
+                setTimeout(() => {
+                    if (window.fleetMapInstance) {
+                        window.fleetMapInstance.invalidateSize();
+                    } else {
+                        initFleetMap();
+                    }
+                }, 100);
             }
         });
     });
@@ -153,8 +281,44 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // =========================================================================
-    // 4. CHART INITIALIZATION & REAL-TIME TRACKING
+    // 4. CHART INITIALIZATION: SCRAP VOLUME (WITH TIMEFRAMES) & COMPOSITION
     // =========================================================================
+    let currentTimeframe = 'weekly';
+    const timeframeData = {
+        daily: {
+            labels: ['8 AM', '10 AM', '12 PM', '2 PM', '4 PM', '6 PM', '8 PM'],
+            data: [42, 65, 88, 72, 110, 94, 58]
+        },
+        weekly: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            data: [120, 190, 150, 220, 180, 310, 280]
+        },
+        monthly: {
+            labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+            data: [820, 1140, 980, 1320, 1210, 1450]
+        }
+    };
+
+    window.setTimeframe = function (tf) {
+        currentTimeframe = tf;
+        document.querySelectorAll('.timeframe-btn').forEach(b => b.classList.remove('active'));
+        const activeBtn = document.getElementById(`tf-${tf}`);
+        if (activeBtn) activeBtn.classList.add('active');
+
+        if (window.scrapChartInstance) {
+            const currentData = tf === 'weekly' ? data.weeklyScrap : timeframeData[tf].data;
+            window.scrapChartInstance.data.labels = timeframeData[tf].labels;
+            window.scrapChartInstance.data.datasets[0].data = [...currentData];
+            window.scrapChartInstance.update();
+
+            const totalChip = document.getElementById('chart-total-chip');
+            if (totalChip) {
+                const totalKg = currentData.reduce((acc, curr) => acc + curr, 0);
+                totalChip.innerHTML = `<i class="fa-solid fa-scale-balanced"></i> ${totalKg.toLocaleString()} Kg Total`;
+            }
+        }
+    };
+
     function updateChartTotalBadge() {
         const totalChip = document.getElementById('chart-total-chip');
         if (totalChip && data.weeklyScrap) {
@@ -182,10 +346,10 @@ document.addEventListener("DOMContentLoaded", () => {
         window.scrapChartInstance = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                labels: timeframeData[currentTimeframe].labels,
                 datasets: [{
                     label: 'Scrap Collected (Kg)',
-                    data: [...data.weeklyScrap],
+                    data: currentTimeframe === 'weekly' ? [...data.weeklyScrap] : [...timeframeData[currentTimeframe].data],
                     borderColor: '#10b981',
                     borderWidth: 3,
                     backgroundColor: gradient,
@@ -253,16 +417,207 @@ document.addEventListener("DOMContentLoaded", () => {
         updateChartTotalBadge();
     }
 
+    function initCompositionChart() {
+        const compCanvas = document.getElementById('compositionChart');
+        if (!compCanvas) return;
+
+        if (window.compositionChartInstance) {
+            window.compositionChartInstance.destroy();
+        }
+
+        const ctx = compCanvas.getContext('2d');
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+        window.compositionChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Paper & Cartons', 'PET & Hard Plastics', 'E-Waste', 'Metals & Alloys', 'Glass & Others'],
+                datasets: [{
+                    data: [...data.composition],
+                    backgroundColor: ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#06b6d4'],
+                    borderWidth: 2,
+                    borderColor: isDark ? '#111827' : '#ffffff',
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '68%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: isDark ? '#cbd5e1' : '#475569',
+                            font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' },
+                            padding: 10,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: isDark ? '#1f2937' : '#0f172a',
+                        titleColor: '#ffffff',
+                        bodyColor: '#ffffff',
+                        borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                        borderWidth: 1,
+                        padding: 10,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: (context) => {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const val = context.parsed;
+                                const pct = ((val / total) * 100).toFixed(1);
+                                return ` ${context.label}: ${val} Kg (${pct}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     initScrapChart();
+    initCompositionChart();
 
     window.addEventListener('resize', () => {
-        if (window.scrapChartInstance) {
-            window.scrapChartInstance.resize();
-        }
+        if (window.scrapChartInstance) window.scrapChartInstance.resize();
+        if (window.compositionChartInstance) window.compositionChartInstance.resize();
+        if (window.fleetMapInstance) window.fleetMapInstance.invalidateSize();
     });
 
     // =========================================================================
-    // 5. RENDERERS & DATA VISUALIZATION
+    // 5. LIVE FLEET & DISPATCH RADAR MAP (LEAFLET.JS)
+    // =========================================================================
+    const hubLocation = [28.5700, 77.3400]; // Delhi-NCR Hub
+    let collectorMarkers = [];
+    let pickupMarkers = [];
+
+    const mapPickupsData = [
+        { id: "#EK-1045", citizen: "Rahul Sharma", type: "Mixed Electronics", status: "Accepted", lat: 28.5830, lng: 77.3200, isEwaste: true },
+        { id: "#EK-1046", citizen: "Priya Desai", type: "Paper & Cardboard", status: "Matching", lat: 28.5600, lng: 77.3550 },
+        { id: "#EK-1047", citizen: "Vikram Singh", type: "Hard Plastics", status: "Completed", lat: 28.5900, lng: 77.3700 },
+        { id: "#EK-1048", citizen: "Neha Gupta", type: "Scrap Metal", status: "Unassigned", lat: 28.5450, lng: 77.3300 }
+    ];
+
+    const collectorVehicles = [
+        { id: "K-101", name: "Ravi Kumar", vehicle: "MH 04 AB 1234", lat: 28.5750, lng: 77.3300, targetLat: 28.5830, targetLng: 77.3200 },
+        { id: "K-103", name: "Ajay Verma", vehicle: "MH 02 EF 9012", lat: 28.5520, lng: 77.3620, targetLat: 28.5600, targetLng: 77.3550 }
+    ];
+
+    function initFleetMap() {
+        if (!document.getElementById('fleetMap') || typeof L === 'undefined') return;
+
+        if (window.fleetMapInstance) {
+            window.fleetMapInstance.remove();
+            window.fleetMapInstance = null;
+        }
+
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        window.fleetMapInstance = L.map('fleetMap', {
+            center: hubLocation,
+            zoom: 13,
+            zoomControl: true
+        });
+
+        const tileUrl = isDark
+            ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+            : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+
+        window.mapTileLayer = L.tileLayer(tileUrl, {
+            attribution: '&copy; OpenStreetMap &copy; CARTO',
+            maxZoom: 19
+        }).addTo(window.fleetMapInstance);
+
+        renderMapMarkers();
+        startVehicleAnimation();
+    }
+
+    function renderMapMarkers() {
+        if (!window.fleetMapInstance) return;
+
+        // Clear previous markers
+        pickupMarkers.forEach(m => window.fleetMapInstance.removeLayer(m));
+        collectorMarkers.forEach(m => window.fleetMapInstance.removeLayer(m));
+        pickupMarkers = [];
+        collectorMarkers = [];
+
+        // Add pickups
+        mapPickupsData.forEach(p => {
+            let pulseClass = p.isEwaste ? 'ewaste' : (p.status.toLowerCase() === 'accepted' ? 'accepted' : 'matching');
+            const iconHtml = `<div class="map-pickup-pulse ${pulseClass}"><i class="fa-solid ${p.isEwaste ? 'fa-bolt' : 'fa-box'}"></i></div>`;
+            const customIcon = L.divIcon({
+                html: iconHtml,
+                className: 'leaflet-div-icon',
+                iconSize: [26, 26],
+                iconAnchor: [13, 13]
+            });
+
+            const marker = L.marker([p.lat, p.lng], { icon: customIcon }).addTo(window.fleetMapInstance);
+            marker.bindPopup(`
+                <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.85rem; padding: 4px; min-width: 170px;">
+                    <div style="font-weight: 800; color: #10b981;">${p.id}</div>
+                    <div style="font-weight: 700; color: #0f172a; margin: 3px 0;">${p.citizen}</div>
+                    <div style="font-size: 0.78rem; color: #64748b;">${p.type}</div>
+                    <div style="margin-top: 6px;"><span class="badge ${p.status === 'Accepted' ? 'completed' : 'pending'}">${p.status}</span></div>
+                    <button class="btn btn-small btn-primary" style="margin-top: 8px; width: 100%; justify-content: center;" onclick="openPickupModal('${p.id}')">Inspect Request</button>
+                </div>
+            `);
+            pickupMarkers.push(marker);
+        });
+
+        // Add collector vehicle GPS trackers
+        collectorVehicles.forEach(c => {
+            const truckHtml = `<div class="map-truck-marker"><i class="fa-solid fa-truck"></i></div>`;
+            const truckIcon = L.divIcon({
+                html: truckHtml,
+                className: 'leaflet-div-icon',
+                iconSize: [34, 34],
+                iconAnchor: [17, 17]
+            });
+
+            const marker = L.marker([c.lat, c.lng], { icon: truckIcon }).addTo(window.fleetMapInstance);
+            marker.bindPopup(`
+                <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.85rem; padding: 4px; min-width: 170px;">
+                    <div style="font-weight: 800; color: #3b82f6;"><i class="fa-solid fa-satellite-dish"></i> ${c.name}</div>
+                    <div style="font-size: 0.78rem; font-family: monospace; font-weight: 700; color: #475569; margin: 3px 0;">${c.vehicle}</div>
+                    <div style="margin-top: 6px;"><span class="badge completed">Live On-Road GPS</span></div>
+                </div>
+            `);
+            c.marker = marker;
+            collectorMarkers.push(marker);
+        });
+
+        // Update radar status metrics
+        const vehEl = document.getElementById('radar-active-vehicles');
+        const pkuEl = document.getElementById('radar-pending-pickups');
+        if (vehEl) vehEl.innerText = collectorVehicles.length + 1;
+        if (pkuEl) pkuEl.innerText = mapPickupsData.length;
+    }
+
+    function startVehicleAnimation() {
+        if (window.vehicleInterval) clearInterval(window.vehicleInterval);
+        window.vehicleInterval = setInterval(() => {
+            if (!window.fleetMapInstance) return;
+            collectorVehicles.forEach(c => {
+                if (c.targetLat && c.targetLng && c.marker) {
+                    c.lat += (c.targetLat - c.lat) * 0.12;
+                    c.lng += (c.targetLng - c.lng) * 0.12;
+                    c.marker.setLatLng([c.lat, c.lng]);
+                }
+            });
+        }, 3500);
+    }
+
+    window.recenterMap = function () {
+        if (window.fleetMapInstance) {
+            window.fleetMapInstance.setView(hubLocation, 13, { animate: true });
+            showToast("Fleet radar map recentered to Delhi-NCR hub.");
+        }
+    };
+
+    // =========================================================================
+    // 6. RENDERERS & DATA VISUALIZATION
     // =========================================================================
     function getStatusBadgeClass(status) {
         switch (status.toLowerCase()) {
@@ -362,9 +717,12 @@ document.addEventListener("DOMContentLoaded", () => {
                         </span>
                     </td>
                     <td><span class="badge ${getStatusBadgeClass(p.status)}">${p.status}</span></td>
-                    <td>
-                        <button class="btn btn-small btn-primary" onclick="openPickupModal('${p.id}')">
+                    <td style="white-space: nowrap;">
+                        <button class="btn btn-small btn-primary" style="margin-right: 6px;" onclick="openPickupModal('${p.id}')">
                             <i class="fa-solid fa-sliders"></i> Inspect
+                        </button>
+                        <button class="btn btn-small btn-outline" onclick="openManifestModal('${p.id}')" title="Print CPCB Waste Manifest">
+                            <i class="fa-solid fa-file-invoice"></i>
                         </button>
                     </td>
                 </tr>`;
@@ -389,14 +747,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
             `;
 
-            let thirdCol = '';
-            let extraCol = '';
-            let actionBtns = '';
-
             if (type === 'citizens') {
-                thirdCol = `<i class="fa-solid fa-location-dot" style="color: var(--primary); margin-right: 5px;"></i> ${u.location}`;
-                extraCol = `<span style="font-weight: 800; color: #f59e0b; font-size: 0.95rem;">${u.coins}</span> <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted);">pts</span>`;
-                actionBtns = `
+                const thirdCol = `<i class="fa-solid fa-location-dot" style="color: var(--primary); margin-right: 5px;"></i> ${u.location}`;
+                const extraCol = `<span style="font-weight: 800; color: #f59e0b; font-size: 0.95rem;">${u.coins}</span> <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted);">pts</span>`;
+                const actionBtns = `
                     <button class="btn btn-small" style="background: var(--primary-light); color: var(--primary); margin-right: 6px;" onclick="openCitizenDetails('${u.id}')">
                         <i class="fa-solid fa-id-card"></i> Profile
                     </button>
@@ -404,25 +758,78 @@ document.addEventListener("DOMContentLoaded", () => {
                         <i class="fa-solid fa-pen-to-square"></i> Manage
                     </button>
                 `;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><span style="font-weight: 800; color: var(--primary);">${u.id}</span></td>
+                        <td>${userCell}</td>
+                        <td>${thirdCol}</td>
+                        <td>${extraCol}</td>
+                        <td style="white-space: nowrap;">${actionBtns}</td>
+                    </tr>`;
             } else {
-                thirdCol = `<span style="font-family: monospace; font-weight: 700; background: var(--bg-surface-subtle); padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border-color);">${u.vehicle}</span>`;
-                extraCol = `<span class="badge ${u.status.toLowerCase() === 'active' ? 'completed' : 'offline'}">${u.status}</span>`;
-                actionBtns = `
+                // Collectors View with Enhanced KPIs
+                const zone = u.zone || "North Zone (Sec 10-25)";
+                const completion = u.completionRate || 95;
+                const rating = u.rating || 4.8;
+                const reviews = u.reviews || 42;
+
+                const vehicleCell = `
+                    <div>
+                        <span style="font-family: monospace; font-weight: 700; background: var(--bg-surface-subtle); padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border-color);">${u.vehicle}</span>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 3px;"><i class="fa-solid fa-map-pin" style="color: var(--primary);"></i> ${zone}</div>
+                    </div>
+                `;
+
+                const completionCell = `
+                    <div style="min-width: 110px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.76rem; font-weight: 700; margin-bottom: 2px;">
+                            <span>${completion}%</span>
+                            <span style="color: var(--primary); font-size: 0.7rem;">Verified</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" style="width: ${completion}%;"></div>
+                        </div>
+                    </div>
+                `;
+
+                const ratingCell = `
+                    <div class="star-rating">
+                        <i class="fa-solid fa-star"></i>
+                        <span>${rating}</span>
+                        <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 500;">(${reviews})</span>
+                    </div>
+                `;
+
+                const statusCell = `<span class="badge ${u.status.toLowerCase() === 'active' ? 'completed' : 'offline'}">${u.status}</span>`;
+                const actionBtns = `
                     <button class="btn btn-small" style="background: var(--accent-blue-light); color: var(--accent-blue);" onclick="openUserModal('${type}', '${u.id}')">
                         <i class="fa-solid fa-pen-to-square"></i> Manage
                     </button>
                 `;
-            }
 
-            tbody.innerHTML += `
-                <tr>
-                    <td><span style="font-weight: 800; color: var(--primary);">${u.id}</span></td>
-                    <td>${userCell}</td>
-                    <td>${thirdCol}</td>
-                    <td>${extraCol}</td>
-                    <td style="white-space: nowrap;">${actionBtns}</td>
-                </tr>`;
+                tbody.innerHTML += `
+                    <tr>
+                        <td><span style="font-weight: 800; color: var(--primary);">${u.id}</span></td>
+                        <td>${userCell}</td>
+                        <td>${vehicleCell}</td>
+                        <td>${completionCell}</td>
+                        <td>${ratingCell}</td>
+                        <td>${statusCell}</td>
+                        <td style="white-space: nowrap;">${actionBtns}</td>
+                    </tr>`;
+            }
         });
+
+        // Update collector summary KPI counts if elements exist
+        const fleetTotalEl = document.getElementById('stat-fleet-total');
+        const fleetUtilEl = document.getElementById('stat-fleet-util');
+        if (fleetTotalEl) fleetTotalEl.innerText = data.collectors.length;
+        if (fleetUtilEl) {
+            const activeCount = data.collectors.filter(c => c.status === 'Active').length;
+            const pct = Math.round((activeCount / data.collectors.length) * 100);
+            fleetUtilEl.innerText = `${pct}%`;
+        }
     }
 
     function renderRates() {
@@ -468,43 +875,49 @@ document.addEventListener("DOMContentLoaded", () => {
     renderAll();
 
     // =========================================================================
-    // 6. SIMULATE LIVE INCOMING PICKUP REQUEST
+    // 7. SIMULATE LIVE INCOMING PICKUP REQUEST
     // =========================================================================
     window.simulateNewPickup = function () {
+        // Play Chime
+        playDispatchChime();
+
         const sampleCitizens = [
-            { name: "Ananya Sharma", location: "Sector 62, Indirapuram" },
-            { name: "Rohan Varma", location: "Sector 18, Block B" },
-            { name: "Meera Nair", location: "Green Glen Layout" },
-            { name: "Kunal Kapoor", location: "Sector 14, Main Road" },
-            { name: "Deepak Choudhury", location: "Alpha 1, Greater Noida" }
+            { name: "Ananya Sharma", location: "Sector 62, Indirapuram", lat: 28.5910, lng: 77.3710 },
+            { name: "Rohan Varma", location: "Sector 18, Block B", lat: 28.5720, lng: 77.3240 },
+            { name: "Meera Nair", location: "Green Glen Layout", lat: 28.5580, lng: 77.3480 },
+            { name: "Kunal Kapoor", location: "Sector 14, Main Road", lat: 28.5810, lng: 77.3190 },
+            { name: "Deepak Choudhury", location: "Alpha 1, Greater Noida", lat: 28.5410, lng: 77.3320 }
         ];
         const sampleScrap = [
-            "Mixed E-Waste (Laptops & Cables)",
-            "PET Plastic Bottles (3.2 kg)",
-            "Corrugated Packaging Boxes",
-            "Aluminium & Copper Scrap (4.8 kg)",
-            "Household Mixed Paper & Cartons"
+            { type: "Mixed E-Waste (Laptops & Cables)", isEwaste: true },
+            { type: "PET Plastic Bottles (3.2 kg)", isEwaste: false },
+            { type: "Corrugated Packaging Boxes", isEwaste: false },
+            { type: "Aluminium & Copper Scrap (4.8 kg)", isEwaste: false },
+            { type: "Household Mixed Paper & Cartons", isEwaste: false }
         ];
 
         const randomCit = sampleCitizens[Math.floor(Math.random() * sampleCitizens.length)];
-        const randomScrap = sampleScrap[Math.floor(Math.random() * sampleScrap.length)];
+        const randomScrapObj = sampleScrap[Math.floor(Math.random() * sampleScrap.length)];
         const newId = `#EK-${Math.floor(1050 + Math.random() * 8900)}`;
 
         const newPickup = {
             id: newId,
             citizen: randomCit.name,
             collector: "Searching Nearby...",
-            type: randomScrap,
+            type: randomScrapObj.type,
             status: "Matching",
             conf: `${Math.floor(91 + Math.random() * 8)}%`,
-            isNew: true
+            isNew: true,
+            lat: randomCit.lat,
+            lng: randomCit.lng,
+            isEwaste: randomScrapObj.isEwaste
         };
 
         // Prepend to array
         data.pickups.unshift(newPickup);
 
         // Dynamically increment real-time scrap volume on the chart for today
-        const simulatedWeight = Math.floor(12 + Math.random() * 24); // 12-35 kg
+        const simulatedWeight = Math.floor(14 + Math.random() * 22); // 14-36 kg
         if (data.weeklyScrap && data.weeklyScrap.length > 0) {
             data.weeklyScrap[data.weeklyScrap.length - 1] += simulatedWeight;
             if (window.scrapChartInstance) {
@@ -514,6 +927,23 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
+        // Dynamically increment composition chart
+        if (data.composition && data.composition.length > 0) {
+            const catIdx = randomScrapObj.isEwaste ? 2 : Math.floor(Math.random() * 2);
+            data.composition[catIdx] += simulatedWeight;
+            if (window.compositionChartInstance) {
+                window.compositionChartInstance.data.datasets[0].data = [...data.composition];
+                window.compositionChartInstance.update();
+            }
+        }
+
+        // Add dynamically onto Leaflet map
+        if (window.fleetMapInstance) {
+            mapPickupsData.unshift(newPickup);
+            renderMapMarkers();
+            window.fleetMapInstance.panTo([newPickup.lat, newPickup.lng], { animate: true });
+        }
+
         saveData();
         renderAll();
 
@@ -521,7 +951,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // =========================================================================
-    // 7. EXPORT PICKUPS TO CSV
+    // 8. EXPORT PICKUPS TO CSV
     // =========================================================================
     window.exportPickupsCSV = function () {
         if (!data.pickups || data.pickups.length === 0) {
@@ -551,12 +981,12 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // =========================================================================
-    // 8. REAL-TIME SEARCH FILTER
+    // 9. SEARCH BAR FILTER
     // =========================================================================
     const searchInput = document.getElementById('global-search');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase().trim();
+            const query = e.target.value.toLowerCase();
             const activeSection = document.querySelector('.view-section:not(.hidden)');
             if (!activeSection) return;
 
@@ -573,7 +1003,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // =========================================================================
-    // 9. REGISTRATION FORM ACTIONS
+    // 10. REGISTRATION FORM ACTIONS
     // =========================================================================
     window.openModalById = function (modalId) {
         const modal = document.getElementById(modalId);
@@ -613,9 +1043,19 @@ document.addEventListener("DOMContentLoaded", () => {
         const name = document.getElementById('reg-col-name').value;
         const phone = document.getElementById('reg-col-phone').value;
         const vehicle = document.getElementById('reg-col-vehicle').value;
+        const zone = document.getElementById('reg-col-zone').value || "North Zone";
 
         const newId = `K-10${data.collectors.length + 1}`;
-        data.collectors.push({ id: newId, name: name, vehicle: vehicle, status: "Active" });
+        data.collectors.push({
+            id: newId,
+            name: name,
+            vehicle: vehicle,
+            zone: zone,
+            completionRate: 100,
+            rating: 5.0,
+            reviews: 1,
+            status: "Active"
+        });
 
         saveData();
         closeModal('onboardCollectorModal');
@@ -627,7 +1067,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // =========================================================================
-    // 10. RATE CARD ACTIONS
+    // 11. RATE CARD ACTIONS
     // =========================================================================
     window.updateRate = function (index) {
         const newVal = document.getElementById(`rate-input-${index}`).value;
@@ -646,7 +1086,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // =========================================================================
-    // 11. USER MANAGEMENT & DETAILS ACTIONS
+    // 12. USER MANAGEMENT & DETAILS ACTIONS
     // =========================================================================
     window.openCitizenDetails = function (id) {
         const user = data.citizens.find(u => u.id === id);
@@ -730,7 +1170,32 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // =========================================================================
-    // 12. GENERAL MODAL & TOAST HANDLERS
+    // 13. WASTE TRANSFER MANIFEST ACTIONS
+    // =========================================================================
+    window.openManifestModal = function (id) {
+        const pickup = data.pickups.find(p => p.id === id) || data.pickups[0];
+        if (!pickup) return;
+
+        document.getElementById('mnf-id').innerText = `#MNF-2026-${pickup.id.replace('#EK-', '')}`;
+        document.getElementById('mnf-date').innerText = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        document.getElementById('mnf-hash').innerText = `EK-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+        document.getElementById('mnf-citizen-name').innerText = pickup.citizen;
+        document.getElementById('mnf-collector-name').innerText = pickup.collector && pickup.collector !== 'Searching Nearby...' ? pickup.collector : 'Ravi Kumar (Fleet Dispatch)';
+        document.getElementById('mnf-collector-veh').innerText = 'MH 04 AB 1234';
+        document.getElementById('mnf-item-type').innerText = pickup.type;
+        document.getElementById('mnf-item-conf').innerHTML = `<span class="badge completed">${pickup.conf || '94%'} AI Verified</span>`;
+        document.getElementById('mnf-item-weight').innerHTML = `<strong>${Math.floor(12 + Math.random() * 20)}.${Math.floor(Math.random() * 9)} Kg</strong>`;
+
+        openModalById('manifestModal');
+    };
+
+    window.openModalById = function (modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.style.display = "block";
+    };
+
+    // =========================================================================
+    // 14. GENERAL MODAL & TOAST HANDLERS
     // =========================================================================
     window.openPickupModal = function (id) {
         currentPickupId = id;
