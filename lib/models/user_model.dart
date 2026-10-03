@@ -1,4 +1,4 @@
-enum UserRole { citizen, collector }
+enum UserRole { citizen, collector, sweeper }
 
 class UserModel {
   final String id;
@@ -33,7 +33,11 @@ class UserModel {
       name: json['name'] ?? '',
       phone: json['phone'] ?? '',
       email: json['email'] ?? '',
-      role: json['role'] == 'collector' ? UserRole.collector : UserRole.citizen,
+      role: json['role'] == 'collector'
+          ? UserRole.collector
+          : json['role'] == 'sweeper'
+              ? UserRole.sweeper
+              : UserRole.citizen,
       address: json['address'] ?? '',
       rating: (json['rating'] ?? 4.8).toDouble(),
       isVerified: json['isVerified'] ?? true,

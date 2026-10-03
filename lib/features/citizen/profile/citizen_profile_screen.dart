@@ -22,10 +22,14 @@ class CitizenProfileScreen extends ConsumerStatefulWidget {
 class _CitizenProfileScreenState extends ConsumerState<CitizenProfileScreen> {
   String _selectedLanguage = 'English';
 
-  Future<void> _switchRole() async {
-    await ref.read(authProvider.notifier).setRole(UserRole.collector);
+  Future<void> _switchRole(UserRole role) async {
+    await ref.read(authProvider.notifier).setRole(role);
     if (mounted) {
-      context.go('/collector/dashboard');
+      if (role == UserRole.collector) {
+        context.go('/collector/dashboard');
+      } else {
+        context.go('/sweeper/dashboard');
+      }
     }
   }
 
@@ -89,12 +93,12 @@ class _CitizenProfileScreenState extends ConsumerState<CitizenProfileScreen> {
               ),
               const SizedBox(height: AppSpacing.xl),
 
-              // ── Switch role card ──
+              // ── Switch role card 1: Collector ──
               CustomCard(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 color: AppColors.techBlueLight,
                 border: Border.all(color: AppColors.techBlue, width: 1.5),
-                onTap: _switchRole,
+                onTap: () => _switchRole(UserRole.collector),
                 child: Row(
                   children: [
                     Container(
@@ -122,6 +126,44 @@ class _CitizenProfileScreenState extends ConsumerState<CitizenProfileScreen> {
                       ),
                     ),
                     const Icon(LucideIcons.arrowRight, size: 18, color: AppColors.techBlue),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+
+              // ── Switch role card 2: Sweeper ──
+              CustomCard(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                color: AppColors.sweeperAmberLight,
+                border: Border.all(color: AppColors.sweeperAmber, width: 1.5),
+                onTap: () => _switchRole(UserRole.sweeper),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: const BoxDecoration(
+                        color: AppColors.sweeperAmber,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(LucideIcons.sparkles, color: AppColors.surface, size: 19),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Switch to Sanitation Hero Mode',
+                            style: AppTypography.titleSmall.copyWith(color: AppColors.sweeperAmberDark),
+                          ),
+                          Text(
+                            'Clean spots, upload photos & earn Eco Points',
+                            style: AppTypography.bodySmall,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(LucideIcons.arrowRight, size: 18, color: AppColors.sweeperAmber),
                   ],
                 ),
               ),

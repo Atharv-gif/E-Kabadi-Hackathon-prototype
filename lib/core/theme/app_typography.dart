@@ -55,10 +55,22 @@ class AppTypography {
     color: AppColors.textMuted,
   );
 
+  static TextStyle headlineMedium = GoogleFonts.plusJakartaSans(
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+    color: AppColors.textPrimary,
+  );
+
   static TextStyle labelLarge = GoogleFonts.plusJakartaSans(
     fontSize: 14,
     fontWeight: FontWeight.bold,
     color: AppColors.surface,
+  );
+
+  static TextStyle labelMedium = GoogleFonts.plusJakartaSans(
+    fontSize: 12,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
   );
 
   static TextStyle labelSmall = GoogleFonts.plusJakartaSans(

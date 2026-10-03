@@ -5,26 +5,33 @@ import '../../core/theme/app_shadows.dart';
 import '../../core/theme/app_spacing.dart';
 
 enum ButtonType { primary, secondary, outline, text, danger }
+typedef ButtonVariant = ButtonType;
 
 /// Premium button with press-scale feedback, loading & disabled states.
 class CustomButton extends StatefulWidget {
   final String text;
   final VoidCallback? onPressed;
   final ButtonType type;
+  final ButtonType? variant;
   final bool isLoading;
   final IconData? icon;
   final double? width;
   final double height;
+  final Color? backgroundColor;
+  final Color? textColor;
 
   const CustomButton({
     super.key,
     required this.text,
     required this.onPressed,
     this.type = ButtonType.primary,
+    this.variant,
     this.isLoading = false,
     this.icon,
     this.width,
     this.height = 52,
+    this.backgroundColor,
+    this.textColor,
   });
 
   @override
@@ -34,8 +41,11 @@ class CustomButton extends StatefulWidget {
 class _CustomButtonState extends State<CustomButton> {
   bool _pressed = false;
 
+  ButtonType get _effectiveType => widget.variant ?? widget.type;
+
   Color get _bg {
-    switch (widget.type) {
+    if (widget.backgroundColor != null) return widget.backgroundColor!;
+    switch (_effectiveType) {
       case ButtonType.primary:
         return AppColors.primary;
       case ButtonType.secondary:
@@ -50,7 +60,8 @@ class _CustomButtonState extends State<CustomButton> {
   }
 
   Color get _fg {
-    switch (widget.type) {
+    if (widget.textColor != null) return widget.textColor!;
+    switch (_effectiveType) {
       case ButtonType.primary:
         return AppColors.surface;
       case ButtonType.secondary:

@@ -16,8 +16,10 @@ class RoleSelectionScreen extends ConsumerWidget {
     if (context.mounted) {
       if (role == UserRole.citizen) {
         context.go('/citizen/home');
-      } else {
+      } else if (role == UserRole.collector) {
         context.go('/collector/dashboard');
+      } else {
+        context.go('/sweeper/dashboard');
       }
     }
   }
@@ -26,12 +28,12 @@ class RoleSelectionScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               Row(
                 children: [
                   Container(
@@ -49,7 +51,7 @@ class RoleSelectionScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 36),
+              const SizedBox(height: 28),
               Text(
                 'Who are you?',
                 style: AppTypography.displayMedium.copyWith(fontSize: 28),
@@ -59,7 +61,7 @@ class RoleSelectionScreen extends ConsumerWidget {
                 'Select your profile experience to continue inside the application.',
                 style: AppTypography.bodyLarge,
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
 
               // Option 1: CITIZEN
               CustomCard(
@@ -74,7 +76,7 @@ class RoleSelectionScreen extends ConsumerWidget {
                         color: AppColors.primaryLight,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(LucideIcons.home, size: 36, color: AppColors.primary),
+                      child: const Icon(LucideIcons.home, size: 34, color: AppColors.primary),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -102,7 +104,7 @@ class RoleSelectionScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
               // Option 2: SCRAP COLLECTOR
               CustomCard(
@@ -117,7 +119,7 @@ class RoleSelectionScreen extends ConsumerWidget {
                         color: AppColors.techBlueLight,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(LucideIcons.truck, size: 36, color: AppColors.techBlue),
+                      child: const Icon(LucideIcons.truck, size: 34, color: AppColors.techBlue),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -145,13 +147,58 @@ class RoleSelectionScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              const Spacer(),
+              const SizedBox(height: 16),
+
+              // Option 3: SANITATION HERO (SWEEPER / CLEANER)
+              CustomCard(
+                padding: const EdgeInsets.all(20),
+                border: Border.all(color: AppColors.sweeperAmber, width: 2),
+                onTap: () => _selectRole(context, ref, UserRole.sweeper),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: const BoxDecoration(
+                        color: AppColors.sweeperAmberLight,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(LucideIcons.sparkles, size: 34, color: AppColors.sweeperAmber),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                'I am a Sanitation Hero',
+                                style: AppTypography.titleMedium,
+                              ),
+                              const Spacer(),
+                              const Icon(LucideIcons.arrowRight, size: 20, color: AppColors.sweeperAmber),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Claim garbage spots, upload cleanup photos & earn verified Eco Points.',
+                            style: AppTypography.bodyMedium,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
               Center(
                 child: Text(
                   'You can switch roles anytime in Profile Settings.',
                   style: AppTypography.bodySmall,
                 ),
               ),
+              const SizedBox(height: 12),
             ],
           ),
         ),

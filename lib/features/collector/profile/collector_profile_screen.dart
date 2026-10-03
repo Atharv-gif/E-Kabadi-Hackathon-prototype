@@ -73,7 +73,7 @@ class CollectorProfileScreen extends ConsumerWidget {
               ),
               const SizedBox(height: AppSpacing.xl),
 
-              // ── Switch role card ──
+              // ── Switch role card 1: Citizen ──
               CustomCard(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 color: AppColors.primaryLight,
@@ -105,6 +105,43 @@ class CollectorProfileScreen extends ConsumerWidget {
                       ),
                     ),
                     const Icon(LucideIcons.arrowRight, size: 18, color: AppColors.primary),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+
+              // ── Switch role card 2: Sweeper ──
+              CustomCard(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                color: AppColors.sweeperAmberLight,
+                border: Border.all(color: AppColors.sweeperAmber, width: 1.5),
+                onTap: () async {
+                  await ref.read(authProvider.notifier).setRole(UserRole.sweeper);
+                  if (context.mounted) {
+                    context.go('/sweeper/dashboard');
+                  }
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: const BoxDecoration(color: AppColors.sweeperAmber, shape: BoxShape.circle),
+                      child: const Icon(LucideIcons.sparkles, color: AppColors.surface, size: 19),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Switch to Sanitation Hero Mode',
+                            style: AppTypography.titleSmall.copyWith(color: AppColors.sweeperAmberDark),
+                          ),
+                          Text('Clean spots, upload photos & earn Eco Points', style: AppTypography.bodySmall),
+                        ],
+                      ),
+                    ),
+                    const Icon(LucideIcons.arrowRight, size: 18, color: AppColors.sweeperAmber),
                   ],
                 ),
               ),

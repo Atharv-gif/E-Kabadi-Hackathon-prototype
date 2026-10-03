@@ -46,6 +46,18 @@ class RewardRules {
     final remaining = citizenMinBillForPoints - finalBillAmount;
     return remaining > 0 ? remaining : 0;
   }
+
+  // ── SWEEPER — "Eco Points" (same currency as citizen) ──
+
+  /// Points earned per litre of verified garbage cleaned.
+  static const double sweeperPointsPerLitre = 2.0;
+
+  /// Eco Points for a sweeper from verified cleaned volume.
+  /// 100 L → 200 pts · 200 L → 400 pts · 350 L → 700 pts.
+  static int sweeperEcoPoints(double verifiedVolumeLitres) {
+    if (verifiedVolumeLitres <= 0) return 0;
+    return (verifiedVolumeLitres * sweeperPointsPerLitre).floor();
+  }
 }
 
 /// Lightweight in-memory ledger of reward transactions.
@@ -60,11 +72,13 @@ class RewardLedger {
   // citizen +120 earned (₹1,200 bill) − 100 redeemed = 20.
   static int _citizenPoints = 20;
   static int _collectorCoins = 1215;
+  static int _sweeperPoints = 1240; // Demo starting balance
 
   static final List<void Function()> _listeners = [];
 
   static int get citizenPoints => _citizenPoints;
   static int get collectorCoins => _collectorCoins;
+  static int get sweeperPoints => _sweeperPoints;
 
   static void addListener(void Function() listener) => _listeners.add(listener);
 
@@ -116,10 +130,31 @@ class RewardLedger {
     return true;
   }
 
+  // ── Sweeper Eco Points ──
+
+  /// Awards sweeper Eco Points from verified cleaned volume.
+  static int awardSweeperPointsForCleaning(double verifiedVolumeLitres) {
+    final earned = RewardRules.sweeperEcoPoints(verifiedVolumeLitres);
+    if (earned > 0) {
+      _sweeperPoints += earned;
+      _notify();
+    }
+    return earned;
+  }
+
+  /// Attempts to redeem [cost] points for sweeper benefits.
+  static bool redeemSweeperPoints(int cost) {
+    if (cost > _sweeperPoints) return false;
+    _sweeperPoints -= cost;
+    _notify();
+    return true;
+  }
+
   /// Testing / demo reset.
-  static void reset({int citizenPoints = 20, int collectorCoins = 1215}) {
+  static void reset({int citizenPoints = 20, int collectorCoins = 1215, int sweeperPoints = 1240}) {
     _citizenPoints = citizenPoints;
     _collectorCoins = collectorCoins;
+    _sweeperPoints = sweeperPoints;
     _notify();
   }
 }

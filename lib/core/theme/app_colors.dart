@@ -13,6 +13,15 @@ class AppColors {
   static const Color techBlue = Color(0xFF0284C7);
   static const Color techBlueLight = Color(0xFFE0F2FE);
 
+  // Sweeper Accent - Warm Amber
+  static const Color sweeperAmber = Color(0xFFD97706);
+  static const Color sweeperAmberLight = Color(0xFFFEF3C7);
+  static const Color sweeperAmberDark = Color(0xFFB45309);
+  static const Color sweeperTeal = Color(0xFF0D9488);
+  static const Color sweeperTealLight = Color(0xFFCCFBF1);
+  static const Color secondary = Color(0xFF0284C7);
+  static const Color surfaceWarm = Color(0xFFFFFBEB);
+
   // Reward Accent - Energy Orange
   static const Color rewardOrange = Color(0xFFEA580C);
   static const Color rewardOrangeLight = Color(0xFFFFEDD5);

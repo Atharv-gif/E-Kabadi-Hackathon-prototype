@@ -73,6 +73,37 @@ class CollectorEcoCoinsNotifier extends StateNotifier<int> {
   }
 }
 
+/// Reactive Eco Points balance for the SWEEPER side.
+/// Sweepers earn "Eco Points" (same currency as citizens) based on
+/// verified garbage volume cleaned — 2 pts per litre.
+final sweeperEcoPointsProvider =
+    StateNotifierProvider<SweeperEcoPointsNotifier, int>((ref) {
+  return SweeperEcoPointsNotifier();
+});
+
+class SweeperEcoPointsNotifier extends StateNotifier<int> {
+  SweeperEcoPointsNotifier() : super(RewardLedger.sweeperPoints) {
+    RewardLedger.addListener(_sync);
+  }
+
+  void _sync() {
+    if (mounted) state = RewardLedger.sweeperPoints;
+  }
+
+  /// Awards Eco Points from verified cleaned volume.
+  int awardForCleanedVolume(double verifiedVolumeLitres) {
+    return RewardLedger.awardSweeperPointsForCleaning(verifiedVolumeLitres);
+  }
+
+  bool redeem(int cost) => RewardLedger.redeemSweeperPoints(cost);
+
+  @override
+  void dispose() {
+    RewardLedger.removeListener(_sync);
+    super.dispose();
+  }
+}
+
 final citizenPointHistoryProvider = FutureProvider<List<EcoPointModel>>((ref) {
   final repo = ref.watch(rewardsRepositoryProvider);
   return repo.getCitizenPointHistory();

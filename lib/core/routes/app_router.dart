@@ -32,6 +32,15 @@ import '../../features/collector/eco_coins/eco_coins_screen.dart';
 import '../../features/collector/voice/collector_voice_screen.dart';
 import '../../features/collector/profile/collector_profile_screen.dart';
 
+import '../../features/sweeper/sweeper_shell.dart';
+import '../../features/sweeper/dashboard/sweeper_dashboard_screen.dart';
+import '../../features/sweeper/tasks/sweeper_tasks_screen.dart';
+import '../../features/sweeper/tasks/task_detail_screen.dart';
+import '../../features/sweeper/tasks/cleaning_workflow_screen.dart';
+import '../../features/sweeper/tasks/task_completion_screen.dart';
+import '../../features/sweeper/rewards/sweeper_rewards_screen.dart';
+import '../../features/sweeper/profile/sweeper_profile_screen.dart';
+
 /// Smooth fade-through transition used across all routes.
 CustomTransitionPage<void> _fadePage(Widget child, GoRouterState state) {
   return CustomTransitionPage<void>(
@@ -176,6 +185,41 @@ final appRouter = GoRouter(
         GoRoute(
           path: '/collector/profile',
           pageBuilder: (context, state) => _fadePage(const CollectorProfileScreen(), state),
+        ),
+      ],
+    ),
+
+    // Sweeper Routes Shell
+    ShellRoute(
+      builder: (context, state, child) => SweeperShell(child: child),
+      routes: [
+        GoRoute(
+          path: '/sweeper/dashboard',
+          pageBuilder: (context, state) => _fadePage(const SweeperDashboardScreen(), state),
+        ),
+        GoRoute(
+          path: '/sweeper/tasks',
+          pageBuilder: (context, state) => _fadePage(const SweeperTasksScreen(), state),
+        ),
+        GoRoute(
+          path: '/sweeper/task-detail',
+          pageBuilder: (context, state) => _fadePage(const TaskDetailScreen(), state),
+        ),
+        GoRoute(
+          path: '/sweeper/cleaning-workflow',
+          pageBuilder: (context, state) => _fadePage(const CleaningWorkflowScreen(), state),
+        ),
+        GoRoute(
+          path: '/sweeper/task-completion',
+          pageBuilder: (context, state) => _fadePage(const TaskCompletionScreen(), state),
+        ),
+        GoRoute(
+          path: '/sweeper/rewards',
+          pageBuilder: (context, state) => _fadePage(const SweeperRewardsScreen(), state),
+        ),
+        GoRoute(
+          path: '/sweeper/profile',
+          pageBuilder: (context, state) => _fadePage(const SweeperProfileScreen(), state),
         ),
       ],
     ),

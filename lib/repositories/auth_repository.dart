@@ -70,6 +70,12 @@ class MockAuthRepository implements AuthRepository {
         name: 'Ramesh Kumar (Collector)',
         address: 'Service Area: Sector 62 & 63, Noida',
       );
+    } else if (role == UserRole.sweeper) {
+      _currentUser = baseUser.copyWith(
+        role: role,
+        name: 'Suresh Yadav (Sweeper)',
+        address: 'Service Area: Sector 62 & Nearby, Noida',
+      );
     } else {
       _currentUser = baseUser.copyWith(
         role: role,
