@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,13 +8,15 @@
     <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <!-- SIDEBAR NAVIGATION -->
     <aside class="sidebar">
@@ -28,7 +31,7 @@
             </div>
             <span class="brand-badge">Command</span>
         </div>
-        
+
         <ul class="sidebar-menu" id="nav-menu">
             <li class="active" data-target="dashboard-view"><i class="fa-solid fa-chart-pie"></i> Dashboard</li>
             <li data-target="citizens-view"><i class="fa-solid fa-users"></i> Citizens</li>
@@ -57,7 +60,8 @@
         <!-- TOPBAR -->
         <header class="topbar">
             <div class="topbar-left">
-                <button class="menu-toggle" id="menu-toggle-btn" title="Toggle Navigation"><i class="fa-solid fa-bars"></i></button>
+                <button class="menu-toggle" id="menu-toggle-btn" title="Toggle Navigation"><i
+                        class="fa-solid fa-bars"></i></button>
                 <div class="search-bar">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" id="global-search" placeholder="Search requests, citizens, collectors...">
@@ -72,7 +76,8 @@
 
                 <!-- Profile Badge -->
                 <div class="profile" title="Administrator Profile">
-                    <img src="https://ui-avatars.com/api/?name=Admin+Ops&background=10b981&color=fff&bold=true" alt="Admin" class="profile-avatar">
+                    <img src="https://ui-avatars.com/api/?name=Admin+Ops&background=10b981&color=fff&bold=true"
+                        alt="Admin" class="profile-avatar">
                     <div class="profile-info">
                         <span class="profile-name">Command Admin</span>
                         <span class="profile-role">Super Admin</span>
@@ -91,7 +96,8 @@
             <div class="cards">
                 <div class="card esg-card">
                     <div class="card-info">
-                        <h3>4.2 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 600;">Tons</span></h3>
+                        <h3>4.2 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 600;">Tons</span>
+                        </h3>
                         <p>Total CO₂ Offset</p>
                         <span class="card-trend"><i class="fa-solid fa-arrow-trend-up"></i> +18.4% this month</span>
                     </div>
@@ -113,7 +119,8 @@
 
                 <div class="card esg-card">
                     <div class="card-info">
-                        <h3>1,250 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 600;">Kg</span></h3>
+                        <h3>1,250 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 600;">Kg</span>
+                        </h3>
                         <p>Diverted from Landfill</p>
                         <span class="card-trend"><i class="fa-solid fa-arrow-trend-up"></i> +320 kg this week</span>
                     </div>
@@ -154,7 +161,8 @@
                     <div class="card-info">
                         <h3 id="stat-pickups">0</h3>
                         <p>Live Auto-Matching</p>
-                        <span class="card-trend" style="color: #ef4444;"><i class="fa-solid fa-satellite-dish"></i> In Dispatch</span>
+                        <span class="card-trend" style="color: #ef4444;"><i class="fa-solid fa-satellite-dish"></i> In
+                            Dispatch</span>
                     </div>
                     <div class="card-icon" style="color: #ef4444; background: var(--accent-coral-light);">
                         <i class="fa-solid fa-satellite-dish"></i>
@@ -167,23 +175,28 @@
                     <div class="chart-header">
                         <h3><i class="fa-solid fa-chart-line"></i> Real-Time Scrap Volume</h3>
                         <div style="display: flex; gap: 8px; align-items: center;">
-                            <span class="chart-chip" id="chart-total-chip"><i class="fa-solid fa-scale-balanced"></i> 1,450 Kg Total</span>
-                            <span class="chart-chip" style="background: rgba(59, 130, 246, 0.12); color: var(--accent-blue);"><i class="fa-solid fa-calendar-week"></i> Weekly</span>
+                            <span class="chart-chip" id="chart-total-chip"><i class="fa-solid fa-scale-balanced"></i>
+                                1,450 Kg Total</span>
+                            <span class="chart-chip"
+                                style="background: rgba(59, 130, 246, 0.12); color: var(--accent-blue);"><i
+                                    class="fa-solid fa-calendar-week"></i> Weekly</span>
                         </div>
                     </div>
                     <div class="chart-canvas-wrapper">
                         <canvas id="scrapChart"></canvas>
                     </div>
                 </div>
-                
+
                 <div class="table-container">
                     <div class="chart-header">
                         <h3><i class="fa-solid fa-list-check"></i> Live Dispatch Queue</h3>
                         <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-small btn-primary" onclick="simulateNewPickup()" title="Simulate incoming citizen scrap request">
+                            <button class="btn btn-small btn-primary" onclick="simulateNewPickup()"
+                                title="Simulate incoming citizen scrap request">
                                 <i class="fa-solid fa-plus"></i> Simulate Live
                             </button>
-                            <button class="btn btn-small btn-outline" onclick="exportPickupsCSV()" title="Download Dispatch Report CSV">
+                            <button class="btn btn-small btn-outline" onclick="exportPickupsCSV()"
+                                title="Download Dispatch Report CSV">
                                 <i class="fa-solid fa-file-csv"></i> CSV
                             </button>
                         </div>
@@ -272,11 +285,16 @@
 
             <!-- Filter Pills -->
             <div class="filter-bar" id="pickup-filter-bar">
-                <button class="filter-pill active" onclick="setPickupFilter('all')">All <span class="count" id="count-all">0</span></button>
-                <button class="filter-pill" onclick="setPickupFilter('matching')">Matching <span class="count" id="count-matching">0</span></button>
-                <button class="filter-pill" onclick="setPickupFilter('accepted')">Accepted <span class="count" id="count-accepted">0</span></button>
-                <button class="filter-pill" onclick="setPickupFilter('completed')">Completed <span class="count" id="count-completed">0</span></button>
-                <button class="filter-pill" onclick="setPickupFilter('unassigned')">Unassigned <span class="count" id="count-unassigned">0</span></button>
+                <button class="filter-pill active" onclick="setPickupFilter('all')">All <span class="count"
+                        id="count-all">0</span></button>
+                <button class="filter-pill" onclick="setPickupFilter('matching')">Matching <span class="count"
+                        id="count-matching">0</span></button>
+                <button class="filter-pill" onclick="setPickupFilter('accepted')">Accepted <span class="count"
+                        id="count-accepted">0</span></button>
+                <button class="filter-pill" onclick="setPickupFilter('completed')">Completed <span class="count"
+                        id="count-completed">0</span></button>
+                <button class="filter-pill" onclick="setPickupFilter('unassigned')">Unassigned <span class="count"
+                        id="count-unassigned">0</span></button>
             </div>
 
             <div class="tables-section">
@@ -329,7 +347,8 @@
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('registerCitizenModal')">&times;</span>
             <h2>Register New Citizen</h2>
-            <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 20px;">Add a household user to the E-Kabadi recycling network.</p>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 20px;">Add a household user to the
+                E-Kabadi recycling network.</p>
             <form id="citizenForm" onsubmit="submitCitizen(event)">
                 <div class="form-group">
                     <label>Full Name</label>
@@ -345,9 +364,11 @@
                 </div>
                 <div class="form-group">
                     <label>Primary Location / Sector</label>
-                    <input type="text" id="reg-cit-location" class="form-input" placeholder="e.g. Sector 14, Main Road" required>
+                    <input type="text" id="reg-cit-location" class="form-input" placeholder="e.g. Sector 14, Main Road"
+                        required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px; padding: 13px;">
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; justify-content: center; margin-top: 10px; padding: 13px;">
                     <i class="fa-solid fa-user-plus"></i> Create Citizen Account
                 </button>
             </form>
@@ -359,7 +380,8 @@
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('onboardCollectorModal')">&times;</span>
             <h2>Onboard Collector Fleet</h2>
-            <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 20px;">Verify and approve a scrap collector into the live dispatch fleet.</p>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 20px;">Verify and approve a scrap
+                collector into the live dispatch fleet.</p>
             <form id="collectorForm" onsubmit="submitCollector(event)">
                 <div class="form-group">
                     <label>Driver Full Name</label>
@@ -371,7 +393,8 @@
                 </div>
                 <div class="form-group">
                     <label>Vehicle Registration Number</label>
-                    <input type="text" id="reg-col-vehicle" class="form-input" placeholder="e.g. MH 04 AB 1234" required>
+                    <input type="text" id="reg-col-vehicle" class="form-input" placeholder="e.g. MH 04 AB 1234"
+                        required>
                 </div>
                 <div class="form-group">
                     <label>Assigned Zone</label>
@@ -383,7 +406,8 @@
                         <option value="West Zone">West Zone (Sectors 66 - 85)</option>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px; padding: 13px;">
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; justify-content: center; margin-top: 10px; padding: 13px;">
                     <i class="fa-solid fa-truck-ramp-box"></i> Approve & Add to Fleet
                 </button>
             </form>
@@ -395,20 +419,25 @@
         <div class="modal-content" style="width: 540px;">
             <span class="close-btn" onclick="closeModal('actionModal')">&times;</span>
             <h2 id="modal-title">Pickup Dispatch Inspector</h2>
-            <p style="color: var(--text-muted); font-size: 0.88rem;">Live sensor telemetry and AI model categorization.</p>
-            
+            <p style="color: var(--text-muted); font-size: 0.88rem;">Live sensor telemetry and AI model categorization.
+            </p>
+
             <div class="modal-grid">
                 <div class="modal-info" style="font-size: 0.92rem; line-height: 1.8;">
                     <p><strong>Citizen:</strong> <span id="modal-citizen" style="color: var(--primary);"></span></p>
                     <p><strong>Address:</strong> Sector 14, Main Road, City</p>
                     <p><strong>Reported Type:</strong> <span id="modal-type"></span></p>
-                    <p><strong>Current Match:</strong> <span id="modal-collector-status" style="font-weight: 700;"></span></p>
+                    <p><strong>Current Match:</strong> <span id="modal-collector-status"
+                            style="font-weight: 700;"></span></p>
                 </div>
                 <div class="modal-ai-box">
                     <h4><i class="fa-solid fa-robot" style="color: var(--primary);"></i> AI Vision Classification</h4>
-                    <p><strong>Detected Category:</strong> <span id="modal-ai-type" style="color: var(--primary); font-weight: 700;"></span></p>
-                    <p><strong>Model Confidence:</strong> <span id="modal-ai-conf" style="font-weight: 700;">94%</span></p>
-                    <p><strong>Validation:</strong> <span class="badge completed" style="padding: 2px 8px; font-size: 0.7rem;">Verified</span></p>
+                    <p><strong>Detected Category:</strong> <span id="modal-ai-type"
+                            style="color: var(--primary); font-weight: 700;"></span></p>
+                    <p><strong>Model Confidence:</strong> <span id="modal-ai-conf" style="font-weight: 700;">94%</span>
+                    </p>
+                    <p><strong>Validation:</strong> <span class="badge completed"
+                            style="padding: 2px 8px; font-size: 0.7rem;">Verified</span></p>
                 </div>
             </div>
 
@@ -435,16 +464,25 @@
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('citizenDetailsModal')">&times;</span>
             <h2>Citizen Profile</h2>
-            <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 16px;">Comprehensive account & loyalty balance details.</p>
-            <div style="line-height: 2; font-size: 0.95rem; background: var(--bg-surface-subtle); padding: 18px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
-                <p><i class="fa-solid fa-user" style="color: var(--primary); width: 25px;"></i> <strong>Name:</strong> <span id="detail-cit-name"></span></p>
-                <p><i class="fa-solid fa-id-badge" style="color: var(--primary); width: 25px;"></i> <strong>User ID:</strong> <span id="detail-cit-id"></span></p>
-                <p><i class="fa-solid fa-phone" style="color: var(--primary); width: 25px;"></i> <strong>Phone:</strong> <span id="detail-cit-phone"></span></p>
-                <p><i class="fa-solid fa-envelope" style="color: var(--primary); width: 25px;"></i> <strong>Email:</strong> <span id="detail-cit-email"></span></p>
-                <p><i class="fa-solid fa-location-dot" style="color: var(--primary); width: 25px;"></i> <strong>Location:</strong> <span id="detail-cit-location"></span></p>
-                <p><i class="fa-solid fa-coins" style="color: #f59e0b; width: 25px;"></i> <strong>Eco Points:</strong> <span id="detail-cit-coins" style="font-weight: 800; color: #f59e0b;"></span></p>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 16px;">Comprehensive account &
+                loyalty balance details.</p>
+            <div
+                style="line-height: 2; font-size: 0.95rem; background: var(--bg-surface-subtle); padding: 18px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+                <p><i class="fa-solid fa-user" style="color: var(--primary); width: 25px;"></i> <strong>Name:</strong>
+                    <span id="detail-cit-name"></span></p>
+                <p><i class="fa-solid fa-id-badge" style="color: var(--primary); width: 25px;"></i> <strong>User
+                        ID:</strong> <span id="detail-cit-id"></span></p>
+                <p><i class="fa-solid fa-phone" style="color: var(--primary); width: 25px;"></i> <strong>Phone:</strong>
+                    <span id="detail-cit-phone"></span></p>
+                <p><i class="fa-solid fa-envelope" style="color: var(--primary); width: 25px;"></i>
+                    <strong>Email:</strong> <span id="detail-cit-email"></span></p>
+                <p><i class="fa-solid fa-location-dot" style="color: var(--primary); width: 25px;"></i>
+                    <strong>Location:</strong> <span id="detail-cit-location"></span></p>
+                <p><i class="fa-solid fa-coins" style="color: #f59e0b; width: 25px;"></i> <strong>Eco Points:</strong>
+                    <span id="detail-cit-coins" style="font-weight: 800; color: #f59e0b;"></span></p>
             </div>
-            <button class="btn btn-secondary" style="width: 100%; justify-content: center; margin-top: 20px;" onclick="closeModal('citizenDetailsModal')">Close Profile</button>
+            <button class="btn btn-secondary" style="width: 100%; justify-content: center; margin-top: 20px;"
+                onclick="closeModal('citizenDetailsModal')">Close Profile</button>
         </div>
     </div>
 
@@ -453,19 +491,28 @@
         <div class="modal-content" style="width: 440px;">
             <span class="close-btn" onclick="closeModal('citizenModal')">&times;</span>
             <h2>Manage Citizen Account</h2>
-            <div style="margin: 16px 0; background: var(--bg-surface-subtle); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-                <p style="margin-bottom: 6px;"><strong>Name:</strong> <span id="manage-cit-name" style="color: var(--primary); font-weight: 700;"></span></p>
+            <div
+                style="margin: 16px 0; background: var(--bg-surface-subtle); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                <p style="margin-bottom: 6px;"><strong>Name:</strong> <span id="manage-cit-name"
+                        style="color: var(--primary); font-weight: 700;"></span></p>
                 <p style="margin-bottom: 6px;"><strong>ID:</strong> <span id="manage-cit-id"></span></p>
-                <p><strong>Eco Points:</strong> <span id="manage-cit-coins" style="color: #f59e0b; font-weight: 800; font-size: 1.15rem;"></span> <i class="fa-solid fa-award" style="color: #f59e0b;"></i></p>
+                <p><strong>Eco Points:</strong> <span id="manage-cit-coins"
+                        style="color: #f59e0b; font-weight: 800; font-size: 1.15rem;"></span> <i
+                        class="fa-solid fa-award" style="color: #f59e0b;"></i></p>
             </div>
-            
-            <h4 style="margin-bottom: 10px; font-size: 0.95rem; color: var(--text-primary);"><i class="fa-solid fa-award" style="color: #f59e0b;"></i> Adjust Eco Points Balance</h4>
+
+            <h4 style="margin-bottom: 10px; font-size: 0.95rem; color: var(--text-primary);"><i
+                    class="fa-solid fa-award" style="color: #f59e0b;"></i> Adjust Eco Points Balance</h4>
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                 <input type="number" id="coin-amount" class="form-input" placeholder="Points..." style="width: 130px;">
-                <button class="btn btn-primary" onclick="modifyCoins('add')"><i class="fa-solid fa-plus"></i> Reward</button>
-                <button class="btn btn-secondary" onclick="modifyCoins('deduct')"><i class="fa-solid fa-minus"></i> Deduct</button>
+                <button class="btn btn-primary" onclick="modifyCoins('add')"><i class="fa-solid fa-plus"></i>
+                    Reward</button>
+                <button class="btn btn-secondary" onclick="modifyCoins('deduct')"><i class="fa-solid fa-minus"></i>
+                    Deduct</button>
             </div>
-            <button class="btn btn-small" style="width: 100%; justify-content: center; padding: 12px; background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);" onclick="deleteUser('citizens')">
+            <button class="btn btn-small"
+                style="width: 100%; justify-content: center; padding: 12px; background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);"
+                onclick="deleteUser('citizens')">
                 <i class="fa-solid fa-ban"></i> Suspend Citizen Account
             </button>
         </div>
@@ -476,16 +523,21 @@
         <div class="modal-content" style="width: 440px;">
             <span class="close-btn" onclick="closeModal('collectorModal')">&times;</span>
             <h2>Manage Collector</h2>
-            <div style="margin: 16px 0; background: var(--bg-surface-subtle); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-                <p style="margin-bottom: 6px;"><strong>Name:</strong> <span id="col-name" style="color: var(--primary); font-weight: 700;"></span></p>
+            <div
+                style="margin: 16px 0; background: var(--bg-surface-subtle); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                <p style="margin-bottom: 6px;"><strong>Name:</strong> <span id="col-name"
+                        style="color: var(--primary); font-weight: 700;"></span></p>
                 <p style="margin-bottom: 6px;"><strong>ID:</strong> <span id="col-id"></span></p>
                 <p><strong>Fleet Status:</strong> <span id="col-status" class="badge"></span></p>
             </div>
             <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
-                <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="toggleCollectorStatus()">
+                <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;"
+                    onclick="toggleCollectorStatus()">
                     <i class="fa-solid fa-power-off"></i> Toggle Status (Active / Offline)
                 </button>
-                <button class="btn btn-small" style="width: 100%; justify-content: center; padding: 12px; background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);" onclick="deleteUser('collectors')">
+                <button class="btn btn-small"
+                    style="width: 100%; justify-content: center; padding: 12px; background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);"
+                    onclick="deleteUser('collectors')">
                     <i class="fa-solid fa-trash"></i> Remove from Collector Fleet
                 </button>
             </div>
@@ -500,4 +552,5 @@
 
     <script src="js/script.js"></script>
 </body>
+
 </html>

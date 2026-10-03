@@ -9,10 +9,10 @@ document.addEventListener("DOMContentLoaded", () => {
     function applyTheme(theme) {
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('ekabadi_admin_theme', theme);
-        
+
         if (themeToggleBtn) {
-            themeToggleBtn.innerHTML = theme === 'dark' 
-                ? '<i class="fa-solid fa-sun" style="color: #f59e0b;"></i>' 
+            themeToggleBtn.innerHTML = theme === 'dark'
+                ? '<i class="fa-solid fa-sun" style="color: #f59e0b;"></i>'
                 : '<i class="fa-solid fa-moon"></i>';
             themeToggleBtn.setAttribute('title', `Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`);
         }
@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    window.resetDemoData = function() {
+    window.resetDemoData = function () {
         if (confirm("Reset prototype back to initial default demo data?")) {
             data = JSON.parse(JSON.stringify(defaultData));
             saveData();
@@ -265,7 +265,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 5. RENDERERS & DATA VISUALIZATION
     // =========================================================================
     function getStatusBadgeClass(status) {
-        switch(status.toLowerCase()) {
+        switch (status.toLowerCase()) {
             case 'accepted': return 'completed';
             case 'matching': return 'pending';
             case 'completed': return 'active';
@@ -282,10 +282,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const dashTbody = document.getElementById('dashboard-table-body');
         if (!dashTbody) return;
         dashTbody.innerHTML = '';
-        
-        data.pickups.slice(0, 5).forEach((p, idx) => { 
+
+        data.pickups.slice(0, 5).forEach((p, idx) => {
             const isMatching = p.status === 'Matching';
-            const collectorDisplay = isMatching 
+            const collectorDisplay = isMatching
                 ? `<span style="color: var(--accent-amber); font-weight: 600;"><i class="fa-solid fa-spinner fa-spin" style="margin-right: 5px;"></i>${p.collector}</span>`
                 : `<span style="font-weight: 600; color: var(--text-primary);"><i class="fa-solid fa-truck" style="margin-right: 6px; color: var(--primary); font-size: 0.85rem;"></i>${p.collector}</span>`;
 
@@ -319,7 +319,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    window.setPickupFilter = function(filter) {
+    window.setPickupFilter = function (filter) {
         currentPickupFilter = filter;
         document.querySelectorAll('#pickup-filter-bar .filter-pill').forEach(btn => {
             btn.classList.remove('active');
@@ -344,10 +344,10 @@ document.addEventListener("DOMContentLoaded", () => {
             tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 32px; color: var(--text-muted); font-weight: 600;">No pickup requests found under '${currentPickupFilter}'.</td></tr>`;
             return;
         }
-        
+
         filtered.forEach((p, idx) => {
             const isMatching = p.status === 'Matching';
-            const collectorDisplay = isMatching 
+            const collectorDisplay = isMatching
                 ? `<span style="color: var(--accent-amber); font-weight: 600;"><i class="fa-solid fa-spinner fa-spin" style="margin-right: 5px;"></i>${p.collector}</span>`
                 : `<span style="font-weight: 600; color: var(--text-primary);"><i class="fa-solid fa-truck" style="margin-right: 6px; color: var(--primary); font-size: 0.85rem;"></i>${p.collector}</span>`;
 
@@ -375,10 +375,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const tbody = document.getElementById(elementId);
         if (!tbody) return;
         tbody.innerHTML = '';
-        
+
         data[type].forEach(u => {
             const initials = getInitials(u.name);
-            
+
             let userCell = `
                 <div class="user-pill">
                     <div class="user-avatar-initials">${initials}</div>
@@ -429,7 +429,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const tbody = document.getElementById('rates-table-body');
         if (!tbody) return;
         tbody.innerHTML = '';
-        
+
         data.rates.forEach((r, index) => {
             let trendIcon = r.trendType === 'up' ? 'fa-arrow-up' : (r.trendType === 'down' ? 'fa-arrow-down' : 'fa-minus');
             tbody.innerHTML += `
@@ -470,7 +470,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // =========================================================================
     // 6. SIMULATE LIVE INCOMING PICKUP REQUEST
     // =========================================================================
-    window.simulateNewPickup = function() {
+    window.simulateNewPickup = function () {
         const sampleCitizens = [
             { name: "Ananya Sharma", location: "Sector 62, Indirapuram" },
             { name: "Rohan Varma", location: "Sector 18, Block B" },
@@ -523,7 +523,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // =========================================================================
     // 7. EXPORT PICKUPS TO CSV
     // =========================================================================
-    window.exportPickupsCSV = function() {
+    window.exportPickupsCSV = function () {
         if (!data.pickups || data.pickups.length === 0) {
             return showToast("No pickups data available to export.");
         }
@@ -575,68 +575,68 @@ document.addEventListener("DOMContentLoaded", () => {
     // =========================================================================
     // 9. REGISTRATION FORM ACTIONS
     // =========================================================================
-    window.openModalById = function(modalId) {
+    window.openModalById = function (modalId) {
         const modal = document.getElementById(modalId);
         if (modal) modal.style.display = 'block';
     };
 
-    window.submitCitizen = function(e) {
+    window.submitCitizen = function (e) {
         e.preventDefault();
-        
+
         const name = document.getElementById('reg-cit-name').value;
         const phone = document.getElementById('reg-cit-phone').value;
         const email = document.getElementById('reg-cit-email').value;
         const location = document.getElementById('reg-cit-location').value;
-        
+
         const newId = `C-00${data.citizens.length + 1}`;
-        data.citizens.push({ 
-            id: newId, 
-            name: name, 
-            location: location, 
-            coins: 0, 
-            phone: phone, 
-            email: email 
+        data.citizens.push({
+            id: newId,
+            name: name,
+            location: location,
+            coins: 0,
+            phone: phone,
+            email: email
         });
-        
+
         saveData();
         closeModal('registerCitizenModal');
         document.getElementById('citizenForm').reset();
         renderDashboard();
         renderUsers('citizens', 'citizens-table-body');
-        
+
         showToast(`Success! ${name} registered successfully as ${newId}.`);
     };
 
-    window.submitCollector = function(e) {
+    window.submitCollector = function (e) {
         e.preventDefault();
-        
+
         const name = document.getElementById('reg-col-name').value;
         const phone = document.getElementById('reg-col-phone').value;
         const vehicle = document.getElementById('reg-col-vehicle').value;
-        
+
         const newId = `K-10${data.collectors.length + 1}`;
         data.collectors.push({ id: newId, name: name, vehicle: vehicle, status: "Active" });
-        
+
         saveData();
         closeModal('onboardCollectorModal');
         document.getElementById('collectorForm').reset();
         renderDashboard();
         renderUsers('collectors', 'collectors-table-body');
-        
+
         showToast(`Success! Collector ${name} onboarded as ${newId}.`);
     };
 
     // =========================================================================
     // 10. RATE CARD ACTIONS
     // =========================================================================
-    window.updateRate = function(index) {
+    window.updateRate = function (index) {
         const newVal = document.getElementById(`rate-input-${index}`).value;
         data.rates[index].price = parseFloat(newVal);
         saveData();
         showToast(`${data.rates[index].material} rate updated locally to ₹${newVal}/Kg`);
     };
 
-    window.syncRates = function() {
+    window.syncRates = function () {
         data.rates.forEach((r, i) => {
             const newVal = document.getElementById(`rate-input-${i}`).value;
             r.price = parseFloat(newVal);
@@ -648,9 +648,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // =========================================================================
     // 11. USER MANAGEMENT & DETAILS ACTIONS
     // =========================================================================
-    window.openCitizenDetails = function(id) {
+    window.openCitizenDetails = function (id) {
         const user = data.citizens.find(u => u.id === id);
-        if(!user) return;
+        if (!user) return;
 
         document.getElementById('detail-cit-name').innerText = user.name;
         document.getElementById('detail-cit-id').innerText = user.id;
@@ -662,17 +662,17 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('citizenDetailsModal').style.display = 'block';
     };
 
-    window.openUserModal = function(type, id) {
+    window.openUserModal = function (type, id) {
         currentUserId = id;
         currentUserType = type;
         const user = data[type].find(u => u.id === id);
         if (!user) return;
-        
+
         if (type === 'citizens') {
             document.getElementById('manage-cit-name').innerText = user.name;
             document.getElementById('manage-cit-id').innerText = user.id;
             document.getElementById('manage-cit-coins').innerText = user.coins;
-            document.getElementById('coin-amount').value = ""; 
+            document.getElementById('coin-amount').value = "";
             document.getElementById('citizenModal').style.display = 'block';
         } else {
             document.getElementById('col-name').innerText = user.name;
@@ -683,16 +683,16 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    window.modifyCoins = function(action) {
+    window.modifyCoins = function (action) {
         const amount = parseInt(document.getElementById('coin-amount').value) || 0;
-        if(amount <= 0) return showToast("Please enter a valid positive points amount.");
-        
+        if (amount <= 0) return showToast("Please enter a valid positive points amount.");
+
         const user = data.citizens.find(u => u.id === currentUserId);
         if (!user) return;
 
-        if(action === 'add') user.coins += amount;
-        else if(action === 'deduct') user.coins = Math.max(0, user.coins - amount);
-        
+        if (action === 'add') user.coins += amount;
+        else if (action === 'deduct') user.coins = Math.max(0, user.coins - amount);
+
         saveData();
         document.getElementById('manage-cit-coins').innerText = user.coins;
         document.getElementById('coin-amount').value = '';
@@ -700,29 +700,29 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast(`Eco Points successfully ${action === 'add' ? 'added to' : 'deducted from'} ${user.name}`);
     };
 
-    window.toggleCollectorStatus = function() {
+    window.toggleCollectorStatus = function () {
         const user = data.collectors.find(u => u.id === currentUserId);
         if (!user) return;
 
         user.status = user.status === 'Active' ? 'Offline' : 'Active';
         saveData();
-        
+
         document.getElementById('col-status').innerText = user.status;
         document.getElementById('col-status').className = `badge ${user.status === 'Active' ? 'completed' : 'offline'}`;
-        
-        renderDashboard(); 
+
+        renderDashboard();
         renderUsers('collectors', 'collectors-table-body');
         showToast(`${user.name} status updated to ${user.status}`);
     };
 
-    window.deleteUser = function(type) {
+    window.deleteUser = function (type) {
         const userIndex = data[type].findIndex(u => u.id === currentUserId);
         if (userIndex === -1) return;
 
         const name = data[type][userIndex].name;
-        data[type].splice(userIndex, 1); 
+        data[type].splice(userIndex, 1);
         saveData();
-        
+
         renderDashboard();
         renderUsers(type, type + '-table-body');
         closeModal(type === 'citizens' ? 'citizenModal' : 'collectorModal');
@@ -732,60 +732,60 @@ document.addEventListener("DOMContentLoaded", () => {
     // =========================================================================
     // 12. GENERAL MODAL & TOAST HANDLERS
     // =========================================================================
-    window.openPickupModal = function(id) {
+    window.openPickupModal = function (id) {
         currentPickupId = id;
         const pickup = data.pickups.find(p => p.id === id);
         if (!pickup) return;
-        
+
         document.getElementById('modal-title').innerText = `Inspect Request ${pickup.id}`;
         document.getElementById('modal-citizen').innerText = pickup.citizen;
         document.getElementById('modal-type').innerText = pickup.type;
         document.getElementById('modal-ai-type').innerText = pickup.type;
         document.getElementById('modal-ai-conf').innerText = pickup.conf || '94%';
         document.getElementById('modal-collector-status').innerText = pickup.collector;
-        
+
         document.getElementById('actionModal').style.display = "block";
     };
 
-    window.closeModal = function(modalId) {
+    window.closeModal = function (modalId) {
         const modal = document.getElementById(modalId);
         if (modal) modal.style.display = "none";
     };
 
-    window.onclick = (e) => { 
+    window.onclick = (e) => {
         if (e.target.classList.contains('modal')) {
             e.target.style.display = "none";
         }
     };
 
-    window.assignCollector = function() {
+    window.assignCollector = function () {
         const select = document.getElementById('collector-select');
-        if(!select.value) {
+        if (!select.value) {
             showToast("Please select a collector from the dropdown.");
             return;
         }
 
         const pickup = data.pickups.find(p => p.id === currentPickupId);
-        if(pickup) {
+        if (pickup) {
             pickup.collector = select.value;
-            pickup.status = "Accepted"; 
+            pickup.status = "Accepted";
             saveData();
         }
-        
+
         closeModal('actionModal');
-        select.value = ""; 
+        select.value = "";
         renderDashboard();
         renderPickups();
         showToast(`Admin Override: Reassigned request to ${pickup.collector}`);
     };
 
-    window.showToast = function(message) {
+    window.showToast = function (message) {
         const toast = document.getElementById("toast");
         const toastText = document.getElementById("toast-text") || toast;
         toastText.innerText = message;
         toast.className = "toast show";
-        setTimeout(() => { 
-            toast.className = toast.className.replace("show", ""); 
+        setTimeout(() => {
+            toast.className = toast.className.replace("show", "");
         }, 3000);
     };
 });
