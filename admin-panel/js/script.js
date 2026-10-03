@@ -24,6 +24,10 @@ document.addEventListener("DOMContentLoaded", () => {
             window.scrapChartInstance.options.scales.y.grid.color = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
             window.scrapChartInstance.options.scales.x.ticks.color = isDark ? '#94a3b8' : '#64748b';
             window.scrapChartInstance.options.scales.y.ticks.color = isDark ? '#94a3b8' : '#64748b';
+            if (window.scrapChartInstance.options.plugins && window.scrapChartInstance.options.plugins.tooltip) {
+                window.scrapChartInstance.options.plugins.tooltip.backgroundColor = isDark ? '#1f2937' : '#0f172a';
+                window.scrapChartInstance.options.plugins.tooltip.borderColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+            }
             window.scrapChartInstance.update();
         }
     }
@@ -65,7 +69,8 @@ document.addEventListener("DOMContentLoaded", () => {
             { material: "Iron / Steel (Metal)", price: 28, trend: "-2.0%", trendType: "down" },
             { material: "E-Waste (Mixed)", price: 45, trend: "+5.2%", trendType: "up" },
             { material: "Cardboard Cartons", price: 12, trend: "+0.5%", trendType: "up" }
-        ]
+        ],
+        weeklyScrap: [120, 190, 150, 220, 180, 310, 280]
     };
 
     let data;
@@ -74,6 +79,10 @@ document.addEventListener("DOMContentLoaded", () => {
         data = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(defaultData));
     } catch (e) {
         data = JSON.parse(JSON.stringify(defaultData));
+    }
+
+    if (!data.weeklyScrap || !Array.isArray(data.weeklyScrap) || data.weeklyScrap.length === 0) {
+        data.weeklyScrap = [120, 190, 150, 220, 180, 310, 280];
     }
 
     function saveData() {
@@ -89,6 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
             data = JSON.parse(JSON.stringify(defaultData));
             saveData();
             renderAll();
+            initScrapChart();
             showToast("Prototype demo data successfully reset!");
         }
     };
@@ -124,6 +134,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 targetElem.classList.remove('hidden');
             }
             document.querySelector(".sidebar").classList.remove("active");
+
+            // Chart tab switch fix: resize and update chart when switching back to dashboard
+            if (targetId === 'dashboard-view' && window.scrapChartInstance) {
+                setTimeout(() => {
+                    window.scrapChartInstance.resize();
+                    window.scrapChartInstance.update();
+                }, 50);
+            }
         });
     });
 
@@ -135,16 +153,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // =========================================================================
-    // 4. CHART INITIALIZATION
+    // 4. CHART INITIALIZATION & REAL-TIME TRACKING
     // =========================================================================
-    const chartCanvas = document.getElementById('scrapChart');
-    if (chartCanvas) {
+    function updateChartTotalBadge() {
+        const totalChip = document.getElementById('chart-total-chip');
+        if (totalChip && data.weeklyScrap) {
+            const totalKg = data.weeklyScrap.reduce((acc, curr) => acc + curr, 0);
+            totalChip.innerHTML = `<i class="fa-solid fa-scale-balanced"></i> ${totalKg.toLocaleString()} Kg Total`;
+        }
+    }
+
+    function initScrapChart() {
+        const chartCanvas = document.getElementById('scrapChart');
+        if (!chartCanvas) return;
+
+        if (window.scrapChartInstance) {
+            window.scrapChartInstance.destroy();
+        }
+
         const ctx = chartCanvas.getContext('2d');
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
-        const gradient = ctx.createLinearGradient(0, 0, 0, 240);
-        gradient.addColorStop(0, 'rgba(16, 185, 129, 0.35)');
-        gradient.addColorStop(0.7, 'rgba(16, 185, 129, 0.08)');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+        gradient.addColorStop(0, 'rgba(16, 185, 129, 0.40)');
+        gradient.addColorStop(0.65, 'rgba(16, 185, 129, 0.08)');
         gradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
 
         window.scrapChartInstance = new Chart(ctx, {
@@ -153,7 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                 datasets: [{
                     label: 'Scrap Collected (Kg)',
-                    data: [120, 190, 150, 220, 180, 310, 280],
+                    data: [...data.weeklyScrap],
                     borderColor: '#10b981',
                     borderWidth: 3,
                     backgroundColor: gradient,
@@ -172,12 +204,18 @@ document.addEventListener("DOMContentLoaded", () => {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
                         backgroundColor: isDark ? '#1f2937' : '#0f172a',
                         titleColor: '#ffffff',
                         bodyColor: '#ffffff',
+                        borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                        borderWidth: 1,
                         padding: 12,
                         cornerRadius: 8,
                         boxPadding: 6,
@@ -211,7 +249,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
         });
+
+        updateChartTotalBadge();
     }
+
+    initScrapChart();
+
+    window.addEventListener('resize', () => {
+        if (window.scrapChartInstance) {
+            window.scrapChartInstance.resize();
+        }
+    });
 
     // =========================================================================
     // 5. RENDERERS & DATA VISUALIZATION
@@ -454,10 +502,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Prepend to array
         data.pickups.unshift(newPickup);
+
+        // Dynamically increment real-time scrap volume on the chart for today
+        const simulatedWeight = Math.floor(12 + Math.random() * 24); // 12-35 kg
+        if (data.weeklyScrap && data.weeklyScrap.length > 0) {
+            data.weeklyScrap[data.weeklyScrap.length - 1] += simulatedWeight;
+            if (window.scrapChartInstance) {
+                window.scrapChartInstance.data.datasets[0].data = [...data.weeklyScrap];
+                window.scrapChartInstance.update('active');
+                updateChartTotalBadge();
+            }
+        }
+
         saveData();
         renderAll();
 
-        showToast(`🔔 LIVE DISPATCH: New pickup ${newId} booked by ${randomCit.name}!`);
+        showToast(`🔔 LIVE DISPATCH: New pickup ${newId} booked (+${simulatedWeight} Kg scrap logged)!`);
     };
 
     // =========================================================================
